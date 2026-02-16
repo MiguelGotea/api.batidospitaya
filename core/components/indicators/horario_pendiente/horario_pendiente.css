@@ -1,0 +1,20 @@
+/* =====================================================
+   ESTILOS ESPECÍFICOS: Horario Pendiente
+   ===================================================== */
+
+/* Estilos específicos para el indicador de horario */
+.horario-indicador {
+    /* Estilos específicos si son necesarios */
+}
+
+.horario-indicador.completo {
+    background-color: #28a745;
+}
+
+.horario-indicador.pendiente {
+    background-color: #ffc107;
+}
+
+.horario-indicador.vencido {
+    background-color: #dc3545;
+}

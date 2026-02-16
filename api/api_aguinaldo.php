@@ -5,6 +5,9 @@
  * Ubicación: public_html/api/api_aguinaldo.php
  */
 
+// Usar conexión centralizada (ya incluye timezone America/Managua)
+require_once __DIR__ . '/../core/database/conexion.php';
+
 // Headers de seguridad
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
@@ -18,12 +21,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // === CONFIGURACIÓN ===
-define('DB_HOST', 'localhost');
-define('DB_PORT', '3306');
-define('DB_NAME', 'u839374897_erp');
-define('DB_USER', 'u839374897_erp');
-define('DB_PASS', 'ERpPitHay2025$');
-
 // Token de seguridad (debe coincidir con el del módulo VBA)
 define('API_TOKEN', 'a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2');
 
@@ -35,27 +32,30 @@ define('LOG_FILE', __DIR__ . '/logs/api_aguinaldo.log');
 
 // === FUNCIONES AUXILIARES ===
 
-function logMessage($message, $type = 'INFO') {
+function logMessage($message, $type = 'INFO')
+{
     $timestamp = date('Y-m-d H:i:s');
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
     $logEntry = "[$timestamp] [$type] [IP: $ip] $message" . PHP_EOL;
-    
+
     // Crear carpeta logs si no existe
     $logDir = dirname(LOG_FILE);
     if (!file_exists($logDir)) {
         mkdir($logDir, 0755, true);
     }
-    
+
     file_put_contents(LOG_FILE, $logEntry, FILE_APPEND);
 }
 
-function sendResponse($data, $httpCode = 200) {
+function sendResponse($data, $httpCode = 200)
+{
     http_response_code($httpCode);
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
 }
 
-function sendError($message, $httpCode = 400) {
+function sendError($message, $httpCode = 400)
+{
     logMessage($message, 'ERROR');
     sendResponse(['error' => $message], $httpCode);
 }
@@ -92,21 +92,10 @@ if (!is_array($datos) || empty($datos)) {
 logMessage('Datos JSON recibidos correctamente. Total de boletas: ' . count($datos));
 
 // === CONEXIÓN A BASE DE DATOS ===
-try {
-    $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-    $opciones = [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
-    ];
-    
-    $pdo = new PDO($dsn, DB_USER, DB_PASS, $opciones);
-    logMessage('Conexión a base de datos exitosa');
-    
-} catch (PDOException $e) {
-    sendError('Error de conexión: ' . $e->getMessage(), 500);
-}
+// Usar conexión global de conexion.php
+global $conn;
+$pdo = $conn;
+logMessage('Usando conexión centralizada de base de datos');
 
 // === PREPARAR CONSULTA SQL ===
 $sql = "INSERT INTO BoletaAguinaldo (
@@ -148,14 +137,14 @@ $sql = "INSERT INTO BoletaAguinaldo (
 
 try {
     $stmt = $pdo->prepare($sql);
-    
+
     // === PROCESAR CADA BOLETA ===
     $pdo->beginTransaction();
-    
+
     $insertados = 0;
     $actualizados = 0;
     $errores = [];
-    
+
     foreach ($datos as $index => $boleta) {
         try {
             // Validar campos requeridos
@@ -165,16 +154,16 @@ try {
                     throw new Exception("Campo requerido '$campo' faltante o vacío en boleta #$index");
                 }
             }
-            
+
             // Validar que cod_operario y cod_contrato sean números válidos
             if (!is_numeric($boleta['cod_operario']) || intval($boleta['cod_operario']) <= 0) {
                 throw new Exception("cod_operario debe ser un número válido mayor a 0 en boleta #$index");
             }
-            
+
             if (!is_numeric($boleta['cod_contrato']) || intval($boleta['cod_contrato']) <= 0) {
                 throw new Exception("cod_contrato debe ser un número válido mayor a 0 en boleta #$index");
             }
-            
+
             // Ejecutar INSERT/UPDATE
             $resultado = $stmt->execute([
                 ':cod_operario' => intval($boleta['cod_operario']),
@@ -189,7 +178,7 @@ try {
                 ':fecha_emision' => $boleta['fecha_emision'] ?? date('Y-m-d'),
                 ':registrado_por' => REGISTRADO_POR
             ]);
-            
+
             if ($resultado) {
                 // Verificar si fue inserción o actualización
                 // Si rowCount es 1, fue INSERT; si es 2, fue UPDATE
@@ -200,23 +189,23 @@ try {
                     $actualizados++;
                 }
             }
-            
+
         } catch (Exception $e) {
             $errores[] = "Boleta #$index: " . $e->getMessage();
             logMessage("Error en boleta #$index: " . $e->getMessage(), 'WARNING');
         }
     }
-    
+
     // Confirmar transacción
     $pdo->commit();
-    
+
     $mensaje = "Procesamiento completado. Insertados: $insertados, Actualizados: $actualizados";
     if (!empty($errores)) {
         $mensaje .= ". Errores: " . count($errores);
     }
-    
+
     logMessage($mensaje, 'SUCCESS');
-    
+
     // Respuesta exitosa
     sendResponse([
         'success' => true,
@@ -226,7 +215,7 @@ try {
         'errores' => $errores,
         'timestamp' => date('Y-m-d H:i:s')
     ]);
-    
+
 } catch (PDOException $e) {
     $pdo->rollBack();
     sendError('Error en base de datos: ' . $e->getMessage(), 500);

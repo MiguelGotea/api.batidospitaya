@@ -1,10 +1,8 @@
 <?php
+// Usar conexión centralizada
+require_once __DIR__ . '/../core/database/conexion.php';
+
 // === CONFIGURACIÓN ===
-define('DB_HOST', 'localhost');
-define('DB_PORT', '3306');
-define('DB_NAME', 'u839374897_erp');
-define('DB_USER', 'u839374897_erp');
-define('DB_PASS', 'ERpPitHay2025$');
 define('API_TOKEN', 'a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2');
 define('LOG_FILE', __DIR__ . '/logs/marcaciones_hoy.log');
 
@@ -27,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 // Función para registrar logs
-function logMessage($message) {
+function logMessage($message)
+{
     if (!file_exists(dirname(LOG_FILE))) {
         mkdir(dirname(LOG_FILE), 0777, true);
     }
@@ -37,10 +36,11 @@ function logMessage($message) {
 }
 
 // Verificar token de seguridad
-function verifyToken() {
+function verifyToken()
+{
     $headers = getallheaders();
     $token = '';
-    
+
     // Buscar token en headers
     if (isset($headers['Authorization'])) {
         $token = str_replace('Bearer ', '', $headers['Authorization']);
@@ -49,17 +49,18 @@ function verifyToken() {
     } elseif (isset($_POST['token'])) {
         $token = $_POST['token'];
     }
-    
+
     if ($token !== API_TOKEN) {
         logMessage("ERROR: Token inválido recibido: " . substr($token, 0, 10) . "...");
         return false;
     }
-    
+
     return true;
 }
 
 // Función principal
-function getMarcacionesHoy() {
+function getMarcacionesHoy()
+{
     try {
         // Verificar token
         if (!verifyToken()) {
@@ -70,11 +71,11 @@ function getMarcacionesHoy() {
             ]);
             return;
         }
-        
+
         // Obtener parámetros
         $sucursal_codigo = isset($_GET['sucursal']) ? $_GET['sucursal'] : null;
         $fecha = isset($_GET['fecha']) ? $_GET['fecha'] : date('Y-m-d');
-        
+
         // Validar parámetro sucursal
         if (!$sucursal_codigo || !is_numeric($sucursal_codigo)) {
             http_response_code(400);
@@ -85,17 +86,11 @@ function getMarcacionesHoy() {
             logMessage("ERROR: Parámetro sucursal inválido: $sucursal_codigo");
             return;
         }
-        
-        // Conectar a la base de datos
-        $dsn = "mysql:host=" . DB_HOST . ";port=" . DB_PORT . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $options = [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false,
-        ];
-        
-        $pdo = new PDO($dsn, DB_USER, DB_PASS, $options);
-        
+
+        // Usar conexión global de conexion.php
+        global $conn;
+        $pdo = $conn;
+
         // Consulta SQL para obtener marcaciones del día actual
         $sql = "
             SELECT 
@@ -109,18 +104,18 @@ function getMarcacionesHoy() {
                 AND sucursal_codigo = :sucursal_codigo
             ORDER BY CodOperario, hora_ingreso
         ";
-        
+
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':fecha' => $fecha,
             ':sucursal_codigo' => $sucursal_codigo
         ]);
-        
+
         $resultados = $stmt->fetchAll();
-        
+
         // Registrar en log
         logMessage("SUCCESS: Consulta exitosa - Sucursal: $sucursal_codigo, Fecha: $fecha, Registros: " . count($resultados));
-        
+
         // Devolver resultados
         echo json_encode([
             'success' => true,
@@ -129,7 +124,7 @@ function getMarcacionesHoy() {
             'total_registros' => count($resultados),
             'marcaciones' => $resultados
         ]);
-        
+
     } catch (PDOException $e) {
         logMessage("ERROR PDO: " . $e->getMessage());
         http_response_code(500);

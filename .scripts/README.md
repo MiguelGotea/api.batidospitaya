@@ -1,70 +1,55 @@
-# 📦 Scripts de Deploy - Guía de Uso
+# 📦 Scripts de Deploy - API Batidos Pitaya
 
-Esta carpeta contiene los scripts de PowerShell para hacer deploy rápido de cada módulo del ERP.
+Esta carpeta contiene los scripts para realizar despliegues rápidos del repositorio API.
 
 ## 🚀 Uso desde la Terminal
 
 ### Desde la raíz del proyecto:
 ```powershell
-.\.scripts\gitpush-mantenimiento.ps1
-.\.scripts\gitpush-sistemas.ps1
-.\.scripts\gitpush-gerencia.ps1
-# ... etc
+.\.scripts\gitpush.ps1
 ```
 
-### Desde cualquier ubicación:
-```powershell
-cd "c:\Users\migue\Desktop\Sistema\Pitaya Web\VisualCode\erp.batidospitaya.com"
-.\.scripts\gitpush-[nombre-modulo].ps1
-```
+### Qué hace el script:
+- Realiza `git add .`
+- Crea un commit con la fecha y hora actual.
+- Sube los cambios a la rama `main` de GitHub.
+- Activa el deploy automático vía GitHub Actions.
 
-## 📋 Scripts Disponibles
+---
 
-- `gitpush-atencioncliente.ps1`
-- `gitpush-auxiliaradministrativo.ps1`
-- `gitpush-cds.ps1`
-- `gitpush-desarrollo.ps1`
-- `gitpush-diseno.ps1`
-- `gitpush-experienciadigital.ps1`
-- `gitpush-gerencia.ps1`
-- `gitpush-infraestructura.ps1`
-- `gitpush-legal.ps1`
-- `gitpush-mantenimiento.ps1`
-- `gitpush-marketing.ps1`
-- `gitpush-produccion.ps1`
-- `gitpush-rh.ps1`
-- `gitpush-sistemas.ps1`
-- `gitpush-sucursales.ps1`
-- `gitpush-tecnicodesarrollohumano.ps1`
-- `gitpush-ventas.ps1`
-- `gitpush.ps1` (sube todos los cambios)
+## 🏗️ Lógica del Deploy
 
-## 🔄 Sincronización en Hostinger (Reset)
+El sistema de deploy está configurado para:
+- ✅ Sincronizar **únicamente** la carpeta `api/`.
+- ❌ Excluir la carpeta `api/uploads/` para preservar archivos subidos por usuarios.
+- 🔧 Configurar permisos automáticos en el servidor (755 carpetas, 644 archivos).
 
-Si necesitas forzar que el servidor de Hostinger se iguale exactamente a lo que hay en GitHub (útil si hay conflictos o archivos nuevos de configuración):
+---
+
+## 🔄 Sincronización Manual (Reset)
+
+Si necesitas forzar que el servidor se iguale a GitHub:
 
 ```bash
-cd ~/domains/erp.batidospitaya.com/public_html
+ssh -p 65002 u839374897@145.223.105.42
+cd ~/domains/api.batidospitaya.com/public_html
 git fetch origin main
 git reset --hard origin/main
 ```
 
-## ⚡ Tip: Crear Alias (Opcional)
+> [!CAUTION]
+> El comando `git reset --hard` borrará cualquier cambio local no committeado en el servidor. Úsalo con precaución.
 
-Para hacer los comandos más cortos, puedes agregar esto a tu perfil de PowerShell:
+---
 
-```powershell
-# Abrir perfil
-notepad $PROFILE
+## 🔐 Configuración SSH
 
-# Agregar estas líneas:
-function gpm { .\.scripts\gitpush-mantenimiento.ps1 }
-function gps { .\.scripts\gitpush-sistemas.ps1 }
-function gpg { .\.scripts\gitpush-gerencia.ps1 }
-# ... etc
+Este repositorio utiliza la clave estandarizada `batidospitaya-deploy`.
 
-# Guardar y recargar
-. $PROFILE
-```
+Ver documentación completa:  
+[docs/DEPLOY_SETUP.md](docs/DEPLOY_SETUP.md)
 
-Luego solo escribes `gpm` para subir mantenimiento, `gps` para sistemas, etc.
+---
+
+**Última actualización:** 2026-02-17
+

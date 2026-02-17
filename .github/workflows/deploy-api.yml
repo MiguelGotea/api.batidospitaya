@@ -5,8 +5,6 @@ on:
     branches: [ main ]
     paths:
       - 'api/**'
-      - 'default.php'
-      - '.htaccess'
 
 jobs:
   deploy:
@@ -21,48 +19,32 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
         
-    - name: 📤 Sincronizar archivos API
+    - name: 📤 Sincronizar carpeta API
       run: |
-        echo "🔄 Sincronizando archivos de API..."
+        echo "🔄 Sincronizando carpeta api/..."
         
-        # Crear la estructura de carpetas en el servidor si no existe
-        ssh -o StrictHostKeyChecking=no -p 65002 ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }} \
-          "mkdir -p ${{ secrets.HOSTINGER_PATH_API }}/api && \
-           mkdir -p ${{ secrets.HOSTINGER_PATH_API }}/core && \
-           mkdir -p ${{ secrets.HOSTINGER_PATH_API }}/uploads"
-        
-        # Sincronizar carpeta api/ (excluyendo uploads)
-        echo "📁 Sincronizando api/..."
         rsync -avz \
           --delete \
           --exclude='uploads/' \
           -e "ssh -o StrictHostKeyChecking=no -p 65002" \
           ./api/ \
           ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/api/
-        
-        # Sincronizar archivos raíz (default.php y .htaccess)
-        echo "📄 Sincronizando archivos raíz..."
-        rsync -avz \
-          -e "ssh -o StrictHostKeyChecking=no -p 65002" \
-          ./default.php \
-          ./.htaccess \
-          ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/
-        
-        # NO sincronizar core/ (excluido según instrucciones)
-        echo "⚠️ Carpeta core/ excluida del deploy (según configuración)"
           
     - name: 🔧 Configurar permisos
       run: |
         echo "🔧 Configurando permisos en el servidor..."
         
-        ssh -o StrictHostKeyChecking=no -p 65002 ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }} \
-          "chmod -R 755 ${{ secrets.HOSTINGER_PATH_API }}/ && \
-           find ${{ secrets.HOSTINGER_PATH_API }}/ -type f -exec chmod 644 {} \; && \
-           chmod -R 777 ${{ secrets.HOSTINGER_PATH_API }}/uploads/ || true"
+        ssh -o StrictHostKeyChecking=no -p 65002 ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }} << 'EOF'
+          cd ${{ secrets.HOSTINGER_PATH_API }}
+          find api -type d -exec chmod 755 {} \;
+          find api -type f -exec chmod 644 {} \;
+          chmod -R 777 api/uploads/ || true
+        EOF
         
     - name: ✅ Verificar deploy
       run: |
         echo "✅ Deploy completado exitosamente"
-        echo "📁 Carpetas excluidas: uploads/, core/"
+        echo "📁 Carpeta sincronizada: api/"
+        echo "📁 Carpeta excluida: api/uploads/"
         echo "🌐 Sitio: https://api.batidospitaya.com"
         echo "🖥️ Servidor: ${{ secrets.HOSTINGER_HOST }}:65002"

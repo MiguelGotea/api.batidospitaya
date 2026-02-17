@@ -11,13 +11,18 @@ Repositorio de la API central para los servicios de Batidos Pitaya.
 - `.github/workflows/`: Workflows de GitHub Actions.
 - `.scripts/`: Scripts auxiliares de PowerShell.
 
-## 🚀 Deploy Automático
+### Gestión de Archivos (Estandarización)
+Para mantener el repositorio limpio y seguro, se aplican las siguientes reglas:
 
-El sistema sincroniza la raíz del repositorio con el host, asegurando que `api/`, `default.php` y `README.md` estén siempre actualizados.
+| Carpeta/Archivo | Subir a GitHub | Subir al Host |
+| :--- | :---: | :---: |
+| `.agent/`, `core/`, `docs/`, `api/uploads/` | ❌ No | ❌ No |
+| `.scripts/` | ✅ Sí | ❌ No |
+| `.github/`, `.gitignore` | ✅ Sí | ❌ No |
+| `api/` (lógica) | ✅ Sí | ✅ Sí |
+| Raíz (`default.php`, `README.md`, `.htaccess`) | ✅ Sí | ✅ Sí |
 
-- ✅ Sincronización completa (excepto `core/` y carpetas auxiliares).
-- ❌ Exclusión de `api/uploads/`.
-- 🔧 Permisos automáticos aplicados en cada deploy.
+- 🔧 Permisos automáticos aplicados en cada deploy: 755 para carpetas y 644 para archivos.
  Hostinger.
 
 ### Documentación de Deploy

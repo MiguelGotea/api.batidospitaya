@@ -4,14 +4,21 @@ Repositorio de la API central para los servicios de Batidos Pitaya.
 
 ## 📦 Estructura del Proyecto
 
-- `api/`: Lógica central de la API (sincronizada con producción).
-- `core/`: Dependencias y archivos core (gestionados manualmente o vía composer).
-- `.github/workflows/`: Workflows de GitHub Actions para deploy automático.
+- `api/`: Lógica central de la API.
+- `core/`: Dependencias y archivos core (excluidos del deploy).
+- `default.php`: Página de bienvenida técnica.
+- `README.md`: Documentación del proyecto.
+- `.github/workflows/`: Workflows de GitHub Actions.
 - `.scripts/`: Scripts auxiliares de PowerShell.
 
 ## 🚀 Deploy Automático
 
-Este repositorio utiliza **GitHub Actions** para desplegar automáticamente la carpeta `api/` en el servidor de producción Hostinger.
+El sistema sincroniza la raíz del repositorio con el host, asegurando que `api/`, `default.php` y `README.md` estén siempre actualizados.
+
+- ✅ Sincronización completa (excepto `core/` y carpetas auxiliares).
+- ❌ Exclusión de `api/uploads/`.
+- 🔧 Permisos automáticos aplicados en cada deploy.
+ Hostinger.
 
 ### Documentación de Deploy
 

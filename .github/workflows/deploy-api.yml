@@ -3,8 +3,6 @@ name: 🚀 Deploy API - Batidos Pitaya
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'api/**'
 
 jobs:
   deploy:
@@ -19,18 +17,22 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
         
-    - name: 📤 Sincronizar carpeta API
+    - name: 📤 Sincronizar archivos (rsync)
       run: |
-        echo "🔄 Sincronizando carpeta api/..."
+        echo "🔄 Sincronizando repositorio..."
         
         rsync -avz \
           --delete \
-          --exclude='uploads/' \
-          --exclude='core/' \
+          --exclude='.git/' \
+          --exclude='.github/' \
+          --exclude='.scripts/' \
+          --exclude='.agent/' \
           --exclude='.gitignore' \
+          --exclude='core/' \
+          --exclude='api/uploads/' \
           -e "ssh -o StrictHostKeyChecking=no -p 65002" \
-          ./api/ \
-          ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/api/
+          ./ \
+          ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/
           
     - name: 🔧 Configurar permisos
       run: |

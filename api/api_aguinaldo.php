@@ -5,6 +5,7 @@
  * Ubicación: public_html/api/api_aguinaldo.php
  */
 
+
 // Usar conexión centralizada (ya incluye timezone America/Managua)
 require_once __DIR__ . '/../core/database/conexion.php';
 

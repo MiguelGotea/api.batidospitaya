@@ -2,6 +2,7 @@
 
 <html lang="es">
 
+
 <head>
     <title>Página por defecto</title>
     <link rel="icon" type="image/x-icon" href="https://hpanel.hostinger.com/favicons/hostinger.png">

@@ -5,6 +5,10 @@ on:
     branches: [ main ]
     paths:
       - 'api/**'
+    paths-ignore:
+      - 'core/**'
+      - '.scripts/**'
+      - '.agent/**'
 
 jobs:
   deploy:
@@ -26,6 +30,8 @@ jobs:
         rsync -avz \
           --delete \
           --exclude='uploads/' \
+          --exclude='core/' \
+          --exclude='.gitignore' \
           -e "ssh -o StrictHostKeyChecking=no -p 65002" \
           ./api/ \
           ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/api/

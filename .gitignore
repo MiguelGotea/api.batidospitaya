@@ -1,0 +1,21 @@
+# Configuración de Entorno
+.env
+.agent/
+.gemini/
+
+# Dependencias
+node_modules/
+vendor/
+core/
+
+# Archivos de Sistema / IDE
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Subidas (Carpeta dinámica no gestionada por Git)
+uploads/
+
+# Scripts de Deploy
+.scripts/

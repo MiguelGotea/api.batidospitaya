@@ -16,11 +16,11 @@ Para mantener el repositorio limpio y seguro, se aplican las siguientes reglas:
 
 | Carpeta/Archivo | Subir a GitHub | Subir al Host |
 | :--- | :---: | :---: |
-| `.agent/`, `core/`, `docs/`, `api/uploads/` | ❌ No | ❌ No |
 | `.scripts/` | ✅ Sí | ❌ No |
 | `.github/`, `.gitignore` | ✅ Sí | ❌ No |
 | `api/` (lógica) | ✅ Sí | ✅ Sí |
-| Raíz (`default.php`, `README.md`, `.htaccess`) | ✅ Sí | ✅ Sí |
+| Raíz (`README.md`, `default.php`) | ✅ Sí | ✅ Sí |
+| `.agent/`, `core/`, `docs/`, `api/uploads/` | ❌ No | ❌ No |
 
 - 🔧 Permisos automáticos aplicados en cada deploy: 755 para carpetas y 644 para archivos.
  Hostinger.

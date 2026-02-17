@@ -17,5 +17,8 @@ Thumbs.db
 # Subidas (Carpeta dinámica no gestionada por Git)
 uploads/
 
+# Documentación Técnica (Mantenida en ERP o local)
+docs/
+
 # Scripts de Deploy
-.scripts/
+# .scripts/ (Versionado en GitHub pero excluido del host)

@@ -57,7 +57,7 @@ $data = [
 
 $ch = curl_init($url);
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Seguir redirecciones (ej. HTTP a HTTPS)
 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
 curl_setopt($ch, CURLOPT_HTTPHEADER, [
     'Authorization: Bearer ' . $api_token,

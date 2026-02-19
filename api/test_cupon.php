@@ -10,7 +10,7 @@ $api_token = 'a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2';
 $url = 'http://localhost/api/aplicar_cupon.php'; // Ajusta la URL según tu entorno local
 
 // Datos de prueba
-$numero_cupon = 'TEST-CUPON-001'; // Cambia esto por un cupón real en tu BD si deseas una prueba exitosa
+$numero_cupon = '467465170'; // Cambia esto por un cupón real en tu BD si deseas una prueba exitosa
 $cod_sucursal = 1;
 $cod_pedido = 12345;
 

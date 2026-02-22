@@ -3,10 +3,6 @@
  * pendientes.php — Campañas listas para enviar
  * GET /api/wsp/pendientes.php
  * Requiere: Header X-WSP-Token
- *
- * Retorna campañas con estado='programada' cuya fecha_envio ya pasó,
- * junto con sus destinatarios pendientes (enviado=0).
- * Limita a MAX 50 destinatarios por llamada para controlar el flujo.
  */
 
 require_once __DIR__ . '/auth.php';
@@ -17,17 +13,16 @@ header('Content-Type: application/json; charset=utf-8');
 verificarTokenVPS();
 
 try {
-    // Límite de destinatarios por polling (control de flujo anti-ban)
     $LIMITE_DESTINATARIOS = 50;
 
-    // Obtener campañas listas (fecha llegó y estado=programada)
-    $sqlCampanas = "
+    // Campañas programadas cuya fecha de envío ya llegó
+    $stmtCamp = $conn->prepare("
         SELECT 
             id,
             nombre,
             mensaje,
             imagen_url,
-            fecha_envio,
+            DATE_FORMAT(fecha_envio, '%Y-%m-%d %H:%i:%s') AS fecha_envio,
             total_destinatarios,
             total_enviados
         FROM wsp_campanas_
@@ -35,57 +30,47 @@ try {
           AND fecha_envio <= CONVERT_TZ(NOW(), '+00:00', '-06:00')
         ORDER BY fecha_envio ASC
         LIMIT 5
-    ";
+    ");
+    $stmtCamp->execute();
+    $campanas = $stmtCamp->fetchAll();
 
-    $campanas = [];
-    $result = $conn->query($sqlCampanas);
+    $resultado = [];
 
-    if ($result && $result->num_rows > 0) {
-        while ($campana = $result->fetch_assoc()) {
-            // Obtener destinatarios pendientes de esta campaña
-            $stmt = $conn->prepare("
-                SELECT 
-                    id,
-                    id_cliente,
-                    nombre,
-                    telefono
-                FROM wsp_destinatarios_
-                WHERE campana_id = ?
-                  AND enviado   = 0
-                  AND (error IS NULL OR error = '')
-                ORDER BY id ASC
-                LIMIT ?
-            ");
-            $stmt->bind_param('ii', $campana['id'], $LIMITE_DESTINATARIOS);
-            $stmt->execute();
-            $rDest = $stmt->get_result();
+    foreach ($campanas as $campana) {
+        // Destinatarios pendientes de esta campaña
+        $stmtDest = $conn->prepare("
+            SELECT id, id_cliente, nombre, telefono, sucursal
+            FROM wsp_destinatarios_
+            WHERE campana_id = :cid
+              AND enviado = 0
+              AND (error IS NULL OR error = '')
+            ORDER BY id ASC
+            LIMIT :lim
+        ");
+        $stmtDest->bindValue(':cid', (int) $campana['id'], PDO::PARAM_INT);
+        $stmtDest->bindValue(':lim', $LIMITE_DESTINATARIOS, PDO::PARAM_INT);
+        $stmtDest->execute();
+        $destinatarios = $stmtDest->fetchAll();
 
-            $destinatarios = [];
-            while ($d = $rDest->fetch_assoc()) {
-                $destinatarios[] = $d;
-            }
-            $stmt->close();
+        if (empty($destinatarios))
+            continue;
 
-            if (!empty($destinatarios)) {
-                $campana['destinatarios'] = $destinatarios;
-                $campanas[] = $campana;
+        $campana['destinatarios'] = $destinatarios;
+        $resultado[] = $campana;
 
-                // Marcar campaña como "enviando" si aún está en "programada"
-                $stmtUpd = $conn->prepare("
-                    UPDATE wsp_campanas_ SET estado = 'enviando'
-                    WHERE id = ? AND estado = 'programada'
-                ");
-                $stmtUpd->bind_param('i', $campana['id']);
-                $stmtUpd->execute();
-                $stmtUpd->close();
-            }
-        }
+        // Marcar campaña como "enviando"
+        $stmtUpd = $conn->prepare("
+            UPDATE wsp_campanas_
+            SET estado = 'enviando'
+            WHERE id = :id AND estado = 'programada'
+        ");
+        $stmtUpd->execute([':id' => $campana['id']]);
     }
 
     echo json_encode([
         'success' => true,
-        'campanas' => $campanas,
-        'total' => count($campanas),
+        'campanas' => $resultado,
+        'total' => count($resultado),
         'hora_api' => date('Y-m-d H:i:s')
     ]);
 

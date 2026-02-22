@@ -3,14 +3,6 @@
  * actualizar.php — El VPS reporta el resultado de cada mensaje enviado
  * POST /api/wsp/actualizar.php
  * Requiere: Header X-WSP-Token
- *
- * Body JSON:
- *  {
- *    "campana_id": 1,
- *    "destinatario_id": 5,
- *    "resultado": "exito" | "error",
- *    "detalle": "mensaje opcional de error"
- *  }
  */
 
 require_once __DIR__ . '/auth.php';
@@ -24,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST')
     respuestaError('Método no permitido', 405);
 
 $body = json_decode(file_get_contents('php://input'), true);
-
 $campanaId = (int) ($body['campana_id'] ?? 0);
 $destinatarioId = (int) ($body['destinatario_id'] ?? 0);
 $resultado = $body['resultado'] ?? '';
@@ -35,72 +26,69 @@ if (!$campanaId || !$destinatarioId || !in_array($resultado, ['exito', 'error'])
 }
 
 try {
-    $ahora = "CONVERT_TZ(NOW(),'+00:00','-06:00')";
+    $errorGuardar = ($resultado === 'error') ? $detalle : null;
 
     // Actualizar destinatario
-    $stmt = $conn->prepare("
+    $stmtDest = $conn->prepare("
         UPDATE wsp_destinatarios_
-        SET enviado    = 1,
-            error      = ?,
+        SET enviado     = 1,
+            error       = :err,
             fecha_envio = CONVERT_TZ(NOW(),'+00:00','-06:00')
-        WHERE id = ? AND campana_id = ?
+        WHERE id = :id AND campana_id = :cid
     ");
-    $errorGuardar = ($resultado === 'error') ? $detalle : null;
-    $stmt->bind_param('sii', $errorGuardar, $destinatarioId, $campanaId);
-    $stmt->execute();
-    $stmt->close();
+    $stmtDest->execute([
+        ':err' => $errorGuardar,
+        ':id' => $destinatarioId,
+        ':cid' => $campanaId
+    ]);
 
-    // Registrar en log
+    // Insertar en log
     $tipo = ($resultado === 'exito') ? 'exito' : 'error';
-    $stmt2 = $conn->prepare("
+    $stmtLog = $conn->prepare("
         INSERT INTO wsp_logs_ (campana_id, destinatario_id, tipo, detalle, fecha)
-        VALUES (?, ?, ?, ?, CONVERT_TZ(NOW(),'+00:00','-06:00'))
+        VALUES (:cid, :did, :tipo, :det, CONVERT_TZ(NOW(),'+00:00','-06:00'))
     ");
-    $stmt2->bind_param('iiss', $campanaId, $destinatarioId, $tipo, $detalle);
-    $stmt2->execute();
-    $stmt2->close();
+    $stmtLog->execute([
+        ':cid' => $campanaId,
+        ':did' => $destinatarioId,
+        ':tipo' => $tipo,
+        ':det' => $detalle
+    ]);
 
     // Recalcular contadores de la campaña
-    $stmt3 = $conn->prepare("
+    $stmtCount = $conn->prepare("
         UPDATE wsp_campanas_ c
-        SET 
+        SET
             total_enviados = (
                 SELECT COUNT(*) FROM wsp_destinatarios_
-                WHERE campana_id = ? AND enviado = 1 AND (error IS NULL OR error = '')
+                WHERE campana_id = :cid1
+                  AND enviado = 1 AND (error IS NULL OR error = '')
             ),
             total_errores = (
                 SELECT COUNT(*) FROM wsp_destinatarios_
-                WHERE campana_id = ? AND enviado = 1 AND error IS NOT NULL AND error != ''
+                WHERE campana_id = :cid2
+                  AND enviado = 1 AND error IS NOT NULL AND error != ''
             )
-        WHERE c.id = ?
+        WHERE c.id = :cid3
     ");
-    $stmt3->bind_param('iii', $campanaId, $campanaId, $campanaId);
-    $stmt3->execute();
-    $stmt3->close();
+    $stmtCount->execute([':cid1' => $campanaId, ':cid2' => $campanaId, ':cid3' => $campanaId]);
 
     // Verificar si la campaña está completamente enviada
     $stmtCheck = $conn->prepare("
-        SELECT 
-            COUNT(*) total,
-            SUM(enviado) enviados
+        SELECT COUNT(*) AS total, SUM(enviado) AS enviados
         FROM wsp_destinatarios_
-        WHERE campana_id = ?
+        WHERE campana_id = :cid
     ");
-    $stmtCheck->bind_param('i', $campanaId);
-    $stmtCheck->execute();
-    $rCheck = $stmtCheck->get_result()->fetch_assoc();
-    $stmtCheck->close();
+    $stmtCheck->execute([':cid' => $campanaId]);
+    $check = $stmtCheck->fetch();
 
-    if ($rCheck['total'] > 0 && $rCheck['total'] == $rCheck['enviados']) {
-        // Todos enviados — marcar como completada
+    if ((int) $check['total'] > 0 && (int) $check['total'] === (int) $check['enviados']) {
         $stmtFin = $conn->prepare("
             UPDATE wsp_campanas_
             SET estado = 'completada'
-            WHERE id = ? AND estado = 'enviando'
+            WHERE id = :id AND estado = 'enviando'
         ");
-        $stmtFin->bind_param('i', $campanaId);
-        $stmtFin->execute();
-        $stmtFin->close();
+        $stmtFin->execute([':id' => $campanaId]);
     }
 
     respuestaOk(['mensaje' => 'Resultado registrado correctamente']);

@@ -6,12 +6,13 @@
  * NO dejar en producción permanentemente — eliminar o proteger después de las pruebas.
  */
 
+// Leer el token desde auth.php para que siempre estén sincronizados
+require_once __DIR__ . '/auth.php';   // define WSP_TOKEN_SECRETO
+
 header('Content-Type: text/html; charset=utf-8');
 
-// Lee el token directamente desde auth.php para nunca desincronizarse
-require_once __DIR__ . '/auth.php';
 $TOKEN = WSP_TOKEN_SECRETO;
-$BASE = 'https://api.batidospitaya.com';
+$BASE  = 'https://api.batidospitaya.com';
 
 function testGet($url, $headers = [])
 {

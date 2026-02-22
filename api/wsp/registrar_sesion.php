@@ -3,12 +3,6 @@
  * registrar_sesion.php — El VPS reporta su estado de conexión WhatsApp
  * POST /api/wsp/registrar_sesion.php
  * Requiere: Header X-WSP-Token
- *
- * Body JSON:
- *  {
- *    "estado": "desconectado" | "qr_pendiente" | "conectado",
- *    "qr_base64": "data:image/png;base64,..." | null
- *  }
  */
 
 require_once __DIR__ . '/auth.php';
@@ -31,26 +25,25 @@ if (!in_array($estado, $estadosValidos)) {
 }
 
 try {
-    // Obtener IP del VPS
     $ipVPS = $_SERVER['REMOTE_ADDR'] ?? 'desconocida';
 
-    // Actualizar (solo hay 1 fila en wsp_sesion_vps_)
+    // Si se conectó, limpiar el QR
+    if ($estado === 'conectado')
+        $qr = null;
+
     $stmt = $conn->prepare("
         UPDATE wsp_sesion_vps_
-        SET estado      = ?,
-            qr_base64   = ?,
+        SET estado      = :estado,
+            qr_base64   = :qr,
             ultimo_ping  = CONVERT_TZ(NOW(),'+00:00','-06:00'),
-            ip_vps       = ?
+            ip_vps       = :ip
         WHERE id = 1
     ");
-    $stmt->bind_param('sss', $estado, $qr, $ipVPS);
-    $stmt->execute();
-    $stmt->close();
-
-    // Si se conectó, limpiar QR
-    if ($estado === 'conectado') {
-        $conn->query("UPDATE wsp_sesion_vps_ SET qr_base64 = NULL WHERE id = 1");
-    }
+    $stmt->execute([
+        ':estado' => $estado,
+        ':qr' => $qr,
+        ':ip' => $ipVPS
+    ]);
 
     respuestaOk(['estado' => $estado]);
 

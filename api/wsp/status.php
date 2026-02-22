@@ -49,6 +49,17 @@ try {
     echo json_encode($respuesta);
 
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode(['error' => 'Error interno']);
+    // Si la tabla no existe aún (SQL no ejecutado), devolver desconectado en vez de 500
+    $msg = $e->getMessage();
+    if (str_contains($msg, "doesn't exist") || str_contains($msg, 'Table') || str_contains($msg, 'wsp_sesion_vps_')) {
+        echo json_encode([
+            'estado' => 'desconectado',
+            'activo' => false,
+            'qr' => null,
+            '_nota' => 'Tabla no creada aún — ejecutar campanas_wsp_install.sql'
+        ]);
+    } else {
+        http_response_code(500);
+        echo json_encode(['error' => 'Error interno: ' . $msg]);
+    }
 }

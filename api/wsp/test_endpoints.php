@@ -8,8 +8,9 @@
 
 header('Content-Type: text/html; charset=utf-8');
 
-// Token de prueba (debe coincidir con WSP_TOKEN_SECRETO en auth.php)
-$TOKEN = 'CAMBIAR_POR_TOKEN_SECRETO_SEGURO_32CHARS';
+// Lee el token directamente desde auth.php para nunca desincronizarse
+require_once __DIR__ . '/auth.php';
+$TOKEN = WSP_TOKEN_SECRETO;
 $BASE = 'https://api.batidospitaya.com';
 
 function testGet($url, $headers = [])

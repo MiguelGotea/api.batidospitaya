@@ -55,6 +55,11 @@ try {
         if (empty($destinatarios))
             continue;
 
+        // Convertir imagen_url relativa a URL absoluta para que el VPS pueda descargarla
+        if (!empty($campana['imagen_url']) && str_starts_with($campana['imagen_url'], '/')) {
+            $campana['imagen_url'] = 'https://erp.batidospitaya.com' . $campana['imagen_url'];
+        }
+
         $campana['destinatarios'] = $destinatarios;
         $resultado[] = $campana;
 

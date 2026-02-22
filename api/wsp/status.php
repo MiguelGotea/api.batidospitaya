@@ -14,6 +14,7 @@ require_once __DIR__ . '/../../core/database/conexion.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
+
 try {
     $result = $conn->query("
         SELECT estado, qr_base64, ultimo_ping, ip_vps

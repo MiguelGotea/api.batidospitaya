@@ -7,6 +7,7 @@
 // Cargar la conexión PDO
 require_once __DIR__ . '/../../core/database/conexion.php';
 
+
 header('Content-Type: text/html; charset=utf-8');
 
 // Función para mostrar resultados bonitos

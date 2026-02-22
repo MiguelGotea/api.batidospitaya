@@ -11,7 +11,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // Definir el token aquí o leerlo desde una constante/archivo de configuración
 // ⚠️ CAMBIAR ESTE TOKEN POR UNO ALEATORIO SEGURO (mínimo 32 caracteres)
-define('WSP_TOKEN_SECRETO', 'CAMBIAR_POR_TOKEN_SECRETO_SEGURO_32CHARS');
+define('WSP_TOKEN_SECRETO', 'c5b155ba8f6877a2eefca0183ab18e37fe9a6accde340cf5c88af724822cbf50');
 
 function verificarTokenVPS()
 {

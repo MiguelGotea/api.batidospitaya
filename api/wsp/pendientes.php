@@ -27,8 +27,9 @@ try {
             total_destinatarios,
             total_enviados
         FROM wsp_campanas_
-        WHERE estado = 'programada'
+        WHERE (estado = 'programada' OR estado = 'enviando')
           AND fecha_envio <= CONVERT_TZ(NOW(), '+00:00', '-06:00')
+          AND total_enviados + total_errores < total_destinatarios
         ORDER BY fecha_envio ASC
         LIMIT 5
     ");

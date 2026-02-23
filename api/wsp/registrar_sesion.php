@@ -3,6 +3,12 @@
  * registrar_sesion.php — El VPS reporta su estado de conexión WhatsApp
  * POST /api/wsp/registrar_sesion.php
  * Requiere: Header X-WSP-Token
+ *
+ * El VPS envía en el body:
+ *   estado           → conectado | qr_pendiente | desconectado
+ *   instancia        → nombre PM2 (wsp-clientes, wsp-rrhh, ...)
+ *   qr_base64        → imagen QR en base64 (solo en qr_pendiente)
+ *   numero_telefono  → número vinculado (solo en conectado)
  */
 
 require_once __DIR__ . '/auth.php';
@@ -17,7 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST')
 
 $body = json_decode(file_get_contents('php://input'), true);
 $estado = $body['estado'] ?? '';
+$instancia = $body['instancia'] ?? 'wsp-clientes';
 $qr = $body['qr_base64'] ?? null;
+$numero = $body['numero_telefono'] ?? null;
 
 $estadosValidos = ['desconectado', 'qr_pendiente', 'conectado'];
 if (!in_array($estado, $estadosValidos)) {
@@ -27,25 +35,32 @@ if (!in_array($estado, $estadosValidos)) {
 try {
     $ipVPS = $_SERVER['REMOTE_ADDR'] ?? 'desconocida';
 
-    // Si se conectó, limpiar el QR
+    // Si se conectó, limpiar el QR; si se desconectó, limpiar el número
     if ($estado === 'conectado')
         $qr = null;
+    if ($estado === 'desconectado')
+        $numero = null;
 
+    // Upsert: actualizar la fila de esta instancia, o insertar si no existe
     $stmt = $conn->prepare("
-        UPDATE wsp_sesion_vps_
-        SET estado      = :estado,
-            qr_base64   = :qr,
-            ultimo_ping  = CONVERT_TZ(NOW(),'+00:00','-06:00'),
-            ip_vps       = :ip
-        WHERE id = 1
+        INSERT INTO wsp_sesion_vps_ (instancia, estado, qr_base64, numero_telefono, ultimo_ping, ip_vps)
+        VALUES (:instancia, :estado, :qr, :numero, CONVERT_TZ(NOW(),'+00:00','-06:00'), :ip)
+        ON DUPLICATE KEY UPDATE
+            estado          = VALUES(estado),
+            qr_base64       = VALUES(qr_base64),
+            numero_telefono = COALESCE(VALUES(numero_telefono), numero_telefono),
+            ultimo_ping     = VALUES(ultimo_ping),
+            ip_vps          = VALUES(ip_vps)
     ");
     $stmt->execute([
+        ':instancia' => $instancia,
         ':estado' => $estado,
         ':qr' => $qr,
+        ':numero' => $numero,
         ':ip' => $ipVPS
     ]);
 
-    respuestaOk(['estado' => $estado]);
+    respuestaOk(['estado' => $estado, 'instancia' => $instancia]);
 
 } catch (Exception $e) {
     respuestaError('Error interno: ' . $e->getMessage(), 500);

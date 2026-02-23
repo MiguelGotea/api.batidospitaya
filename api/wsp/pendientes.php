@@ -73,16 +73,17 @@ try {
         $stmtUpd->execute([':id' => $campana['id']]);
     }
 
-    // Verificar si hay un reset de sesión solicitado
-    $stmtReset = $conn->prepare("SELECT id, reset_solicitado FROM wsp_sesion_vps_ ORDER BY id DESC LIMIT 1");
-    $stmtReset->execute();
+    // Verificar si hay un reset de sesión solicitado para ESTA instancia
+    $instancia = $_GET['instancia'] ?? 'wsp-clientes';
+    $stmtReset = $conn->prepare("SELECT reset_solicitado FROM wsp_sesion_vps_ WHERE instancia = :inst LIMIT 1");
+    $stmtReset->execute([':inst' => $instancia]);
     $sesionRow = $stmtReset->fetch();
     $resetSolicitado = $sesionRow && (int) $sesionRow['reset_solicitado'] === 1;
 
     // Si había reset pendiente, limpiarlo ahora para que solo se ejecute una vez
-    if ($resetSolicitado && $sesionRow) {
-        $stmtClearReset = $conn->prepare("UPDATE wsp_sesion_vps_ SET reset_solicitado = 0 WHERE id = :id");
-        $stmtClearReset->execute([':id' => $sesionRow['id']]);
+    if ($resetSolicitado) {
+        $stmtClearReset = $conn->prepare("UPDATE wsp_sesion_vps_ SET reset_solicitado = 0 WHERE instancia = :inst");
+        $stmtClearReset->execute([':inst' => $instancia]);
     }
 
     echo json_encode([

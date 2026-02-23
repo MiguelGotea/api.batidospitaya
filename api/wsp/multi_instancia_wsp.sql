@@ -32,6 +32,11 @@ ALTER TABLE wsp_sesion_vps_
 -- 5. Verificar resultado
 SELECT id, instancia, estado, numero_telefono, ultimo_ping, ip_vps FROM wsp_sesion_vps_;
 
+-- 6. Actualizar ENUM de estados (NECESARIO para ver 'inicializando')
+ALTER TABLE wsp_sesion_vps_ 
+    MODIFY COLUMN estado ENUM('desconectado', 'qr_pendiente', 'conectado', 'inicializando', 'error') 
+    DEFAULT 'desconectado';
+
 -- ============================================================
 -- CUANDO SE ACTIVEN LAS INSTANCIAS FUTURAS: insertar sus filas
 -- ============================================================

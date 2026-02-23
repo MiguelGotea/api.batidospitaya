@@ -91,7 +91,75 @@ try {
         $stmtFin->execute([':id' => $campanaId]);
     }
 
+
+    // ── CRM History: guardar mensaje de campaña en historial unificado ──
+    if ($resultado === 'exito') {
+        try {
+            // Obtener número del destinatario y el mensaje de la campaña
+            $stmtDatos = $conn->prepare("
+                SELECT d.telefono, c.mensaje, c.instancia
+                FROM wsp_destinatarios_ d
+                JOIN wsp_campanas_ c ON c.id = d.campana_id
+                WHERE d.id = :did AND d.campana_id = :cid
+                LIMIT 1
+            ");
+            $stmtDatos->execute([':did' => $destinatarioId, ':cid' => $campanaId]);
+            $datos = $stmtDatos->fetch();
+
+            if ($datos) {
+                $numCliente = preg_replace('/\D/', '', $datos['telefono']);
+                $instancia = $datos['instancia'] ?? 'wsp-clientes';
+
+                // Buscar o crear conversación para este número en esa instancia
+                $stmtConv = $conn->prepare("
+                    SELECT id FROM conversations
+                    WHERE instancia = :inst AND numero_cliente = :nc
+                    LIMIT 1
+                ");
+                $stmtConv->execute([':inst' => $instancia, ':nc' => $numCliente]);
+                $conv = $stmtConv->fetch();
+
+                if (!$conv) {
+                    // Obtener número remitente de la instancia
+                    $sesion = $conn->prepare("SELECT numero_telefono FROM wsp_sesion_vps_ WHERE instancia = :i LIMIT 1");
+                    $sesion->execute([':i' => $instancia]);
+                    $numRem = $sesion->fetchColumn() ?: '0';
+
+                    $stmtCrConv = $conn->prepare("
+                        INSERT INTO conversations
+                            (instancia, numero_cliente, numero_remitente, status, last_interaction_at, created_at, updated_at)
+                        VALUES
+                            (:inst, :nc, :nr, 'bot',
+                             CONVERT_TZ(NOW(),'+00:00','-06:00'),
+                             CONVERT_TZ(NOW(),'+00:00','-06:00'),
+                             CONVERT_TZ(NOW(),'+00:00','-06:00'))
+                    ");
+                    $stmtCrConv->execute([':inst' => $instancia, ':nc' => $numCliente, ':nr' => $numRem]);
+                    $convId = $conn->lastInsertId();
+                } else {
+                    $convId = $conv['id'];
+                }
+
+                // Insertar mensaje de campaña
+                $stmtMsg = $conn->prepare("
+                    INSERT INTO messages
+                        (conversation_id, direction, sender_type, message_text, message_type, created_at)
+                    VALUES
+                        (:cid, 'out', 'campaign', :txt, 'text', CONVERT_TZ(NOW(),'+00:00','-06:00'))
+                ");
+                $stmtMsg->execute([':cid' => $convId, ':txt' => $datos['mensaje']]);
+
+                $conn->prepare("UPDATE conversations SET last_interaction_at = CONVERT_TZ(NOW(),'+00:00','-06:00'), updated_at = CONVERT_TZ(NOW(),'+00:00','-06:00') WHERE id = :id")
+                    ->execute([':id' => $convId]);
+            }
+        } catch (Exception $crmErr) {
+            // No interrumpir el flujo normal por errores del CRM
+            error_log('CRM history error en actualizar.php: ' . $crmErr->getMessage());
+        }
+    }
+
     respuestaOk(['mensaje' => 'Resultado registrado correctamente']);
+
 
 } catch (Exception $e) {
     respuestaError('Error interno: ' . $e->getMessage(), 500);

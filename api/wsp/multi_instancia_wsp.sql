@@ -33,8 +33,12 @@ ALTER TABLE wsp_sesion_vps_
 SELECT id, instancia, estado, numero_telefono, ultimo_ping, ip_vps FROM wsp_sesion_vps_;
 
 -- ============================================================
--- CUANDO SE ACTIVE wsp-rrhh: insertar su fila
+-- CUANDO SE ACTIVEN LAS INSTANCIAS FUTURAS: insertar sus filas
 -- ============================================================
 -- INSERT INTO wsp_sesion_vps_ (instancia, estado)
 -- VALUES ('wsp-rrhh', 'desconectado')
+-- ON DUPLICATE KEY UPDATE estado = estado;
+
+-- INSERT INTO wsp_sesion_vps_ (instancia, estado)
+-- VALUES ('wsp-crmbot', 'desconectado')
 -- ON DUPLICATE KEY UPDATE estado = estado;

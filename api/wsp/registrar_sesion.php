@@ -61,7 +61,22 @@ try {
         ':ip' => $ipVPS
     ]);
 
-    respuestaOk(['estado' => $estado, 'instancia' => $instancia]);
+    // Verificar si hay un reset solicitado para esta instancia
+    $stmtCheck = $conn->prepare("SELECT reset_solicitado FROM wsp_sesion_vps_ WHERE instancia = :inst LIMIT 1");
+    $stmtCheck->execute([':inst' => $instancia]);
+    $resetSolicitado = (int) ($stmtCheck->fetchColumn() ?: 0) === 1;
+
+    // Si hay reset pendiente, lo limpiamos ahora mismo para que el VPS solo lo vea una vez
+    if ($resetSolicitado) {
+        $stmtClear = $conn->prepare("UPDATE wsp_sesion_vps_ SET reset_solicitado = 0 WHERE instancia = :inst");
+        $stmtClear->execute([':inst' => $instancia]);
+    }
+
+    respuestaOk([
+        'estado' => $estado,
+        'instancia' => $instancia,
+        'reset_solicitado' => $resetSolicitado
+    ]);
 
 } catch (Exception $e) {
     respuestaError('Error interno: ' . $e->getMessage(), 500);

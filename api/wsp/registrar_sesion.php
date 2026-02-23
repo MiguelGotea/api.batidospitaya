@@ -28,7 +28,7 @@ $instancia = $body['instancia'] ?? 'wsp-clientes';
 $qr = $body['qr_base64'] ?? null;
 $numero = $body['numero_telefono'] ?? null;
 
-$estadosValidos = ['desconectado', 'qr_pendiente', 'conectado'];
+$estadosValidos = ['desconectado', 'qr_pendiente', 'conectado', 'inicializando', 'error'];
 if (!in_array($estado, $estadosValidos)) {
     respuestaError('Estado inválido. Valores: ' . implode(', ', $estadosValidos));
 }

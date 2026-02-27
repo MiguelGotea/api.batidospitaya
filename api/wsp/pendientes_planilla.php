@@ -4,8 +4,8 @@
  * GET /api/wsp/pendientes_planilla.php
  * Requiere: Header X-WSP-Token
  *
- * Devuelve programaciones de planilla cuya fecha_envio ya llegó,
- * con los colaboradores destinatarios (telefono_corporativo → Celular).
+ * Lee directamente BoletaPago (columnas wsp_*) en lugar de
+ * una tabla de destinatarios separada.
  */
 
 require_once __DIR__ . '/auth.php';
@@ -18,21 +18,21 @@ verificarTokenVPS();
 try {
     $LIMITE_DESTINATARIOS = 50;
 
-    // Programaciones pendientes cuya fecha_envio ya llegó
+    // Programaciones cuya fecha_envio ya llegó y que tienen boletas pendientes de enviar
     $stmtProg = $conn->prepare("
         SELECT
-            id,
-            fecha_planilla,
-            mensaje,
-            imagen_url,
-            DATE_FORMAT(fecha_envio, '%Y-%m-%d %H:%i:%s') AS fecha_envio,
-            total_destinatarios,
-            total_enviados
-        FROM wsp_planilla_programaciones_
-        WHERE (estado = 'programada' OR estado = 'enviando')
-          AND fecha_envio <= CONVERT_TZ(NOW(), '+00:00', '-06:00')
-          AND total_enviados + total_errores < total_destinatarios
-        ORDER BY fecha_envio ASC
+            p.id,
+            p.fecha_planilla,
+            p.mensaje,
+            p.imagen_url,
+            DATE_FORMAT(p.fecha_envio, '%Y-%m-%d %H:%i:%s') AS fecha_envio,
+            p.total_destinatarios,
+            p.total_enviados
+        FROM wsp_planilla_programaciones_ p
+        WHERE (p.estado = 'programada' OR p.estado = 'enviando')
+          AND p.fecha_envio <= CONVERT_TZ(NOW(), '+00:00', '-06:00')
+          AND p.total_enviados + p.total_errores < p.total_destinatarios
+        ORDER BY p.fecha_envio ASC
         LIMIT 5
     ");
     $stmtProg->execute();
@@ -42,20 +42,27 @@ try {
 
     foreach ($programaciones as $prog) {
 
-        // Poblar / re-sincronizar destinatarios si no existen aún
-        // (en guardar ya se insertan, pero esto garantiza que estén listos)
+        // Destinatarios pendientes: leer directamente de BoletaPago
         $stmtDest = $conn->prepare("
             SELECT
-                d.id,
-                d.cod_operario,
-                d.nombre,
-                d.telefono,
-                :fp AS fecha_planilla
-            FROM wsp_planilla_destinatarios_ d
-            WHERE d.programacion_id = :pid
-              AND d.enviado = 0
-              AND (d.error IS NULL OR d.error = '')
-            ORDER BY d.id ASC
+                b.id_boleta                    AS id,
+                b.cod_operario,
+                CONCAT(
+                    COALESCE(o.Nombre,''),' ',
+                    COALESCE(o.Nombre2,''),' ',
+                    COALESCE(o.Apellido,''),' ',
+                    COALESCE(o.Apellido2,'')
+                )                              AS nombre,
+                COALESCE(
+                    NULLIF(TRIM(o.telefono_corporativo),''),
+                    NULLIF(TRIM(o.Celular),'')
+                )                              AS telefono,
+                :fp                            AS fecha_planilla
+            FROM BoletaPago b
+            INNER JOIN Operarios o ON o.CodOperario = b.cod_operario
+            WHERE b.wsp_programacion_id = :pid
+              AND b.wsp_enviado = 0
+            ORDER BY b.id_boleta ASC
             LIMIT :lim
         ");
         $stmtDest->bindValue(':pid', (int) $prog['id'], PDO::PARAM_INT);
@@ -63,6 +70,10 @@ try {
         $stmtDest->bindValue(':fp', date('d-M-Y', strtotime($prog['fecha_planilla'])));
         $stmtDest->execute();
         $destinatarios = $stmtDest->fetchAll();
+
+        // Filtrar filas sin teléfono (puede pasar si el operario no tiene ninguno)
+        $destinatarios = array_filter($destinatarios, fn($d) => !empty($d['telefono']));
+        $destinatarios = array_values($destinatarios);
 
         if (empty($destinatarios))
             continue;
@@ -75,18 +86,17 @@ try {
         $prog['destinatarios'] = $destinatarios;
         $resultado[] = $prog;
 
-        // Marcar como "enviando"
-        $stmtUpd = $conn->prepare("
+        // Marcar la programación como "enviando"
+        $conn->prepare("
             UPDATE wsp_planilla_programaciones_
             SET estado = 'enviando'
             WHERE id = :id AND estado = 'programada'
-        ");
-        $stmtUpd->execute([':id' => $prog['id']]);
+        ")->execute([':id' => $prog['id']]);
     }
 
     echo json_encode([
         'success' => true,
-        'campanas' => $resultado,   // usa el mismo key 'campanas' para compatibilidad con el worker
+        'campanas' => $resultado,
         'total' => count($resultado),
         'hora_api' => date('Y-m-d H:i:s')
     ]);

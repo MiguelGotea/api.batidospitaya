@@ -21,6 +21,7 @@ try {
     echo "Result of intent:\n";
     print_r($resultado);
 
+
     // Testing update conversation
 
     $respuesta = $resultado['respuesta'];

@@ -69,11 +69,21 @@ try {
         $stmtDest->bindValue(':lim', $LIMITE_DESTINATARIOS, PDO::PARAM_INT);
         $stmtDest->bindValue(':fp', date('d-M-Y', strtotime($prog['fecha_planilla'])));
         $stmtDest->execute();
-        $destinatarios = $stmtDest->fetchAll();
+        $destinatariosRaw = $stmtDest->fetchAll();
 
-        // Filtrar filas sin teléfono (puede pasar si el operario no tiene ninguno)
-        $destinatarios = array_filter($destinatarios, fn($d) => !empty($d['telefono']));
-        $destinatarios = array_values($destinatarios);
+        // Formatear teléfonos al código de Nicaragua (8 dígitos → 505XXXXXXXX)
+        $destinatarios = [];
+        foreach ($destinatariosRaw as $d) {
+            $limpio = preg_replace('/\D/', '', $d['telefono'] ?? '');
+            if (strlen($limpio) === 8)
+                $limpio = '505' . $limpio;
+            elseif (str_starts_with($limpio, '505') && strlen($limpio) === 11) {
+            } // ya OK
+            elseif (strlen($limpio) < 8)
+                continue; // inválido
+            $d['telefono'] = $limpio;
+            $destinatarios[] = $d;
+        }
 
         if (empty($destinatarios))
             continue;

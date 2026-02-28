@@ -1,5 +1,5 @@
 <?php
-require '/core/database/conexion.php';
+require 'core/database/conexion.php';
 try {
     $stmt = $conn->query("DESCRIBE conversations");
     echo "conversations columns:\n";

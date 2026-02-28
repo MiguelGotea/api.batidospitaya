@@ -153,7 +153,7 @@ function procesarIntent(PDO $conn, string $instancia, string $texto, ?string $la
 
     // Cargar intenciones activas (filtrar por instancia o globales)
     $stmt = $conn->prepare("
-        SELECT id, intent_name, keywords, response_templates, priority
+        SELECT id, intent_name, keywords, response_templates, priority, media_url
         FROM bot_intents
         WHERE is_active = 1 AND (instancia IS NULL OR instancia = :inst)
         ORDER BY priority DESC
@@ -275,7 +275,8 @@ function construirRespuesta(PDO $conn, array $intent, string $numCliente, int $n
         'intent_name' => $intent['intent_name'],
         'nivel' => $nivel,
         'confidence' => $conf,
-        'respuesta' => $respuesta
+        'respuesta' => $respuesta,
+        'media_url' => $intent['media_url'] ?? null
     ];
 }
 
@@ -285,6 +286,7 @@ function fallback(string $msg, int $nivel, PDO $conn, string $numCliente): array
         'intent_name' => 'no_entiendo',
         'nivel' => $nivel,
         'confidence' => 0.0,
-        'respuesta' => '¿En qué te puedo ayudar? 😊'
+        'respuesta' => '¿En qué te puedo ayudar? 😊',
+        'media_url' => null
     ];
 }

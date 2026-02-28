@@ -35,11 +35,16 @@ try {
 
     // 1. Obtener número remitente actual de esta instancia
     $stmtSesion = $conn->prepare("
-        SELECT numero_telefono FROM wsp_sesion_vps_ WHERE instancia = :inst LIMIT 1
+        SELECT numero_telefono, hora_inicio, hora_fin, mensaje_fuera_horario, dias_atencion 
+        FROM wsp_sesion_vps_ WHERE instancia = :inst LIMIT 1
     ");
     $stmtSesion->execute([':inst' => $instancia]);
     $sesion = $stmtSesion->fetch();
     $numRemitente = $sesion['numero_telefono'] ?? '0';
+    $horaInicio = $sesion['hora_inicio'] ?? '00:00:00';
+    $horaFin = $sesion['hora_fin'] ?? '23:59:59';
+    $mensajeCerrado = $sesion['mensaje_fuera_horario'] ?? 'Cerrado.';
+    $diasAtencion = explode(',', $sesion['dias_atencion'] ?? '1,2,3,4,5,6,7');
 
     // 2. Buscar o crear conversación (clave: instancia + numero_cliente)
     $stmtConv = $conn->prepare("
@@ -95,8 +100,20 @@ try {
     }
 
     // 6. Motor de intenciones
-    require_once __DIR__ . '/motor_bot.php';
-    $resultado = procesarIntent($conn, $instancia, $texto, $lastIntent, $numCliente);
+    $horaActual = date('H:i:s');
+    $diaActual = date('N'); // 1 (Lunes) - 7 (Domingo)
+
+    if (!in_array($diaActual, $diasAtencion) || $horaActual < $horaInicio || $horaActual > $horaFin) {
+        $resultado = [
+            'intent_name' => 'fuera_horario',
+            'nivel' => 0,
+            'respuesta' => $mensajeCerrado,
+            'media_url' => null
+        ];
+    } else {
+        require_once __DIR__ . '/motor_bot.php';
+        $resultado = procesarIntent($conn, $instancia, $texto, $lastIntent, $numCliente);
+    }
 
     if ($esSwitch) {
         $resultado['intent_name'] = 'humano';
@@ -133,6 +150,7 @@ try {
     echo json_encode([
         'responder' => (bool) $respuesta,
         'texto_respuesta' => $respuesta,
+        'media_url' => $resultado['media_url'] ?? null,
         'intent' => $resultado['intent_name'],
         'nivel' => $resultado['nivel'] ?? 4,
         'conv_id' => $convId,

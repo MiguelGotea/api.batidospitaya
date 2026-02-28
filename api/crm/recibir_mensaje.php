@@ -11,7 +11,7 @@
  *   tipo            — text | image | audio | ...
  */
 
-require_once __DIR__ . '/../auth.php';
+require_once __DIR__ . '/../wsp/auth.php';
 require_once __DIR__ . '/../../core/database/conexion.php';
 
 header('Content-Type: application/json; charset=utf-8');

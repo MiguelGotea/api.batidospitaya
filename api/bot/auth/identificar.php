@@ -59,14 +59,15 @@ try {
         ORDER BY anc.Fecha DESC
         LIMIT 1
     ");
+
     $stmt->execute([':celular' => $celular]);
     $operario = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if (!$operario) {
         echo json_encode([
-            'success'     => false,
-            'registrado'  => false,
-            'message'     => 'No estás registrado para usar PitayaBot. Contacta a RRHH.'
+            'success' => false,
+            'registrado' => false,
+            'message' => 'No estás registrado para usar PitayaBot. Contacta a RRHH.'
         ]);
         exit;
     }
@@ -78,7 +79,8 @@ try {
 
     respuestaOk(['data' => $operario]);
 
-} catch (Exception $e) {
+}
+catch (Exception $e) {
     error_log('Error identificar.php: ' . $e->getMessage());
     respuestaError('Error interno del servidor', 500);
 }

@@ -33,10 +33,10 @@ try {
         $stmt = $conn->prepare("
             SELECT CodOperario, Nombre, Apellido, telefono_corporativo, Celular, Operativo, bot_activo, bot_lid
             FROM Operarios 
-            WHERE (telefono_corporativo LIKE :c8 OR Celular LIKE :c8)
+            WHERE (telefono_corporativo LIKE :c8a OR Celular LIKE :c8b)
             LIMIT 5
         ");
-        $stmt->execute([':c8' => '%' . $celular8]);
+        $stmt->execute([':c8a' => '%' . $celular8, ':c8b' => '%' . $celular8]);
         $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if (count($resultados) > 0) {
@@ -44,8 +44,15 @@ try {
                 // Si el registro coincide con el ID que esperamos y cumple los filtros, lo tomamos
                 if ($r['Operativo'] == 1 && ($r['bot_activo'] == 1 || $r['CodOperario'] == 5)) {
                     $operario = $r;
-                    // Cargar datos extra que faltan del *
-                    $stmtExtra = $conn->prepare("SELECT o.*, nc.Nombre as cargo_nombre FROM Operarios o LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE() LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos WHERE o.CodOperario = :id LIMIT 1");
+                    // Cargar datos extra que faltan incluyendo el cargo
+                    $stmtExtra = $conn->prepare("
+                        SELECT o.*, nc.Nombre as cargo_nombre 
+                        FROM Operarios o 
+                        LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE() 
+                        LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos 
+                        WHERE o.CodOperario = :id 
+                        LIMIT 1
+                    ");
                     $stmtExtra->execute([':id' => $operario['CodOperario']]);
                     $operario = $stmtExtra->fetch(PDO::FETCH_ASSOC);
                     break;
@@ -65,9 +72,10 @@ try {
         exit;
     }
 
-    // Auto-update LID
+    // Auto-update LID si la columna existe
     if ($hasLidColumn && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
-        $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
+        $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")
+             ->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
     }
 
     unset($operario['email_trabajo_clave'], $operario['bot_github_token']);

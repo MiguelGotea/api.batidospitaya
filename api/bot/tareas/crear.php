@@ -24,12 +24,8 @@ if (!$codOperario || !$titulo) {
     respuestaError('Datos incompletos: se requiere cod_operario y titulo');
 }
 
-// Validar prioridad
-if (!in_array($prioridad, ['alta', 'media', 'baja'])) {
-    $prioridad = 'media';
-}
+if (!in_array($prioridad, ['alta', 'media', 'baja'])) $prioridad = 'media';
 
-// Validar fecha si viene
 $fechaFinal = null;
 if (!empty($fechaMeta)) {
     $dt = DateTime::createFromFormat('Y-m-d', $fechaMeta);
@@ -37,29 +33,53 @@ if (!empty($fechaMeta)) {
 }
 
 try {
-    $stmt = $conn->prepare("
-        INSERT INTO gestion_tareas_reuniones_items
-            (tipo, titulo, descripcion, cod_cargo_asignado, cod_cargo_creador,
-             cod_operario_creador, fecha_meta, estado, prioridad, fecha_creacion)
-        VALUES
-            ('tarea', :titulo, :descripcion, :codCargo, :codCargo,
-             :codOperario, :fechaMeta, 'en_progreso', :prioridad, CONVERT_TZ(NOW(), '+00:00', '-06:00'))
-    ");
-    $stmt->execute([
-        ':titulo'      => $titulo,
-        ':descripcion' => $descripcion ?: null,
-        ':codCargo'    => $codCargo ?: null,
-        ':codOperario' => $codOperario,
-        ':fechaMeta'   => $fechaFinal,
-        ':prioridad'   => $prioridad,
-    ]);
-    $id = $conn->lastInsertId();
+    // Verificar si la columna prioridad existe (defensivo)
+    $cols = $conn->query("SHOW COLUMNS FROM gestion_tareas_reuniones_items LIKE 'prioridad'")->fetchAll();
+    $tienePrioridad = count($cols) > 0;
 
+    if ($tienePrioridad) {
+        $stmt = $conn->prepare("
+            INSERT INTO gestion_tareas_reuniones_items
+                (tipo, titulo, descripcion, cod_cargo_asignado, cod_cargo_creador,
+                 cod_operario_creador, fecha_meta, estado, prioridad, fecha_creacion)
+            VALUES
+                ('tarea', :titulo, :descripcion, :codCargo, :codCargo,
+                 :codOperario, :fechaMeta, 'en_progreso', :prioridad,
+                 CONVERT_TZ(NOW(), '+00:00', '-06:00'))
+        ");
+        $stmt->execute([
+            ':titulo'      => $titulo,
+            ':descripcion' => $descripcion ?: null,
+            ':codCargo'    => $codCargo ?: null,
+            ':codOperario' => $codOperario,
+            ':fechaMeta'   => $fechaFinal,
+            ':prioridad'   => $prioridad,
+        ]);
+    } else {
+        $stmt = $conn->prepare("
+            INSERT INTO gestion_tareas_reuniones_items
+                (tipo, titulo, descripcion, cod_cargo_asignado, cod_cargo_creador,
+                 cod_operario_creador, fecha_meta, estado, fecha_creacion)
+            VALUES
+                ('tarea', :titulo, :descripcion, :codCargo, :codCargo,
+                 :codOperario, :fechaMeta, 'en_progreso',
+                 CONVERT_TZ(NOW(), '+00:00', '-06:00'))
+        ");
+        $stmt->execute([
+            ':titulo'      => $titulo,
+            ':descripcion' => $descripcion ?: null,
+            ':codCargo'    => $codCargo ?: null,
+            ':codOperario' => $codOperario,
+            ':fechaMeta'   => $fechaFinal,
+        ]);
+    }
+
+    $id = $conn->lastInsertId();
     respuestaOk([
         'data'    => ['id' => $id, 'titulo' => $titulo, 'fecha_meta' => $fechaFinal, 'prioridad' => $prioridad],
         'message' => "Tarea '$titulo' creada exitosamente."
     ]);
 } catch (Exception $e) {
     error_log('Error tareas/crear.php: ' . $e->getMessage());
-    respuestaError('Error interno al crear la tarea', 500);
+    respuestaError('Error interno al crear la tarea: ' . $e->getMessage(), 500);
 }

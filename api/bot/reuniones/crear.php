@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') respuestaError('Metodo no permitido',
 
 $body        = json_decode(file_get_contents('php://input'), true) ?? [];
 $codOperario = (int)($body['cod_operario'] ?? 0);
+$codCargo    = (int)($body['cod_cargo']    ?? 0);
 $titulo      = trim($body['titulo']       ?? '');
 $descripcion = trim($body['descripcion']  ?? '');
 $fecha       = trim($body['fecha']        ?? '');
@@ -27,8 +28,8 @@ $duracion    = (int)($body['duracion_min'] ?? 60);
 $lugar       = trim($body['lugar']        ?? 'Presencial');
 $participantes = $body['participantes']   ?? [];
 
-if (!$codOperario || !$titulo || !$fecha) {
-    respuestaError('Se requiere cod_operario, titulo y fecha');
+if (!$codOperario || !$codCargo || !$titulo || !$fecha) {
+    respuestaError('Se requiere cod_operario, cod_cargo, titulo y fecha');
 }
 
 $dtFecha = DateTime::createFromFormat('Y-m-d', $fecha);
@@ -50,9 +51,9 @@ $tieneSequence  = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_seq
 $tieneUid       = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_uid');
 
 // Construir INSERT dinámicamente
-$cols   = ['tipo','titulo','descripcion','cod_operario_creador','fecha_meta','estado','fecha_creacion'];
-$vals   = ["'reunion'",' :titulo',':desc',':codOp',':fecha',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
-$params = [':titulo'=>$titulo,':desc'=>$descripcion?:null,':codOp'=>$codOperario,':fecha'=>$fecha];
+$cols   = ['tipo','titulo','descripcion','cod_cargo_creador','cod_operario_creador','fecha_meta','estado','fecha_creacion'];
+$vals   = ["'reunion'",' :titulo',':desc',':codCargo',':codOp',':fecha',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
+$params = [':titulo'=>$titulo,':desc'=>$descripcion?:null,':codCargo'=>$codCargo,':codOp'=>$codOperario,':fecha'=>$fecha];
 
 if ($tieneHora)     { $cols[] = 'hora_inicio';  $vals[] = ':hora';  $params[':hora']  = $hora; }
 if ($tieneDuracion) { $cols[] = 'duracion_min'; $vals[] = ':dur';   $params[':dur']   = $duracion; }

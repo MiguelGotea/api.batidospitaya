@@ -41,13 +41,14 @@ $fechaReunion = "$fecha $hora:00";
 
 // Construir INSERT con los nuevos requerimientos
 $cols   = ['tipo','titulo','descripcion','cod_cargo_creador','cod_cargo_asignado','cod_operario_creador','fecha_reunion','estado','fecha_creacion'];
-$vals   = ["'reunion'",' :titulo',':desc',':codCargo',':codCargo',':codOp',':fechaR',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
+$vals   = ["'reunion'",' :titulo',':desc',':codCargoC',':codCargoA',':codOp',':fechaR',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
 $params = [
-    ':titulo'   => $titulo,
-    ':desc'     => $descripcion ?: null,
-    ':codCargo' => $codCargo,
-    ':codOp'    => $codOperario,
-    ':fechaR'   => $fechaReunion
+    ':titulo'    => $titulo,
+    ':desc'      => $descripcion ?: null,
+    ':codCargoC' => $codCargo,
+    ':codCargoA' => $codCargo,
+    ':codOp'     => $codOperario,
+    ':fechaR'    => $fechaReunion
 ];
 
 // Columnas opcionales que podrian no existir aun

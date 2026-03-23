@@ -93,5 +93,6 @@ try {
 }
 catch (Exception $e) {
     error_log('Error identificar.php: ' . $e->getMessage());
-    respuestaError('Error interno del servidor', 500);
+    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    exit;
 }

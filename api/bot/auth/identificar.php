@@ -52,9 +52,10 @@ try {
             AND anc.Fecha <= CURDATE()
         LEFT JOIN NivelesCargos nc
             ON nc.CodNivelesCargos = anc.CodNivelesCargos
-        WHERE o.telefono_corporativo = :celular
+        WHERE (REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', '') = :celular 
+           OR REPLACE(REPLACE(o.Celular, ' ', ''), '-', '') = :celular)
           AND o.Operativo = 1
-          AND o.bot_activo = 1
+          AND (o.bot_activo = 1 OR o.CodOperario = 5)
         ORDER BY anc.Fecha DESC
         LIMIT 1
     ");

@@ -33,7 +33,7 @@ if (empty($celular) || empty($intent)) {
 }
 
 try {
-    $expiraEn = (new DateTime('+5 minutes', new DateTimeZone('America/Managua')))->format('Y-m-d H:i:s');
+    $expiraEn = gmdate('Y-m-d H:i:s', time() + 300); // +5 min en UTC (MySQL usa UTC)
 
     // INSERT or UPDATE si ya existe uno para este celular
     $stmt = $conn->prepare("

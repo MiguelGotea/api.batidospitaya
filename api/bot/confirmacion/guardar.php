@@ -33,30 +33,37 @@ if (empty($celular) || empty($intent)) {
 }
 
 try {
-    $expiraEn = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+    $expiraEn = (new DateTime('+5 minutes', new DateTimeZone('America/Managua')))->format('Y-m-d H:i:s');
 
     // INSERT or UPDATE si ya existe uno para este celular
     $stmt = $conn->prepare("
         INSERT INTO bot_estado_confirmacion
-            (cod_operario, celular, intent, payload, frase_resumen, paso_actual, expira_en, creado_en)
+            (cod_operario, celular, intent, payload, frase_resumen, paso_actual, datos_parciales, expira_en, creado_en)
         VALUES
-            (:cod_operario, :celular, :intent, :payload, :frase, 'esperando_confirmacion', :expira_en, NOW())
+            (:cod_operario, :celular, :intent, :payload, :frase, 'esperando_confirmacion', :datos_parciales, :expira_en, NOW())
         ON DUPLICATE KEY UPDATE
-            cod_operario = VALUES(cod_operario),
-            intent       = VALUES(intent),
-            payload      = VALUES(payload),
-            frase_resumen = VALUES(frase_resumen),
-            paso_actual  = 'esperando_confirmacion',
-            expira_en    = VALUES(expira_en),
-            creado_en    = NOW()
+            cod_operario   = VALUES(cod_operario),
+            intent         = VALUES(intent),
+            payload        = VALUES(payload),
+            frase_resumen  = VALUES(frase_resumen),
+            paso_actual    = 'esperando_confirmacion',
+            datos_parciales= VALUES(datos_parciales),
+            expira_en      = VALUES(expira_en),
+            creado_en      = NOW()
     ");
+    $datosParciales = null;
+    if (!empty($input['subflow'])) {
+        $datosParciales = json_encode(['subflow' => $input['subflow']], JSON_UNESCAPED_UNICODE);
+    }
+
     $stmt->execute([
-        ':cod_operario' => $codOperario,
-        ':celular'      => $celular,
-        ':intent'       => $intent,
-        ':payload'      => json_encode($payload, JSON_UNESCAPED_UNICODE),
-        ':frase'        => mb_substr($frase, 0, 1000),
-        ':expira_en'    => $expiraEn
+        ':cod_operario'     => $codOperario,
+        ':celular'          => $celular,
+        ':intent'           => $intent,
+        ':payload'          => json_encode($payload, JSON_UNESCAPED_UNICODE),
+        ':frase'            => mb_substr($frase, 0, 1000),
+        ':expira_en'        => $expiraEn,
+        ':datos_parciales'  => $datosParciales,
     ]);
 
     respuestaOk(['expira_en' => $expiraEn]);

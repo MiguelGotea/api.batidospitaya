@@ -3,11 +3,12 @@
  * identificar.php — Identifica un operario por número de teléfono corporativo o LID
  *
  * GET ?celular=88112233&lid=...
- * Retorna datos del operario si está activo y tiene bot_activo = 1
+ * Retorna datos del operario si está activo y tiene permiso 'pitayabot/usar' por cargo.
  */
 
 require_once __DIR__ . '/auth_bot.php';
 require_once __DIR__ . '/../../../core/database/conexion.php';
+require_once __DIR__ . '/../../../core/permissions/permissions.php';
 
 verificarTokenBot();
 
@@ -18,12 +19,12 @@ if (empty($celularInput) && empty($lid)) {
     respuestaError('Se requiere celular o lid');
 }
 
-// Sanitizar y normalizar celular: dejar solo los últimos 8 dígitos si tiene prefijo
+// Sanitizar y normalizar celular: conservar solo los últimos 8 dígitos
 $numLimpio = preg_replace('/\D/', '', $celularInput);
 $celular8  = (strlen($numLimpio) > 8) ? substr($numLimpio, -8) : $numLimpio;
 
 try {
-    // ── 0. Verificar si existe la identidad técnica (bot_lid) ──
+    // ── 0. Verificar si existe la columna bot_lid (Defensivo) ──
     $hasLidColumn = false;
     $checkCol = $conn->query("SHOW COLUMNS FROM Operarios LIKE 'bot_lid'");
     if ($checkCol && $checkCol->rowCount() > 0) {
@@ -32,40 +33,50 @@ try {
 
     $operario = null;
 
-    // ── 1. Identificación por LID (Instantánea y robusta) ──
+    // ── 1. Identificación por LID (Instantánea) ──
     if ($hasLidColumn && !empty($lid)) {
         $stmt = $conn->prepare("
-            SELECT o.*, nc.Nombre AS cargo_nombre
+            SELECT o.*,
+                   anc.CodNivelesCargos,
+                   nc.Nombre AS cargo_nombre
             FROM Operarios o
-            LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
+            LEFT JOIN AsignacionNivelesCargos anc
+                   ON anc.CodOperario = o.CodOperario
+                  AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
+                  AND anc.Fecha <= CURDATE()
             LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
-            WHERE o.bot_lid = :lid AND o.Operativo = 1 AND o.bot_activo = 1
+            WHERE o.bot_lid = :lid
+              AND o.Operativo = 1
             LIMIT 1
         ");
         $stmt->execute([':lid' => $lid]);
         $operario = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // ── 2. Identificación por Teléfono (Fallback con auto-sincronización de LID) ──
+    // ── 2. Identificación por Teléfono (Fallback + auto-sync LID) ──
     if (!$operario && !empty($celular8)) {
         $stmt = $conn->prepare("
-            SELECT o.*, nc.Nombre AS cargo_nombre
+            SELECT o.*,
+                   anc.CodNivelesCargos,
+                   nc.Nombre AS cargo_nombre
             FROM Operarios o
-            LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
+            LEFT JOIN AsignacionNivelesCargos anc
+                   ON anc.CodOperario = o.CodOperario
+                  AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
+                  AND anc.Fecha <= CURDATE()
             LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
             WHERE (
                     REPLACE(REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', ''), '+505', '') LIKE :c8a
                  OR REPLACE(REPLACE(REPLACE(o.Celular, ' ', ''), '-', ''), '+505', '') LIKE :c8b
             )
               AND o.Operativo = 1
-              AND o.bot_activo = 1
             ORDER BY anc.Fecha DESC
             LIMIT 1
         ");
         $stmt->execute([':c8a' => '%' . $celular8, ':c8b' => '%' . $celular8]);
         $operario = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Si se encontró por Teléfono y tenemos un LID nuevo, lo guardamos para el futuro
+        // Guardar LID para identificación futura más rápida
         if ($hasLidColumn && $operario && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
             $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")
                  ->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
@@ -73,8 +84,20 @@ try {
         }
     }
 
+    // ── 3. Usuario no encontrado en el sistema ──
     if (!$operario) {
-        echo json_encode(['success' => false, 'registrado' => false, 'message' => 'No registrado o acceso inactivo']);
+        echo json_encode(['success' => false, 'registrado' => false, 'message' => 'No encontrado en el sistema']);
+        exit;
+    }
+
+    // ── 4. Verificar permiso por cargo (reemplaza bot_activo) ──
+    $codCargo = $operario['CodNivelesCargos'] ?? 0;
+    if (!$codCargo || !tienePermiso('pitayabot', 'usar', $codCargo)) {
+        echo json_encode([
+            'success'    => false,
+            'registrado' => false,
+            'message'    => 'No tienes permiso para usar PitayaBot. Contacta a TI o RRHH.'
+        ]);
         exit;
     }
 

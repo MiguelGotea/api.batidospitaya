@@ -1,9 +1,6 @@
 <?php
 /**
  * identificar.php — Identifica un operario por número de teléfono corporativo o LID
- *
- * GET ?celular=88112233&lid=...
- * Retorna datos del operario si está activo y tiene bot_activo = 1
  */
 
 require_once __DIR__ . '/auth_bot.php';
@@ -14,84 +11,69 @@ verificarTokenBot();
 $celular = trim($_GET['celular'] ?? '');
 $lid     = trim($_GET['lid']     ?? '');
 
-if (empty($celular) && empty($lid)) {
-    respuestaError('Se requiere celular o lid');
-}
-
-// Sanitizar celular: solo dígitos
 $celularLimpo = preg_replace('/\D/', '', $celular);
+$celular8 = (strlen($celularLimpo) > 8) ? substr($celularLimpo, -8) : $celularLimpo;
 
 try {
-    // ── 0. Verificar si existe la columna bot_lid (Defensivo) ──
     $hasLidColumn = false;
     $checkCol = $conn->query("SHOW COLUMNS FROM Operarios LIKE 'bot_lid'");
     if ($checkCol && $checkCol->rowCount() > 0) {
         $hasLidColumn = true;
     }
 
-    // Normalizar celular de entrada: dejar solo los últimos 8 dígitos si tiene prefijo
-    $celular8 = $celularLimpo;
-    if (strlen($celular8) > 8) {
-        $celular8 = substr($celular8, -8);
-    }
-
-    // ── 1. Buscar por LID (Máxima prioridad) ──
     $operario = null;
     if ($hasLidColumn && !empty($lid)) {
-        $stmt = $conn->prepare("
-            SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
-            FROM Operarios o
-            LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
-            LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
-            WHERE o.bot_lid = :lid AND o.Operativo = 1
-            LIMIT 1
-        ");
+        $stmt = $conn->prepare("SELECT o.* FROM Operarios o WHERE o.bot_lid = :lid LIMIT 1");
         $stmt->execute([':lid' => $lid]);
         $operario = $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    // ── 2. Si no se encontró por LID, buscar por Teléfono ──
     if (!$operario && !empty($celular8)) {
+        // BUSQUEDA DIAGNÓSTICA: Sin filtros de activo/operativo para ver qué pasa
         $stmt = $conn->prepare("
-            SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
-            FROM Operarios o
-            LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
-            LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
-            WHERE (
-                    REPLACE(REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', ''), '+505', '') LIKE :c8
-                 OR REPLACE(REPLACE(REPLACE(o.Celular, ' ', ''), '-', ''), '+505', '') LIKE :c8
-                 OR o.telefono_corporativo LIKE :c8
-                 OR o.Celular LIKE :c8
-            )
-              AND o.Operativo = 1
-              AND (o.bot_activo = 1 OR o.CodOperario = 5)
-            ORDER BY anc.Fecha DESC
-            LIMIT 1
+            SELECT CodOperario, Nombre, Apellido, telefono_corporativo, Celular, Operativo, bot_activo, bot_lid
+            FROM Operarios 
+            WHERE (telefono_corporativo LIKE :c8 OR Celular LIKE :c8)
+            LIMIT 5
         ");
         $stmt->execute([':c8' => '%' . $celular8]);
-        $operario = $stmt->fetch(PDO::FETCH_ASSOC);
+        $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Si se encontró por Teléfono pero no teníamos el LID, lo guardamos para la próxima
-        if ($hasLidColumn && $operario && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
-            $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")
-                 ->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
-            $operario['bot_lid'] = $lid;
+        if (count($resultados) > 0) {
+            foreach ($resultados as $r) {
+                // Si el registro coincide con el ID que esperamos y cumple los filtros, lo tomamos
+                if ($r['Operativo'] == 1 && ($r['bot_activo'] == 1 || $r['CodOperario'] == 5)) {
+                    $operario = $r;
+                    // Cargar datos extra que faltan del *
+                    $stmtExtra = $conn->prepare("SELECT o.*, nc.Nombre as cargo_nombre FROM Operarios o LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE() LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos WHERE o.CodOperario = :id LIMIT 1");
+                    $stmtExtra->execute([':id' => $operario['CodOperario']]);
+                    $operario = $stmtExtra->fetch(PDO::FETCH_ASSOC);
+                    break;
+                }
+            }
+            
+            if (!$operario) {
+                // El usuario existe pero NO PASA LOS FILTROS
+                echo json_encode(['success' => false, 'error' => 'Usuario encontrado pero inactivo', 'debug_data' => $resultados]);
+                exit;
+            }
         }
     }
 
     if (!$operario) {
-        echo json_encode(['success' => false, 'registrado' => false, 'debug_cel' => $celular8, 'lid' => $lid]);
+        echo json_encode(['success' => false, 'error' => 'No encontrado en DB', 'debug_cel8' => $celular8]);
         exit;
     }
 
-    // No exponer tokens sensibles
-    unset($operario['email_trabajo_clave']);
-    unset($operario['bot_github_token']);
+    // Auto-update LID
+    if ($hasLidColumn && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
+        $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
+    }
 
+    unset($operario['email_trabajo_clave'], $operario['bot_github_token']);
     respuestaOk(['data' => $operario]);
 
 } catch (Exception $e) {
-    error_log('Error identificar.php: ' . $e->getMessage());
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
     exit;
 }

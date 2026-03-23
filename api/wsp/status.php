@@ -12,6 +12,7 @@ require_once __DIR__ . '/../../core/database/conexion.php';
 header('Content-Type: application/json; charset=utf-8');
 header('Access-Control-Allow-Origin: *');
 
+
 $instancia = $_GET['instancia'] ?? 'wsp-clientes';
 
 try {
@@ -47,7 +48,8 @@ try {
         'qr' => ($estadoFinal === 'qr_pendiente') ? $fila['qr_base64'] : null
     ]);
 
-} catch (Exception $e) {
+}
+catch (Exception $e) {
     http_response_code(500);
     echo json_encode(['error' => 'Error interno', 'detalle' => $e->getMessage()]);
 }

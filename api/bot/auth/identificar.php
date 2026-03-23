@@ -1,12 +1,9 @@
 <?php
 /**
- * identificar.php — Identifica un operario por número de teléfono corporativo
+ * identificar.php — Identifica un operario por número de teléfono corporativo o LID
  *
- * GET ?celular=88112233
+ * GET ?celular=88112233&lid=...
  * Retorna datos del operario si está activo y tiene bot_activo = 1
- * ⚠️ Busca por telefono_corporativo (número asignado por la empresa), NO por celular personal
- *
- * Llamado por: wsp-pitayabot/src/bot/messageHandler.js
  */
 
 require_once __DIR__ . '/auth_bot.php';
@@ -24,13 +21,18 @@ if (empty($celular) && empty($lid)) {
 // Sanitizar celular: solo dígitos
 $celularLimpo = preg_replace('/\D/', '', $celular);
 
-
 try {
     // ── 0. Verificar si existe la columna bot_lid (Defensivo) ──
     $hasLidColumn = false;
     $checkCol = $conn->query("SHOW COLUMNS FROM Operarios LIKE 'bot_lid'");
     if ($checkCol && $checkCol->rowCount() > 0) {
         $hasLidColumn = true;
+    }
+
+    // Normalizar celular de entrada: dejar solo los últimos 8 dígitos si tiene prefijo
+    $celular8 = $celularLimpo;
+    if (strlen($celular8) > 8) {
+        $celular8 = substr($celular8, -8);
     }
 
     // ── 1. Buscar por LID (Máxima prioridad) ──
@@ -49,21 +51,24 @@ try {
     }
 
     // ── 2. Si no se encontró por LID, buscar por Teléfono ──
-    if (!$operario && !empty($celularLimpo)) {
-        // ... (resto del código igual)
+    if (!$operario && !empty($celular8)) {
         $stmt = $conn->prepare("
             SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
             FROM Operarios o
             LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
             LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
-            WHERE (REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', '') = :celular 
-               OR REPLACE(REPLACE(o.Celular, ' ', ''), '-', '') = :celular)
+            WHERE (
+                    REPLACE(REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', ''), '+505', '') LIKE :c8
+                 OR REPLACE(REPLACE(REPLACE(o.Celular, ' ', ''), '-', ''), '+505', '') LIKE :c8
+                 OR o.telefono_corporativo LIKE :c8
+                 OR o.Celular LIKE :c8
+            )
               AND o.Operativo = 1
               AND (o.bot_activo = 1 OR o.CodOperario = 5)
             ORDER BY anc.Fecha DESC
             LIMIT 1
         ");
-        $stmt->execute([':celular' => $celularLimpo]);
+        $stmt->execute([':c8' => '%' . $celular8]);
         $operario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Si se encontró por Teléfono pero no teníamos el LID, lo guardamos para la próxima
@@ -75,23 +80,17 @@ try {
     }
 
     if (!$operario) {
-        echo json_encode([
-            'success' => false,
-            'registrado' => false,
-            'message' => 'No estás registrado para usar PitayaBot. Contacta a RRHH.'
-        ]);
+        echo json_encode(['success' => false, 'registrado' => false, 'debug_cel' => $celular8, 'lid' => $lid]);
         exit;
     }
 
-    // No exponer la clave de email ni tokens sensibles directamente
-    // (el bot los usará en etapas posteriores con cifrado AES)
+    // No exponer tokens sensibles
     unset($operario['email_trabajo_clave']);
     unset($operario['bot_github_token']);
 
     respuestaOk(['data' => $operario]);
 
-}
-catch (Exception $e) {
+} catch (Exception $e) {
     error_log('Error identificar.php: ' . $e->getMessage());
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
     exit;

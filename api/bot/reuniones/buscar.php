@@ -38,7 +38,7 @@ try {
 
     // Filtro por fecha
     if ($fecha && preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha)) {
-        $where[]        = 'r.fecha_meta = :fecha';
+        $where[]        = 'DATE(r.fecha_reunion) = :fecha';
         $params[':fecha'] = $fecha;
     }
 
@@ -47,7 +47,9 @@ try {
     $stmt = $conn->prepare("
         SELECT
             r.id, r.titulo, r.descripcion,
-            r.fecha_meta, r.hora_inicio, r.duracion_min, r.lugar, r.estado,
+            DATE(r.fecha_reunion) AS fecha_meta,
+            TIME_FORMAT(r.fecha_reunion, '%H:%i') AS hora_inicio,
+            r.duracion_min, r.lugar, r.estado,
             r.ics_uid, r.ics_sequence,
             GROUP_CONCAT(
                 CONCAT(TRIM(o.Nombre), ' ', TRIM(o.Apellido))
@@ -65,7 +67,7 @@ try {
               OR anc.CodOperario = :cod
           )
         GROUP BY r.id
-        ORDER BY r.fecha_meta ASC, r.hora_inicio ASC
+        ORDER BY r.fecha_reunion ASC
         LIMIT 6
     ");
     $stmt->execute($params);

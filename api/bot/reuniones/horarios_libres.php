@@ -20,11 +20,11 @@ try {
     $stmt = $conn->prepare("
         SELECT
             r.id, r.titulo,
-            r.hora_inicio,
+            r.fecha_reunion,
             r.duracion_min,
-            TIME_FORMAT(r.hora_inicio, '%H:%i') AS hora_inicio_fmt,
+            TIME_FORMAT(r.fecha_reunion, '%H:%i') AS hora_inicio_fmt,
             TIME_FORMAT(
-                ADDTIME(r.hora_inicio, SEC_TO_TIME(r.duracion_min * 60)),
+                ADDTIME(r.fecha_reunion, SEC_TO_TIME(r.duracion_min * 60)),
                 '%H:%i'
             ) AS hora_fin_fmt
         FROM gestion_tareas_reuniones_items r
@@ -34,14 +34,13 @@ try {
               AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
         WHERE r.tipo = 'reunion'
           AND r.estado != 'cancelado'
-          AND r.fecha_meta = :fecha
-          AND r.hora_inicio IS NOT NULL
+          AND DATE(r.fecha_reunion) = :fecha
           AND (
               r.cod_operario_creador = :cod
               OR anc.CodOperario = :cod2
           )
         GROUP BY r.id
-        ORDER BY r.hora_inicio ASC
+        ORDER BY r.fecha_reunion ASC
     ");
     $stmt->execute([':fecha' => $fecha, ':cod' => $codOperario, ':cod2' => $codOperario]);
     $reuniones = $stmt->fetchAll(PDO::FETCH_ASSOC);

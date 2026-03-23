@@ -27,9 +27,9 @@ $dtFecha = DateTime::createFromFormat('Y-m-d', $nuevaFecha);
 if (!$dtFecha) respuestaError('Formato de fecha invalido. Use Y-m-d');
 
 try {
-    // Verificar que existe y que el operario es el creador
+    // Verificar que existe y que el operario es el organizador
     $stmt = $conn->prepare("
-        SELECT id, titulo, descripcion, hora_inicio, duracion_min, lugar, ics_sequence, estado
+        SELECT id, titulo, descripcion, fecha_reunion, duracion_min, lugar, ics_sequence, estado
         FROM gestion_tareas_reuniones_items
         WHERE id = :id AND cod_operario_creador = :cod AND tipo = 'reunion'
     ");
@@ -40,19 +40,19 @@ try {
     if ($reunion['estado'] === 'cancelado') respuestaError('La reunion ya fue cancelada');
 
     $nuevaSequence = (int)$reunion['ics_sequence'] + 1;
-    $horaFinal     = $nuevaHora ?: $reunion['hora_inicio'];
+    $horaFinal     = $nuevaHora ?: date('H:i', strtotime($reunion['fecha_reunion']));
+    $nuevaFechaR   = "$nuevaFecha $horaFinal:00";
 
-    // Actualizar fecha y sequence
+    // Actualizar fecha_reunion y sequence
     $upd = $conn->prepare("
         UPDATE gestion_tareas_reuniones_items
-        SET fecha_meta = :fecha, hora_inicio = :hora, ics_sequence = :seq
+        SET fecha_reunion = :fechaR, ics_sequence = :seq
         WHERE id = :id
     ");
     $upd->execute([
-        ':fecha' => $nuevaFecha,
-        ':hora'  => $horaFinal,
-        ':seq'   => $nuevaSequence,
-        ':id'    => $idReunion,
+        ':fechaR' => $nuevaFechaR,
+        ':seq'    => $nuevaSequence,
+        ':id'     => $idReunion,
     ]);
 
     // Reenviar ICS a todos los participantes

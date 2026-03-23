@@ -16,8 +16,11 @@ if (!$codOperario) respuestaError('cod_operario requerido');
 try {
     $stmt = $conn->prepare("
         SELECT
-            r.id, r.titulo, r.fecha_meta, r.hora_inicio, r.duracion_min, r.lugar,
-            DATEDIFF(r.fecha_meta, CURDATE()) AS dias_restantes,
+            r.id, r.titulo,
+            DATE(r.fecha_reunion) AS fecha_meta,
+            TIME_FORMAT(r.fecha_reunion, '%H:%i') AS hora_inicio,
+            r.duracion_min, r.lugar,
+            DATEDIFF(r.fecha_reunion, CURDATE()) AS dias_restantes,
             GROUP_CONCAT(
                 TRIM(o.Nombre)
                 ORDER BY o.Nombre SEPARATOR ', '
@@ -30,13 +33,13 @@ try {
         LEFT JOIN Operarios o ON o.CodOperario = anc.CodOperario
         WHERE r.tipo = 'reunion'
           AND r.estado != 'cancelado'
-          AND r.fecha_meta BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)
+          AND r.fecha_reunion BETWEEN CONCAT(CURDATE(), ' 00:00:00') AND CONCAT(DATE_ADD(CURDATE(), INTERVAL 7 DAY), ' 23:59:59')
           AND (
               r.cod_operario_creador = :cod
               OR anc.CodOperario = :cod2
           )
         GROUP BY r.id
-        ORDER BY r.fecha_meta ASC, r.hora_inicio ASC
+        ORDER BY r.fecha_reunion ASC
         LIMIT 10
     ");
     $stmt->execute([':cod' => $codOperario, ':cod2' => $codOperario]);

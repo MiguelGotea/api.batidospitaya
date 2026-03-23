@@ -21,7 +21,7 @@ if (!$idReunion || !$codOperario) respuestaError('Se requiere id_reunion y cod_o
 
 try {
     $stmt = $conn->prepare("
-        SELECT id, titulo, descripcion, fecha_meta, hora_inicio,
+        SELECT id, titulo, descripcion, fecha_reunion,
                duracion_min, lugar, estado, ics_uid, ics_sequence
         FROM gestion_tareas_reuniones_items
         WHERE id = :id AND cod_operario_creador = :cod AND tipo = 'reunion'
@@ -62,8 +62,8 @@ try {
             $p['nombre_completo'],
             '[CANCELADO] ' . $reunion['titulo'],
             'Esta reunion ha sido cancelada.',
-            $reunion['fecha_meta'],
-            $reunion['hora_inicio'] ?: '09:00',
+            date('Y-m-d', strtotime($reunion['fecha_reunion'])),
+            date('H:i', strtotime($reunion['fecha_reunion'])),
             (int)$reunion['duracion_min'],
             $reunion['lugar'] ?? 'Presencial'
         );

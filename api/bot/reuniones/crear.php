@@ -37,25 +37,30 @@ if (!$dtFecha) respuestaError('Formato de fecha invalido. Use Y-m-d');
 if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora)) $hora = '09:00';
 
 $icsUid = 'pb-' . uniqid('', true) . '@batidospitaya.com';
+$fechaReunion = "$fecha $hora:00";
 
-// ── Detectar columnas disponibles ────────────────────────────────────
+// Construir INSERT con los nuevos requerimientos
+$cols   = ['tipo','titulo','descripcion','cod_cargo_creador','cod_cargo_asignado','cod_operario_creador','fecha_reunion','estado','fecha_creacion'];
+$vals   = ["'reunion'",' :titulo',':desc',':codCargo',':codCargo',':codOp',':fechaR',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
+$params = [
+    ':titulo'   => $titulo,
+    ':desc'     => $descripcion ?: null,
+    ':codCargo' => $codCargo,
+    ':codOp'    => $codOperario,
+    ':fechaR'   => $fechaReunion
+];
+
+// Columnas opcionales que podrian no existir aun
 function columnExists($conn, $tabla, $columna) {
     $r = $conn->query("SHOW COLUMNS FROM `$tabla` LIKE '$columna'");
     return $r && $r->rowCount() > 0;
 }
 
-$tieneHora      = columnExists($conn, 'gestion_tareas_reuniones_items', 'hora_inicio');
-$tieneDuracion  = columnExists($conn, 'gestion_tareas_reuniones_items', 'duracion_min');
-$tieneLugar     = columnExists($conn, 'gestion_tareas_reuniones_items', 'lugar');
-$tieneSequence  = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_sequence');
-$tieneUid       = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_uid');
+$tieneDuracion = columnExists($conn, 'gestion_tareas_reuniones_items', 'duracion_min');
+$tieneLugar    = columnExists($conn, 'gestion_tareas_reuniones_items', 'lugar');
+$tieneSequence = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_sequence');
+$tieneUid      = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_uid');
 
-// Construir INSERT dinámicamente
-$cols   = ['tipo','titulo','descripcion','cod_cargo_creador','cod_operario_creador','fecha_meta','estado','fecha_creacion'];
-$vals   = ["'reunion'",' :titulo',':desc',':codCargo',':codOp',':fecha',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
-$params = [':titulo'=>$titulo,':desc'=>$descripcion?:null,':codCargo'=>$codCargo,':codOp'=>$codOperario,':fecha'=>$fecha];
-
-if ($tieneHora)     { $cols[] = 'hora_inicio';  $vals[] = ':hora';  $params[':hora']  = $hora; }
 if ($tieneDuracion) { $cols[] = 'duracion_min'; $vals[] = ':dur';   $params[':dur']   = $duracion; }
 if ($tieneLugar)    { $cols[] = 'lugar';        $vals[] = ':lugar'; $params[':lugar'] = $lugar ?: 'Presencial'; }
 if ($tieneSequence) { $cols[] = 'ics_sequence'; $vals[] = '0'; }

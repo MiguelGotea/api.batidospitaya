@@ -1,9 +1,10 @@
 <?php
 /**
- * identificar.php — Identifica un operario por número de celular
+ * identificar.php — Identifica un operario por número de teléfono corporativo
  *
  * GET ?celular=88112233
  * Retorna datos del operario si está activo y tiene bot_activo = 1
+ * ⚠️ Busca por telefono_corporativo (número asignado por la empresa), NO por celular personal
  *
  * Llamado por: wsp-pitayabot/src/bot/messageHandler.js
  */
@@ -51,7 +52,7 @@ try {
             AND anc.Fecha <= CURDATE()
         LEFT JOIN NivelesCargos nc
             ON nc.CodNivelesCargos = anc.CodNivelesCargos
-        WHERE o.Celular = :celular
+        WHERE o.telefono_corporativo = :celular
           AND o.Operativo = 1
           AND o.bot_activo = 1
         ORDER BY anc.Fecha DESC

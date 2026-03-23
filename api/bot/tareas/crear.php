@@ -43,17 +43,18 @@ try {
                 (tipo, titulo, descripcion, cod_cargo_asignado, cod_cargo_creador,
                  cod_operario_creador, fecha_meta, estado, prioridad, fecha_creacion)
             VALUES
-                ('tarea', :titulo, :descripcion, :codCargo, :codCargo,
+                ('tarea', :titulo, :descripcion, :codCargoAsig, :codCargoCreador,
                  :codOperario, :fechaMeta, 'en_progreso', :prioridad,
                  CONVERT_TZ(NOW(), '+00:00', '-06:00'))
         ");
         $stmt->execute([
-            ':titulo'      => $titulo,
-            ':descripcion' => $descripcion ?: null,
-            ':codCargo'    => $codCargo ?: null,
-            ':codOperario' => $codOperario,
-            ':fechaMeta'   => $fechaFinal,
-            ':prioridad'   => $prioridad,
+            ':titulo'          => $titulo,
+            ':descripcion'     => $descripcion ?: null,
+            ':codCargoAsig'    => $codCargo ?: null,
+            ':codCargoCreador' => $codCargo ?: null,
+            ':codOperario'     => $codOperario,
+            ':fechaMeta'       => $fechaFinal,
+            ':prioridad'       => $prioridad,
         ]);
     } else {
         $stmt = $conn->prepare("
@@ -61,16 +62,17 @@ try {
                 (tipo, titulo, descripcion, cod_cargo_asignado, cod_cargo_creador,
                  cod_operario_creador, fecha_meta, estado, fecha_creacion)
             VALUES
-                ('tarea', :titulo, :descripcion, :codCargo, :codCargo,
+                ('tarea', :titulo, :descripcion, :codCargoAsig, :codCargoCreador,
                  :codOperario, :fechaMeta, 'en_progreso',
                  CONVERT_TZ(NOW(), '+00:00', '-06:00'))
         ");
         $stmt->execute([
-            ':titulo'      => $titulo,
-            ':descripcion' => $descripcion ?: null,
-            ':codCargo'    => $codCargo ?: null,
-            ':codOperario' => $codOperario,
-            ':fechaMeta'   => $fechaFinal,
+            ':titulo'          => $titulo,
+            ':descripcion'     => $descripcion ?: null,
+            ':codCargoAsig'    => $codCargo ?: null,
+            ':codCargoCreador' => $codCargo ?: null,
+            ':codOperario'     => $codOperario,
+            ':fechaMeta'       => $fechaFinal,
         ]);
     }
 

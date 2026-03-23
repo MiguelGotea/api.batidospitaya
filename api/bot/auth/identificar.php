@@ -26,9 +26,16 @@ $celularLimpo = preg_replace('/\D/', '', $celular);
 
 
 try {
+    // ── 0. Verificar si existe la columna bot_lid (Defensivo) ──
+    $hasLidColumn = false;
+    $checkCol = $conn->query("SHOW COLUMNS FROM Operarios LIKE 'bot_lid'");
+    if ($checkCol && $checkCol->rowCount() > 0) {
+        $hasLidColumn = true;
+    }
+
     // ── 1. Buscar por LID (Máxima prioridad) ──
     $operario = null;
-    if (!empty($lid)) {
+    if ($hasLidColumn && !empty($lid)) {
         $stmt = $conn->prepare("
             SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
             FROM Operarios o
@@ -43,6 +50,7 @@ try {
 
     // ── 2. Si no se encontró por LID, buscar por Teléfono ──
     if (!$operario && !empty($celularLimpo)) {
+        // ... (resto del código igual)
         $stmt = $conn->prepare("
             SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
             FROM Operarios o
@@ -59,7 +67,7 @@ try {
         $operario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Si se encontró por Teléfono pero no teníamos el LID, lo guardamos para la próxima
-        if ($operario && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
+        if ($hasLidColumn && $operario && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
             $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")
                  ->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
             $operario['bot_lid'] = $lid;

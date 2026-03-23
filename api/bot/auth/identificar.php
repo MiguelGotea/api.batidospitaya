@@ -15,53 +15,56 @@ require_once __DIR__ . '/../../../core/database/conexion.php';
 verificarTokenBot();
 
 $celular = trim($_GET['celular'] ?? '');
-if (empty($celular)) {
-    respuestaError('Parámetro celular requerido');
+$lid     = trim($_GET['lid']     ?? '');
+
+if (empty($celular) && empty($lid)) {
+    respuestaError('Se requiere celular o lid');
 }
 
-// Sanitizar: solo dígitos
-$celular = preg_replace('/\D/', '', $celular);
-if (strlen($celular) < 7 || strlen($celular) > 15) {
-    respuestaError('Formato de celular inválido');
-}
+// Sanitizar celular: solo dígitos
+$celularLimpo = preg_replace('/\D/', '', $celular);
+
 
 try {
-    $stmt = $conn->prepare("
-        SELECT
-            o.CodOperario,
-            o.Nombre,
-            o.Apellido,
-            o.email_trabajo,
-            o.email_trabajo_clave,
-            o.bot_github_token,
-            o.bot_github_repo,
-            o.bot_github_branch,
-            o.bot_github_vault_folder,
-            o.bot_imap_host,
-            o.bot_imap_port,
-            o.bot_activo,
-            nc.CodNivelesCargos,
-            nc.Nombre AS cargo_nombre
-        FROM Operarios o
-        LEFT JOIN Contratos c
-            ON c.cod_operario = o.CodOperario
-            AND c.Finalizado = 0
-        LEFT JOIN AsignacionNivelesCargos anc
-            ON anc.CodOperario = o.CodOperario
-            AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
-            AND anc.Fecha <= CURDATE()
-        LEFT JOIN NivelesCargos nc
-            ON nc.CodNivelesCargos = anc.CodNivelesCargos
-        WHERE (REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', '') = :celular 
-           OR REPLACE(REPLACE(o.Celular, ' ', ''), '-', '') = :celular)
-          AND o.Operativo = 1
-          AND (o.bot_activo = 1 OR o.CodOperario = 5)
-        ORDER BY anc.Fecha DESC
-        LIMIT 1
-    ");
+    // ── 1. Buscar por LID (Máxima prioridad) ──
+    $operario = null;
+    if (!empty($lid)) {
+        $stmt = $conn->prepare("
+            SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
+            FROM Operarios o
+            LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
+            LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
+            WHERE o.bot_lid = :lid AND o.Operativo = 1
+            LIMIT 1
+        ");
+        $stmt->execute([':lid' => $lid]);
+        $operario = $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
-    $stmt->execute([':celular' => $celular]);
-    $operario = $stmt->fetch(PDO::FETCH_ASSOC);
+    // ── 2. Si no se encontró por LID, buscar por Teléfono ──
+    if (!$operario && !empty($celularLimpo)) {
+        $stmt = $conn->prepare("
+            SELECT o.*, nc.CodNivelesCargos, nc.Nombre AS cargo_nombre
+            FROM Operarios o
+            LEFT JOIN AsignacionNivelesCargos anc ON anc.CodOperario = o.CodOperario AND (anc.Fin IS NULL OR anc.Fin >= CURDATE()) AND anc.Fecha <= CURDATE()
+            LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
+            WHERE (REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', '') = :celular 
+               OR REPLACE(REPLACE(o.Celular, ' ', ''), '-', '') = :celular)
+              AND o.Operativo = 1
+              AND (o.bot_activo = 1 OR o.CodOperario = 5)
+            ORDER BY anc.Fecha DESC
+            LIMIT 1
+        ");
+        $stmt->execute([':celular' => $celularLimpo]);
+        $operario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Si se encontró por Teléfono pero no teníamos el LID, lo guardamos para la próxima
+        if ($operario && !empty($lid) && ($operario['bot_lid'] !== $lid)) {
+            $conn->prepare("UPDATE Operarios SET bot_lid = :lid WHERE CodOperario = :id")
+                 ->execute([':lid' => $lid, ':id' => $operario['CodOperario']]);
+            $operario['bot_lid'] = $lid;
+        }
+    }
 
     if (!$operario) {
         echo json_encode([

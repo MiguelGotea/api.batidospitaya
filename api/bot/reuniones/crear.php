@@ -21,52 +21,56 @@ $body        = json_decode(file_get_contents('php://input'), true) ?? [];
 $codOperario = (int)($body['cod_operario'] ?? 0);
 $titulo      = trim($body['titulo']       ?? '');
 $descripcion = trim($body['descripcion']  ?? '');
-$fecha       = trim($body['fecha']        ?? ''); // Y-m-d
-$hora        = trim($body['hora']         ?? '09:00'); // H:i
+$fecha       = trim($body['fecha']        ?? '');
+$hora        = trim($body['hora']         ?? '09:00');
 $duracion    = (int)($body['duracion_min'] ?? 60);
 $lugar       = trim($body['lugar']        ?? 'Presencial');
-$participantes = $body['participantes']   ?? []; // [{cod_cargo, cod_operario, nombre_completo, email}]
+$participantes = $body['participantes']   ?? [];
 
 if (!$codOperario || !$titulo || !$fecha) {
     respuestaError('Se requiere cod_operario, titulo y fecha');
 }
 
-// Validar fecha
 $dtFecha = DateTime::createFromFormat('Y-m-d', $fecha);
 if (!$dtFecha) respuestaError('Formato de fecha invalido. Use Y-m-d');
-
-// Validar hora
 if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora)) $hora = '09:00';
 
 $icsUid = 'pb-' . uniqid('', true) . '@batidospitaya.com';
 
+// ── Detectar columnas disponibles ────────────────────────────────────
+function columnExists($conn, $tabla, $columna) {
+    $r = $conn->query("SHOW COLUMNS FROM `$tabla` LIKE '$columna'");
+    return $r && $r->rowCount() > 0;
+}
+
+$tieneHora      = columnExists($conn, 'gestion_tareas_reuniones_items', 'hora_inicio');
+$tieneDuracion  = columnExists($conn, 'gestion_tareas_reuniones_items', 'duracion_min');
+$tieneLugar     = columnExists($conn, 'gestion_tareas_reuniones_items', 'lugar');
+$tieneSequence  = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_sequence');
+$tieneUid       = columnExists($conn, 'gestion_tareas_reuniones_items', 'ics_uid');
+
+// Construir INSERT dinámicamente
+$cols   = ['tipo','titulo','descripcion','cod_operario_creador','fecha_meta','estado','fecha_creacion'];
+$vals   = ["'reunion'",' :titulo',':desc',':codOp',':fecha',"'en_progreso'",'CONVERT_TZ(NOW(), \'+00:00\', \'-06:00\')'];
+$params = [':titulo'=>$titulo,':desc'=>$descripcion?:null,':codOp'=>$codOperario,':fecha'=>$fecha];
+
+if ($tieneHora)     { $cols[] = 'hora_inicio';  $vals[] = ':hora';  $params[':hora']  = $hora; }
+if ($tieneDuracion) { $cols[] = 'duracion_min'; $vals[] = ':dur';   $params[':dur']   = $duracion; }
+if ($tieneLugar)    { $cols[] = 'lugar';        $vals[] = ':lugar'; $params[':lugar'] = $lugar ?: 'Presencial'; }
+if ($tieneSequence) { $cols[] = 'ics_sequence'; $vals[] = '0'; }
+if ($tieneUid)      { $cols[] = 'ics_uid';      $vals[] = ':uid';   $params[':uid']   = $icsUid; }
+
+$sqlCols = implode(', ', $cols);
+$sqlVals = implode(', ', $vals);
+
 try {
     $conn->beginTransaction();
 
-    // 1. Insertar en gestion_tareas_reuniones_items
-    $stmt = $conn->prepare("
-        INSERT INTO gestion_tareas_reuniones_items
-            (tipo, titulo, descripcion, cod_operario_creador, fecha_meta,
-             hora_inicio, duracion_min, lugar, estado, ics_uid,
-             fecha_creacion)
-        VALUES
-            ('reunion', :titulo, :desc, :codOp, :fecha,
-             :hora, :dur, :lugar, 'en_progreso', :uid,
-             CONVERT_TZ(NOW(), '+00:00', '-06:00'))
-    ");
-    $stmt->execute([
-        ':titulo' => $titulo,
-        ':desc'   => $descripcion ?: null,
-        ':codOp'  => $codOperario,
-        ':fecha'  => $fecha,
-        ':hora'   => $hora,
-        ':dur'    => $duracion,
-        ':lugar'  => $lugar ?: 'Presencial',
-        ':uid'    => $icsUid,
-    ]);
+    $stmt = $conn->prepare("INSERT INTO gestion_tareas_reuniones_items ($sqlCols) VALUES ($sqlVals)");
+    $stmt->execute($params);
     $idReunion = $conn->lastInsertId();
 
-    // 2. Insertar participantes
+    // Insertar participantes
     $stmtPart = $conn->prepare("
         INSERT IGNORE INTO gestion_tareas_reuniones_participantes
             (id_item, cod_cargo, confirmacion)
@@ -74,23 +78,20 @@ try {
     ");
     foreach ($participantes as $p) {
         if (!empty($p['cod_cargo'])) {
-            $stmtPart->execute([
-                ':id_item'   => $idReunion,
-                ':cod_cargo' => (int)$p['cod_cargo']
-            ]);
+            $stmtPart->execute([':id_item' => $idReunion, ':cod_cargo' => (int)$p['cod_cargo']]);
         }
     }
 
     $conn->commit();
 
-    // 3. Enviar invitaciones ICS
+    // Enviar invitaciones ICS
     $emailService = new EmailService($conn);
     $enviados = [];
     $errores  = [];
 
     foreach ($participantes as $p) {
         if (empty($p['email'])) continue;
-        $resultado = $emailService->enviarInvitacionCalendario(
+        $res = $emailService->enviarInvitacionCalendario(
             $codOperario,
             $p['email'],
             $p['nombre_completo'] ?? 'Participante',
@@ -101,24 +102,21 @@ try {
             $duracion,
             $lugar
         );
-        if ($resultado['success']) {
-            $enviados[] = $p['nombre_completo'] ?? $p['email'];
-        } else {
-            $errores[] = $p['email'];
-        }
+        if ($res['success']) $enviados[] = $p['nombre_completo'] ?? $p['email'];
+        else $errores[] = $p['email'];
     }
 
     respuestaOk([
         'data' => [
-            'id'          => $idReunion,
-            'ics_uid'     => $icsUid,
-            'titulo'      => $titulo,
-            'fecha'       => $fecha,
-            'hora'        => $hora,
-            'duracion_min'=> $duracion,
-            'lugar'       => $lugar,
-            'enviados'    => $enviados,
-            'errores'     => $errores,
+            'id'           => $idReunion,
+            'ics_uid'      => $icsUid,
+            'titulo'       => $titulo,
+            'fecha'        => $fecha,
+            'hora'         => $hora,
+            'duracion_min' => $duracion,
+            'lugar'        => $lugar,
+            'enviados'     => $enviados,
+            'errores'      => $errores,
         ],
         'message' => "Reunion '$titulo' creada. Invitaciones enviadas a " . count($enviados) . " participante(s)."
     ]);
@@ -126,5 +124,5 @@ try {
 } catch (Exception $e) {
     if ($conn->inTransaction()) $conn->rollBack();
     error_log('Error reuniones/crear.php: ' . $e->getMessage());
-    respuestaError('Error interno al crear la reunion: ' . $e->getMessage(), 500);
+    respuestaError('Error al crear la reunion: ' . $e->getMessage(), 500);
 }

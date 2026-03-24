@@ -24,7 +24,7 @@ try {
             o.CodOperario       AS cod_operario,
             anc.CodNivelesCargos AS cod_cargo,
             CONCAT(TRIM(o.Nombre), ' ', TRIM(o.Apellido)) AS nombre_completo,
-            nc.NombreNivel      AS cargo,
+            nc.Nombre           AS cargo,
             o.email_trabajo     AS email
         FROM Operarios o
         INNER JOIN AsignacionNivelesCargos anc

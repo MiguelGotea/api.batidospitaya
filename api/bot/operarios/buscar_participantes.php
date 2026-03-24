@@ -34,7 +34,6 @@ try {
         INNER JOIN NivelesCargos nc ON anc.CodNivelesCargos = nc.CodNivelesCargos
         WHERE (o.Nombre LIKE :like OR o.Apellido LIKE :like2
                OR CONCAT(o.Nombre,' ',o.Apellido) LIKE :like3)
-          AND o.Estado = 'activo'
         ORDER BY o.Nombre, o.Apellido
         LIMIT 6
     ");

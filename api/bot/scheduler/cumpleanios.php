@@ -45,7 +45,7 @@ $stmtOps = $conn->prepare("
     SELECT DISTINCT o.telefono_corporativo
     FROM Operarios o
     INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
-    WHERE o.telefono_corporativo IS NOT NULL AND o.Operativo = 1 AND o.bot_activo = 1
+    WHERE o.telefono_corporativo IS NOT NULL AND o.Operativo = 1
 ");
 $stmtOps->execute();
 $destinatarios = $stmtOps->fetchAll(PDO::FETCH_COLUMN);

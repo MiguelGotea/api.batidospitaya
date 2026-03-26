@@ -28,30 +28,47 @@ if (!$codOperario || !$destNombre || !$asunto || !$cuerpo) {
 }
 
 try {
-    // Buscar email del destinatario por nombre en Operarios (fuzzy)
-    $partes      = array_filter(explode(' ', $destNombre));
-    $condiciones = [];
-    $params      = [];
-    foreach ($partes as $parte) {
-        $condiciones[] = "(Nombre LIKE ? OR Apellido LIKE ? OR Nombre2 LIKE ? OR Apellido2 LIKE ?)";
-        $params        = array_merge($params, ["%$parte%", "%$parte%", "%$parte%", "%$parte%"]);
-    }
-    $where = implode(' OR ', $condiciones);
+    $destinatario = null;
 
-    $stmt = $conn->prepare("
-        SELECT o.CodOperario, o.email_trabajo,
-               CONCAT(TRIM(o.Nombre),' ',TRIM(o.Apellido)) AS nombre_completo
-        FROM Operarios o
-        INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
-        WHERE ($where)
-          AND o.email_trabajo IS NOT NULL
-        LIMIT 1
-    ");
-    $stmt->execute($params);
-    $destinatario = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Si el destinatario ya es un email, usarlo directamente
+    if (filter_var($destNombre, FILTER_VALIDATE_EMAIL)) {
+        // Intentar encontrar el nombre en Operarios para el display
+        $stmtEmail = $conn->prepare("
+            SELECT CONCAT(TRIM(Nombre),' ',TRIM(Apellido)) AS nombre_completo
+            FROM Operarios WHERE email_trabajo = ? LIMIT 1
+        ");
+        $stmtEmail->execute([$destNombre]);
+        $rowEmail = $stmtEmail->fetch(PDO::FETCH_ASSOC);
+        $destinatario = [
+            'email_trabajo'  => $destNombre,
+            'nombre_completo'=> $rowEmail['nombre_completo'] ?? $destNombre
+        ];
+    } else {
+        // Búsqueda fuzzy por nombre
+        $partes      = array_filter(explode(' ', $destNombre));
+        $condiciones = [];
+        $params      = [];
+        foreach ($partes as $parte) {
+            $condiciones[] = "(Nombre LIKE ? OR Apellido LIKE ? OR Nombre2 LIKE ? OR Apellido2 LIKE ?)";
+            $params        = array_merge($params, ["%$parte%", "%$parte%", "%$parte%", "%$parte%"]);
+        }
+        $where = implode(' OR ', $condiciones);
 
-    if (!$destinatario) {
-        respuestaError("No se encontró operario activo llamado '$destNombre' con correo configurado", 404);
+        $stmt = $conn->prepare("
+            SELECT o.CodOperario, o.email_trabajo,
+                   CONCAT(TRIM(o.Nombre),' ',TRIM(o.Apellido)) AS nombre_completo
+            FROM Operarios o
+            INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
+            WHERE ($where)
+              AND o.email_trabajo IS NOT NULL
+            LIMIT 1
+        ");
+        $stmt->execute($params);
+        $destinatario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$destinatario) {
+            respuestaError("No se encontró operario activo llamado '$destNombre' con correo configurado", 404);
+        }
     }
 
     // Manejar adjunto opcional

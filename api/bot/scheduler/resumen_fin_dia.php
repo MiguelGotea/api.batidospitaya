@@ -10,14 +10,17 @@ require_once __DIR__ . '/../../../core/database/conexion.php';
 
 verificarTokenBot();
 
-$stmtCron = $conn->prepare("SELECT activo FROM bot_crons_config WHERE clave = 'resumen_fin_dia' LIMIT 1");
-$stmtCron->execute();
-$cron = $stmtCron->fetch(PDO::FETCH_ASSOC);
-if (!$cron || !$cron['activo']) {
-    respuestaOk(['data' => [], 'motivo' => 'cron desactivado']);
-}
+try {
+    $stmtCron = $conn->prepare("SELECT activo FROM bot_crons_config WHERE clave = 'resumen_fin_dia' LIMIT 1");
+    $stmtCron->execute();
+    $cron = $stmtCron->fetch(PDO::FETCH_ASSOC);
+    if ($cron && !$cron['activo']) {
+        respuestaOk(['data' => [], 'motivo' => 'cron desactivado']);
+    }
+} catch (Exception $e) { /* tabla aún no creada */ }
 
-$conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'resumen_fin_dia'")->execute();
+try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'resumen_fin_dia'")->execute(); } catch (Exception $e) {}
+
 
 $hoy = date('Y-m-d');
 

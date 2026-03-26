@@ -10,14 +10,17 @@ require_once __DIR__ . '/../../../core/database/conexion.php';
 
 verificarTokenBot();
 
-$stmtCron = $conn->prepare("SELECT activo FROM bot_crons_config WHERE clave = 'revision_semanal' LIMIT 1");
-$stmtCron->execute();
-$cron = $stmtCron->fetch(PDO::FETCH_ASSOC);
-if (!$cron || !$cron['activo']) {
-    respuestaOk(['data' => [], 'motivo' => 'cron desactivado']);
-}
+try {
+    $stmtCron = $conn->prepare("SELECT activo FROM bot_crons_config WHERE clave = 'revision_semanal' LIMIT 1");
+    $stmtCron->execute();
+    $cron = $stmtCron->fetch(PDO::FETCH_ASSOC);
+    if ($cron && !$cron['activo']) {
+        respuestaOk(['data' => [], 'motivo' => 'cron desactivado']);
+    }
+} catch (Exception $e) { /* tabla aún no creada */ }
 
-$conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'revision_semanal'")->execute();
+try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'revision_semanal'")->execute(); } catch (Exception $e) {}
+
 
 $inicioSemana = date('Y-m-d', strtotime('monday this week'));
 $hoy          = date('Y-m-d');
@@ -75,7 +78,19 @@ foreach ($operarios as $op) {
               "Reuniones esta semana: " . count($reunionesSemanales) . "\n\n" .
               "Genera el mensaje incluyendo una sugerencia práctica para la siguiente semana.";
 
-    $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-latest:generateContent?key=' . getenv('GEMINI_API_KEY'));
+    // Obtener API key de Gemini desde el rotador de la BD
+    $geminiKey = '';
+    try {
+        $stmtKey = $conn->prepare("
+            SELECT api_key FROM ia_proveedores_api
+            WHERE proveedor = 'google' AND activa = 1 AND limite_alcanzado_hoy = 0
+            ORDER BY RAND() LIMIT 1
+        ");
+        $stmtKey->execute();
+        $geminiKey = $stmtKey->fetchColumn() ?: '';
+    } catch (Exception $e) {}
+
+    $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-latest:generateContent?key=' . $geminiKey);
     curl_setopt_array($ch, [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_POST           => true,
@@ -85,6 +100,7 @@ foreach ($operarios as $op) {
     ]);
     $geminiResp = curl_exec($ch);
     curl_close($ch);
+
 
     $mensaje = '';
     if ($geminiResp) {

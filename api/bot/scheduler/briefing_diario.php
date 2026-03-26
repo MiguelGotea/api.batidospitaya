@@ -11,16 +11,18 @@ require_once __DIR__ . '/../../../core/database/conexion.php';
 
 verificarTokenBot();
 
-// Verificar si este cron está activo
-$stmtCron = $conn->prepare("SELECT activo FROM bot_crons_config WHERE clave = 'briefing_diario' LIMIT 1");
-$stmtCron->execute();
-$cron = $stmtCron->fetch(PDO::FETCH_ASSOC);
-if (!$cron || !$cron['activo']) {
-    respuestaOk(['data' => [], 'motivo' => 'cron desactivado']);
-}
+// Verificar si este cron está activo (resiliente si la tabla aún no existe)
+try {
+    $stmtCron = $conn->prepare("SELECT activo FROM bot_crons_config WHERE clave = 'briefing_diario' LIMIT 1");
+    $stmtCron->execute();
+    $cron = $stmtCron->fetch(PDO::FETCH_ASSOC);
+    if ($cron && !$cron['activo']) {
+        respuestaOk(['data' => [], 'motivo' => 'cron desactivado']);
+    }
+} catch (Exception $e) { /* tabla aún no creada — continuar como activo */ }
 
 // Actualizar última ejecución
-$conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'briefing_diario'")->execute();
+try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'briefing_diario'")->execute(); } catch (Exception $e) {}
 
 $hoy       = date('Y-m-d');
 $diaNombre = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][date('N') - 1];
@@ -94,8 +96,19 @@ foreach ($operarios as $op) {
         // Llamar a Gemini para generar el briefing narrativo
         $promptGemini = "Genera un briefing matutino conciso en español para " . $op['Nombre'] . " (colaborador de Batidos Pitaya). Usa emojis, sé cálido y directo. Máximo 12 líneas. Incluye formato WhatsApp (*negrita*, _cursiva_).\n\nFecha: $fechaHum\n\nTareas para hoy: " . json_encode($tareasHoy, JSON_UNESCAPED_UNICODE) . "\n\nReuniones de hoy: " . json_encode($reunionesHoy, JSON_UNESCAPED_UNICODE) . "\n\nTareas retrasadas: " . json_encode($retrasadas, JSON_UNESCAPED_UNICODE) . "\n\nGenera el mensaje como si fueras su asistente personal.";
 
-        // POST a Gemini via API interna
-        $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-latest:generateContent?key=' . getenv('GEMINI_API_KEY'));
+        // Obtener API key de Gemini desde el rotador de la BD
+        $geminiKey = '';
+        try {
+            $stmtKey = $conn->prepare("
+                SELECT api_key FROM ia_proveedores_api
+                WHERE proveedor = 'google' AND activa = 1 AND limite_alcanzado_hoy = 0
+                ORDER BY RAND() LIMIT 1
+            ");
+            $stmtKey->execute();
+            $geminiKey = $stmtKey->fetchColumn() ?: '';
+        } catch (Exception $e) {}
+
+        $ch = curl_init('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-latest:generateContent?key=' . $geminiKey);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST           => true,
@@ -105,6 +118,7 @@ foreach ($operarios as $op) {
         ]);
         $geminiResp = curl_exec($ch);
         curl_close($ch);
+
 
         $mensaje = '';
         if ($geminiResp) {

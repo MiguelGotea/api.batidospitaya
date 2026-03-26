@@ -47,8 +47,14 @@ function enviarMensajeWsp($numero, $mensaje)
     $vpsUrl = "http://198.211.97.243:3007/send";
     $token  = BOT_TOKEN_SECRETO;
 
+    // Formatear número para Nicaragua (8 dígitos -> 11 con 505)
+    $numeroLimpio = preg_replace('/\D/', '', $numero);
+    if (strlen($numeroLimpio) === 8) {
+        $numeroLimpio = "505" . $numeroLimpio;
+    }
+
     $payload = json_encode([
-        'to'      => $numero,
+        'to'      => $numeroLimpio,
         'message' => $mensaje
     ]);
 

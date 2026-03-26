@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../../core/database/conexion.php';
 
 verificarTokenBot();
 
-define('IMAP_HOST_PEND', 'mail.batidospitaya.com');
+define('IMAP_HOST_PEND', 'imap.hostinger.com');
 define('IMAP_PORT_PEND', 993);
 
 $body        = json_decode(file_get_contents('php://input'), true);
@@ -33,7 +33,7 @@ try {
         respuestaError('El operario no tiene correo corporativo configurado', 404);
     }
 
-    $mailbox = '{' . IMAP_HOST_PEND . ':' . IMAP_PORT_PEND . '/imap/ssl}INBOX';
+    $mailbox = '{' . IMAP_HOST_PEND . ':' . IMAP_PORT_PEND . '/imap/ssl/novalidate-cert}INBOX';
     $mbox    = @imap_open(
         $mailbox,
         $creds['email_trabajo'],
@@ -43,7 +43,8 @@ try {
     );
 
     if (!$mbox) {
-        respuestaError('No se pudo conectar al servidor de correo', 503);
+        $imapErr = imap_last_error() ?: 'Error desconocido de conexión IMAP';
+        respuestaError('No se pudo conectar al servidor de correo: ' . $imapErr, 503);
     }
 
     // Buscar no leídos de los últimos 7 días

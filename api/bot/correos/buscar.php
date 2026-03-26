@@ -14,8 +14,9 @@ require_once __DIR__ . '/../../../core/database/conexion.php';
 
 verificarTokenBot();
 
-// Constantes IMAP (igual que EmailService::SMTP_HOST para SMTP)
-define('IMAP_HOST', 'mail.batidospitaya.com');
+// Hostinger usa imap.hostinger.com para IMAP, o el mismo host del dominio
+// La dirección correcta en Hostinger Business/Premium es el hostname del servidor
+define('IMAP_HOST', 'imap.hostinger.com');
 define('IMAP_PORT', 993);
 
 $body        = json_decode(file_get_contents('php://input'), true);
@@ -39,7 +40,7 @@ try {
         respuestaError('El operario no tiene correo corporativo configurado', 404);
     }
 
-    $mailbox = '{' . IMAP_HOST . ':' . IMAP_PORT . '/imap/ssl}INBOX';
+    $mailbox = '{' . IMAP_HOST . ':' . IMAP_PORT . '/imap/ssl/novalidate-cert}INBOX';
     $mbox    = @imap_open(
         $mailbox,
         $creds['email_trabajo'],
@@ -49,7 +50,8 @@ try {
     );
 
     if (!$mbox) {
-        respuestaError('No se pudo conectar al servidor de correo', 503);
+        $imapErr = imap_last_error() ?: 'Error desconocido de conexión IMAP';
+        respuestaError('No se pudo conectar al servidor de correo: ' . $imapErr, 503);
     }
 
     // Construir criterio de búsqueda

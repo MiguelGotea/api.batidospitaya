@@ -30,7 +30,6 @@ $stmtCump = $conn->prepare("
            TIMESTAMPDIFF(YEAR, o.Cumpleanos, CURDATE()) AS edad
     FROM Operarios o
     WHERE DATE_FORMAT(o.Cumpleanos, '%m-%d') = ?
-    AND o.Operativo = 1
     AND o.Cumpleanos IS NOT NULL
 ");
 $stmtCump->execute([$hoyMD]);
@@ -45,7 +44,7 @@ $stmtOps = $conn->prepare("
     SELECT DISTINCT o.telefono_corporativo
     FROM Operarios o
     INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
-    WHERE o.telefono_corporativo IS NOT NULL AND o.Operativo = 1
+    WHERE o.telefono_corporativo IS NOT NULL
 ");
 $stmtOps->execute();
 $destinatarios = $stmtOps->fetchAll(PDO::FETCH_COLUMN);

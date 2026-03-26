@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * identificar.php — Identifica un operario por número de teléfono corporativo o LID
  *
@@ -46,7 +46,6 @@ try {
                   AND anc.Fecha <= CURDATE()
             LEFT JOIN NivelesCargos nc ON nc.CodNivelesCargos = anc.CodNivelesCargos
             WHERE o.bot_lid = :lid
-              AND o.Operativo = 1
             LIMIT 1
         ");
         $stmt->execute([':lid' => $lid]);
@@ -69,7 +68,6 @@ try {
                     REPLACE(REPLACE(REPLACE(o.telefono_corporativo, ' ', ''), '-', ''), '+505', '') LIKE :c8a
                  OR REPLACE(REPLACE(REPLACE(o.Celular, ' ', ''), '-', ''), '+505', '') LIKE :c8b
             )
-              AND o.Operativo = 1
             ORDER BY anc.Fecha DESC
             LIMIT 1
         ");

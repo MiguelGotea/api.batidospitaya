@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * briefing_diario.php — Genera el briefing matutino para cada usuario activo del bot.
  *
@@ -35,7 +35,6 @@ $stmtOps = $conn->prepare("
     FROM Operarios o
     INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
     WHERE o.telefono_corporativo IS NOT NULL
-    AND o.Operativo = 1
 ");
 $stmtOps->execute();
 $operarios = $stmtOps->fetchAll(PDO::FETCH_ASSOC);

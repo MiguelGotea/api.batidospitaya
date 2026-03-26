@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * recordatorio_reunion.php — Reuniones que comienzan en 55-65 minutos.
  *
@@ -50,7 +50,6 @@ foreach ($reuniones as $reunion) {
         INNER JOIN tools_erp te ON te.id = tep.id_herramienta AND te.slug = 'pitayabot'
         WHERE p.id_item = ?
         AND o.telefono_corporativo IS NOT NULL
-        AND o.Operativo = 1
     ");
     $stmtPart->execute([$reunion['id']]);
     $participantes = $stmtPart->fetchAll(PDO::FETCH_ASSOC);

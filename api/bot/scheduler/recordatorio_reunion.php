@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * recordatorio_reunion.php — Reuniones que comienzan en 55-65 minutos.
  *
@@ -20,7 +20,7 @@ try {
     }
 } catch (Exception $e) { /* tabla aún no creada */ }
 
-try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'recordatorio_reunion'")->execute(); } catch (Exception $e) {}
+$ejecutar = (isset($_GET['ejecutar']) && $_GET['ejecutar'] == 1);
 
 
 // Reuniones que inician en 55-65 minutos
@@ -73,7 +73,20 @@ foreach ($reuniones as $reunion) {
             'celular' => $part['telefono_corporativo'],
             'mensaje' => $mensaje
         ];
+
+        // Envío real si se solicita
+        if ($ejecutar) {
+            enviarMensajeWsp($op['telefono_corporativo'], $mensaje);
+            usleep(2000000); // Anti-ban: esperar 2 segundos entre envíos
+        }
     }
 }
 
-respuestaOk(['data' => $resultados]);
+// Solo actualizar marca de tiempo si fue una ejecución real
+if ($ejecutar) {
+    try {
+        $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'recordatorio_reunion'")->execute();
+    } catch (Exception $e) {}
+}
+
+respuestaOk(['data' => $resultados, 'ejecutado' => $ejecutar]);

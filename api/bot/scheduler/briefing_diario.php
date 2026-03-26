@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * briefing_diario.php — Genera el briefing matutino para cada usuario activo del bot.
  *
@@ -21,8 +21,7 @@ try {
     }
 } catch (Exception $e) { /* tabla aún no creada — continuar como activo */ }
 
-// Actualizar última ejecución
-try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'briefing_diario'")->execute(); } catch (Exception $e) {}
+$ejecutar = (isset($_GET['ejecutar']) && $_GET['ejecutar'] == 1);
 
 $hoy       = date('Y-m-d');
 $diaNombre = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'][date('N') - 1];
@@ -140,9 +139,22 @@ foreach ($operarios as $op) {
             'mensaje' => trim($mensaje)
         ];
 
+        // Envío real si se solicita
+        if ($ejecutar) {
+            enviarMensajeWsp($op['telefono_corporativo'], trim($mensaje));
+            usleep(2000000); // Anti-ban: esperar 2 segundos entre envíos
+        }
+
     } catch (Exception $e) {
         error_log("Error briefing para operario {$op['CodOperario']}: " . $e->getMessage());
     }
 }
 
-respuestaOk(['data' => $resultados]);
+// Solo actualizar marca de tiempo si fue una ejecución real
+if ($ejecutar) {
+    try {
+        $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'briefing_diario'")->execute();
+    } catch (Exception $e) {}
+}
+
+respuestaOk(['data' => $resultados, 'ejecutado' => $ejecutar]);

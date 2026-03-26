@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * resumen_fin_dia.php — Resumen de tareas del día al cierre (6 PM).
  *
@@ -19,8 +19,7 @@ try {
     }
 } catch (Exception $e) { /* tabla aún no creada */ }
 
-try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'resumen_fin_dia'")->execute(); } catch (Exception $e) {}
-
+$ejecutar = (isset($_GET['ejecutar']) && $_GET['ejecutar'] == 1);
 
 $hoy = date('Y-m-d');
 
@@ -64,6 +63,19 @@ foreach ($operarios as $op) {
                "$emoji $cierre";
 
     $resultados[] = ['celular' => $op['telefono_corporativo'], 'mensaje' => $mensaje];
+
+    // Envío real si se solicita
+    if ($ejecutar) {
+        enviarMensajeWsp($op['telefono_corporativo'], $mensaje);
+        usleep(2000000); // Anti-ban: esperar 2 segundos entre envíos
+    }
 }
 
-respuestaOk(['data' => $resultados]);
+// Solo actualizar marca de tiempo si fue una ejecución real
+if ($ejecutar) {
+    try {
+        $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'resumen_fin_dia'")->execute();
+    } catch (Exception $e) {}
+}
+
+respuestaOk(['data' => $resultados, 'ejecutado' => $ejecutar]);

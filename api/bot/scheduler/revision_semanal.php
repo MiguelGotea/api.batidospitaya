@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * revision_semanal.php — Resumen narrativo de la semana generado por Gemini (Viernes 5 PM).
  *
@@ -19,7 +19,7 @@ try {
     }
 } catch (Exception $e) { /* tabla aún no creada */ }
 
-try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'revision_semanal'")->execute(); } catch (Exception $e) {}
+$ejecutar = (isset($_GET['ejecutar']) && $_GET['ejecutar'] == 1);
 
 
 $inicioSemana = date('Y-m-d', strtotime('monday this week'));
@@ -115,6 +115,19 @@ foreach ($operarios as $op) {
     }
 
     $resultados[] = ['celular' => $op['telefono_corporativo'], 'mensaje' => trim($mensaje)];
+
+    // Envío real si se solicita
+    if ($ejecutar) {
+        enviarMensajeWsp($op['telefono_corporativo'], trim($mensaje));
+        usleep(2000000); // Anti-ban: esperar 2 segundos entre envíos
+    }
 }
 
-respuestaOk(['data' => $resultados]);
+// Solo actualizar marca de tiempo si fue una ejecución real
+if ($ejecutar) {
+    try {
+        $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'revision_semanal'")->execute();
+    } catch (Exception $e) {}
+}
+
+respuestaOk(['data' => $resultados, 'ejecutado' => $ejecutar]);

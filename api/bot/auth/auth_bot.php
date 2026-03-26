@@ -38,3 +38,48 @@ function respuestaError($mensaje, $codigo = 400)
     echo json_encode(['success' => false, 'message' => $mensaje]);
     exit;
 }
+
+/**
+ * Envía un mensaje real vía WhatsApp llamando al VPS de DigitalOcean
+ */
+function enviarMensajeWsp($numero, $mensaje)
+{
+    $vpsUrl = "http://198.211.97.243:3007/send";
+    $token  = BOT_TOKEN_SECRETO;
+
+    $payload = json_encode([
+        'to'      => $numero,
+        'message' => $mensaje
+    ]);
+
+    $ch = curl_init($vpsUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_HTTPHEADER     => [
+            'Content-Type: application/json',
+            'X-WSP-Token: ' . $token
+        ],
+        CURLOPT_TIMEOUT        => 10,
+        CURLOPT_CONNECTTIMEOUT => 5,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr  = curl_error($ch);
+    curl_close($ch);
+
+    if ($curlErr) {
+        error_log("PitayaBot cURL Error (To: $numero): $curlErr");
+    }
+
+    if ($httpCode === 200) {
+        $res = json_decode($response, true);
+        return ($res['success'] ?? false);
+    } else {
+        error_log("PitayaBot VPS HTTP Error $httpCode: $response");
+    }
+
+    return false;
+}

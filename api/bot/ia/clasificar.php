@@ -232,7 +232,9 @@ foreach ($cascada as $proveedor) {
         $texto     = llamarProveedor($config, $keyData['api_key'], $systemPrompt, $mensaje);
         $resultado = extraerJSON($texto);
 
-        respuestaOk(array_merge($resultado, ['proveedor_usado' => $proveedor]));
+        respuestaOk([
+            'data' => array_merge($resultado, ['proveedor_usado' => $proveedor])
+        ]);
 
     } catch (RuntimeException $e) {
         $erroresLog[] = "$proveedor: " . $e->getMessage();

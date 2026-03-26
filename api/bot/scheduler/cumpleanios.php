@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * cumpleanios.php — Notifica cumpleaños de compañeros a todos los usuarios del bot (8 AM).
  *
@@ -19,7 +19,7 @@ try {
     }
 } catch (Exception $e) { /* tabla aún no creada */ }
 
-try { $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'cumpleanios'")->execute(); } catch (Exception $e) {}
+$ejecutar = (isset($_GET['ejecutar']) && $_GET['ejecutar'] == 1);
 
 
 $hoyMD = date('m-d');
@@ -65,7 +65,20 @@ foreach ($cumpleaneros as $c) {
 
     foreach ($destinatarios as $celular) {
         $resultados[] = ['celular' => $celular, 'mensaje' => $mensaje];
+
+        // Envío real si se solicita
+        if ($ejecutar) {
+            enviarMensajeWsp($celular, $mensaje);
+            usleep(2000000); // Anti-ban: esperar 2 segundos entre envíos
+        }
     }
 }
 
-respuestaOk(['data' => $resultados]);
+// Solo actualizar marca de tiempo si fue una ejecución real
+if ($ejecutar) {
+    try {
+        $conn->prepare("UPDATE bot_crons_config SET ultima_ejecucion = NOW() WHERE clave = 'cumpleanios'")->execute();
+    } catch (Exception $e) {}
+}
+
+respuestaOk(['data' => $resultados, 'ejecutado' => $ejecutar]);

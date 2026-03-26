@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * cumpleanios.php — Notifica cumpleaños de compañeros a todos los usuarios del bot (8 AM).
  *
@@ -45,9 +45,7 @@ $stmtOps = $conn->prepare("
     SELECT DISTINCT o.telefono_corporativo
     FROM Operarios o
     INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
-    INNER JOIN tools_erp_permisos tep ON tep.cod_operario = o.CodOperario
-    INNER JOIN tools_erp te ON te.id = tep.id_herramienta AND te.slug = 'pitayabot'
-    WHERE o.telefono_corporativo IS NOT NULL AND o.Operativo = 1
+    WHERE o.telefono_corporativo IS NOT NULL AND o.Operativo = 1 AND o.bot_activo = 1
 ");
 $stmtOps->execute();
 $destinatarios = $stmtOps->fetchAll(PDO::FETCH_COLUMN);

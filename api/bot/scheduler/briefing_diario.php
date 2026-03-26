@@ -29,13 +29,11 @@ $diaNombre = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Doming
 $fechaHum  = $diaNombre . ' ' . date('j') . ' de ' . ['','enero','febrero','marzo','abril','mayo','junio',
              'julio','agosto','septiembre','octubre','noviembre','diciembre'][date('n')] . ' de ' . date('Y');
 
-// Obtener operarios activos con permiso pitayabot
+// Obtener operarios activos (contrato vigente) con teléfono corporativo
 $stmtOps = $conn->prepare("
     SELECT DISTINCT o.CodOperario, o.Nombre, o.telefono_corporativo
     FROM Operarios o
     INNER JOIN Contratos c ON c.cod_operario = o.CodOperario AND c.Finalizado = 0
-    INNER JOIN tools_erp_permisos tep ON tep.cod_operario = o.CodOperario
-    INNER JOIN tools_erp te ON te.id = tep.id_herramienta AND te.slug = 'pitayabot'
     WHERE o.telefono_corporativo IS NOT NULL
     AND o.Operativo = 1
 ");

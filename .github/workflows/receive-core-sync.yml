@@ -50,13 +50,12 @@ jobs:
 
       - name: 📤 Deploy core/ → HOST (SOLO core/, nunca docs/ ni .agent/)
         run: |
-          DEPLOY_PATH="${{ secrets[github.event.client_payload.path_secret] }}"
-          echo "📤 Deploying core/ to $DEPLOY_PATH/core/"
+          echo "📤 Deploying core/ to ${{ secrets.HOSTINGER_PATH_API }}/core/"
 
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no -p 65002" \
             ./core/ \
-            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${DEPLOY_PATH}/core/
+            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/core/
 
       - name: ✅ Verificar deploy
         run: |

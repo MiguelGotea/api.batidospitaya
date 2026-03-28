@@ -1,0 +1,65 @@
+name: 📦 Receive PitayaCore Sync
+
+on:
+  repository_dispatch:
+    types: [ pitayacore-sync ]
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout subdominio
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SYNC_TOKEN }}
+          fetch-depth: 0
+
+      - name: 📥 Checkout PitayaCore en SHA específico
+        uses: actions/checkout@v4
+        with:
+          repository: MiguelGotea/PitayaCore
+          token: ${{ secrets.SYNC_TOKEN }}
+          ref: ${{ github.event.client_payload.sha }}
+          path: _pitayacore
+
+      - name: 🔄 Actualizar las 3 carpetas desde PitayaCore
+        run: |
+          rsync -av --delete _pitayacore/core/   ./core/
+          rsync -av --delete _pitayacore/docs/   ./docs/
+          rsync -av --delete _pitayacore/.agent/ ./.agent/
+          rm -rf _pitayacore
+
+      - name: 💾 Commit y push si hay cambios reales
+        run: |
+          git config user.name "PitayaCore Bot"
+          git config user.email "bot@batidospitaya.com"
+          git add core/ docs/ .agent/
+
+          if git diff --staged --quiet; then
+            echo "ℹ️ Sin cambios nuevos que commitear"
+          else
+            git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
+            git push
+            echo "✅ 3 carpetas sincronizadas en el repo"
+          fi
+
+      - name: 🔑 Configurar SSH para deploy al host
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: 📤 Deploy core/ → HOST (SOLO core/, nunca docs/ ni .agent/)
+        run: |
+          DEPLOY_PATH="${{ secrets[github.event.client_payload.path_secret] }}"
+          echo "📤 Deploying core/ to $DEPLOY_PATH/core/"
+
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no -p 65002" \
+            ./core/ \
+            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${DEPLOY_PATH}/core/
+
+      - name: ✅ Verificar deploy
+        run: |
+          echo "✅ core/ deployado exitosamente al host"
+          echo "📁 docs/ y .agent/ solo en GitHub, no en host"
+          echo "🌐 Repositorio: ${{ github.repository }}"

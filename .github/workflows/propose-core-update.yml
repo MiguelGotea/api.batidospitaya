@@ -1,0 +1,73 @@
+name: ⬆️ Propose Core Update → PitayaCore
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'core/**'
+      - 'docs/**'
+      - '.agent/**'
+
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout subdominio (con los cambios del push)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📥 Checkout PitayaCore (HEAD actual)
+        uses: actions/checkout@v4
+        with:
+          repository: MiguelGotea/PitayaCore
+          token: ${{ secrets.SYNC_TOKEN }}
+          path: _pitayacore
+          fetch-depth: 0
+
+      - name: 🔍 Comparar las 3 carpetas vs PitayaCore
+        id: diff
+        run: |
+          DIFF_CORE=$(diff -rq --exclude='.gitkeep' ./core/   _pitayacore/core/   2>/dev/null || true)
+          DIFF_DOCS=$(diff -rq --exclude='.gitkeep' ./docs/   _pitayacore/docs/   2>/dev/null || true)
+          DIFF_AGENT=$(diff -rq --exclude='.gitkeep' ./.agent/ _pitayacore/.agent/ 2>/dev/null || true)
+
+          if [ -n "$DIFF_CORE" ] || [ -n "$DIFF_DOCS" ] || [ -n "$DIFF_AGENT" ]; then
+            echo "has_diff=true" >> $GITHUB_OUTPUT
+            echo "⚡ Diferencias detectadas vs PitayaCore HEAD"
+            echo "--- core diff ---"
+            echo "$DIFF_CORE"
+            echo "--- docs diff ---"
+            echo "$DIFF_DOCS"
+            echo "--- .agent diff ---"
+            echo "$DIFF_AGENT"
+          else
+            echo "has_diff=false" >> $GITHUB_OUTPUT
+            echo "ℹ️ Sin diferencias vs PitayaCore — no se propaga"
+          fi
+
+      - name: 🔄 Actualizar PitayaCore con los cambios del subdominio
+        if: steps.diff.outputs.has_diff == 'true'
+        run: |
+          rsync -av --delete ./core/   _pitayacore/core/
+          rsync -av --delete ./docs/   _pitayacore/docs/
+          rsync -av --delete ./.agent/ _pitayacore/.agent/
+
+          cd _pitayacore
+          git config user.name "Sync Bot — ${{ github.repository }}"
+          git config user.email "bot@batidospitaya.com"
+          git add core/ docs/ .agent/
+
+          if git diff --staged --quiet; then
+            echo "ℹ️ PitayaCore ya tenía estos cambios exactos"
+          else
+            git commit -m "chore(core): update from ${{ github.repository }}@${{ github.sha }}"
+            git push
+            echo "✅ PitayaCore actualizado"
+            echo "🔄 Se activará automáticamente sync-to-subdomains.yml en PitayaCore"
+            echo "   que replicará a todos los subdominios y desplegará core/ en cada host"
+          fi
+
+      - name: 🧹 Limpiar directorio temporal
+        if: always()
+        run: rm -rf _pitayacore

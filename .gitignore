@@ -1,12 +1,12 @@
 # Configuración de Entorno
 .env
-.agent/
+# .agent/ → trackeado en GitHub, excluido del host por --exclude en deploy-api.yml
 .gemini/
 
 # Dependencias
 node_modules/
 vendor/
-core/
+# core/ → trackeado en GitHub, excluido del host por --exclude en deploy-api.yml
 
 # Archivos de Sistema / IDE
 .vscode/
@@ -18,7 +18,7 @@ Thumbs.db
 uploads/
 
 # Documentación Técnica (Mantenida en ERP o local)
-docs/
+# docs/ → trackeada en GitHub, excluida del host por --exclude en deploy-api.yml
 
 # Scripts de Deploy
 # .scripts/ (Versionado en GitHub pero excluido del host)

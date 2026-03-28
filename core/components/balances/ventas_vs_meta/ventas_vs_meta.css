@@ -1,0 +1,123 @@
+/* =====================================================
+   ESTILOS ESPECÍFICOS: Ventas vs Meta
+   ===================================================== */
+
+.ventas-scroll-container {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+}
+
+.scroll-btn {
+    background: #51B8AC;
+    border: none;
+    color: white;
+    width: 40px;
+    height: auto;
+    border-radius: 4px;
+    cursor: pointer;
+    opacity: 0;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s;
+    z-index: 10;
+    flex-shrink: 0;
+    display: flex;
+}
+
+.ventas-scroll-container:hover .scroll-btn.visible {
+    opacity: 1;
+}
+
+.scroll-btn:hover {
+    background: #0E544C;
+}
+
+.ventas-table-wrapper {
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: thin;
+    scrollbar-color: #51B8AC #f1f1f1;
+}
+
+.ventas-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.ventas-table-wrapper::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.ventas-table-wrapper::-webkit-scrollbar-thumb {
+    background: #51B8AC;
+    border-radius: 4px;
+}
+
+.ventas-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #0E544C;
+}
+
+.ventas-meta-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.ventas-meta-table th,
+.ventas-meta-table td {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+    white-space: nowrap;
+}
+
+.ventas-meta-table thead th {
+    background: #0E544C;
+    color: white;
+    font-weight: 600;
+}
+
+.ventas-meta-table tbody tr:nth-child(1) {
+    background: #f8f9fa;
+}
+
+.ventas-meta-table tbody tr:nth-child(2) {
+    background: #ffffff;
+}
+
+.semaforo {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.semaforo.verde {
+    background-color: #28a745;
+}
+
+.semaforo.amarillo {
+    background-color: #ffc107;
+}
+
+.semaforo.rojo {
+    background-color: #dc3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .ventas-meta-table th,
+    .ventas-meta-table td {
+        padding: 8px;
+        font-size: 0.85rem !important;
+    }
+
+    .scroll-btn {
+        width: 35px;
+    }
+}

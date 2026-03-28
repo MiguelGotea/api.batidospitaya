@@ -1,0 +1,20 @@
+/* =====================================================
+   ESTILOS ESPECÍFICOS: Faltas Pendientes
+   ===================================================== */
+
+/* Estilos específicos del modal de faltas */
+#modalFaltas .modal-body-pendientes table {
+    font-size: 0.9rem;
+}
+
+#modalFaltas .estado-ausente {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Responsive específico */
+@media (max-width: 768px) {
+    #modalFaltas .modal-body-pendientes table {
+        font-size: 0.8rem;
+    }
+}

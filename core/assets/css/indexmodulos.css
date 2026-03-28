@@ -1,0 +1,184 @@
+/* public_html/assets/indexmodulos.css */
+@import 'global_tools.css';
+/* ==================== CONTENEDOR PRINCIPAL ==================== */
+
+/* Sección de título */
+.section-title {
+    color: #0E544C;
+    font-size: 1.5rem !important;
+    margin: 30px 0 20px 0;
+    padding-left: 15px;
+    border-left: 5px solid #51B8AC;
+    font-weight: 600;
+}
+
+/* Estilos para el contenedor de indicadores */
+.indicadores-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Estilos para el indicador de tardanzas pendientes */
+.indicator-container {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.indicator-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, #51B8AC 0%, #0E544C 100%);
+}
+
+.indicator-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+}
+
+.indicator-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.indicator-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem !important;
+    background: linear-gradient(135deg, #51B8AC20 0%, #0E544C20 100%);
+    color: #0E544C;
+}
+
+.indicator-count {
+    font-size: 2.5rem !important;
+    font-weight: bold;
+    color: #0E544C;
+    margin: 10px 0;
+}
+
+.indicator-info {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.indicator-titulo {
+    color: #666;
+    font-size: 0.95rem !important;
+    font-weight: 500;
+}
+
+.indicator-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.indicator-status {
+    font-size: 0.85rem !important;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+
+.indicator-status.verde {
+    background: #28a745;
+    color: black;
+}
+
+.indicator-status.amarillo {
+    background: #ffc107;
+    color: black;
+}
+
+.indicator-status.rojo {
+    background: #dc3545;
+    color: black;
+}
+.indicator-status.naranja {
+    background: #ffc107;
+    color: black;  /* ← Cambié a blanco para mejor contraste */
+}
+
+ .indicator-action {
+    color: #51B8AC;
+    font-size: 0.85rem !important;
+    font-weight: 600;
+}
+
+
+/* Accesos Rápidos */
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.quick-access-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+    
+.quick-access-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+}
+
+.quick-access-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(81, 184, 172, 0.2);
+}
+
+.quick-access-icon {
+    font-size: 2rem !important;
+    color: #51B8AC;
+    margin-bottom: 10px;
+}
+
+.quick-access-title {
+    font-size: 0.9rem !important;
+    font-weight: 600;
+    color: #0E544C;
+}
+        
+@media (max-width: 768px) {
+    .indicadores-container {
+        grid-template-columns: 1fr;
+    }
+    .indicator-count {
+        font-size: 2.5rem !important;
+    }
+    .indicator-info {
+        text-align: center;
+    }
+}

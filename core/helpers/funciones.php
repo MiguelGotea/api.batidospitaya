@@ -121,6 +121,7 @@ function redirigirSegunCargo()
         9 => '/modulos/compras/', // Jefe de Compras
         10 => '/modulos/logistica/', // Jefe de Logística
         11 => '/modulos/operaciones/', // Jefe de Operaciones
+        55 => '/modulos/operaciones/', // Jefe de Operaciones
         12 => '/modulos/produccion/', // Jefe de Producción
         13 => '/modulos/rh/', // Jefe de Recursos Humanos
         14 => '/modulos/mantenimiento/', // Jefe de Mantenimiento

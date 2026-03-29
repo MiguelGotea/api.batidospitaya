@@ -14,6 +14,30 @@ Esta skill te guía en el desarrollo de módulos y herramientas para el Sistema 
 **Arquitectura**: Componentes globales compartidos con estructura estandarizada  
 **Ritmo**: ~1 herramienta completa por día  
 
+## 🔄 Sistema de Sincronización PitayaCore
+
+El ecosistema de Batidos Pitaya utiliza un sistema de sincronización centralizada para mantener la coherencia del código compartido entre todos los subdominios (ERP, API, Talento, etc.).
+
+### 📍 Fuente de Verdad: `PitayaCore`
+- **Repositorio Central**: `MiguelGotea/PitayaCore`
+- **Carpetas Gestionadas**: `/core`, `/docs`, `/.agent`
+- **Regla de Oro**: Todo cambio en componentes globales o documentación debe nacer o consolidarse en `PitayaCore`.
+
+### 🚀 Flujo de Trabajo del Desarrollador (IA)
+1. **Modificación Única**: Siempre que necesites cambiar un componente global (ej: `AIService.php`, `global_tools.css`), realiza el cambio en el repositorio `PitayaCore`.
+2. **Despliegue Maestro**: Utiliza **SIEMPRE** el script principal para subir cambios:
+   ```powershell
+   # Desde c:\...\VisualCode\PitayaCore
+   .\.scripts\gitpush.ps1
+   ```
+   - **Nube**: Este comando dispara GitHub Actions que actualizan automáticamente los remotos de todos los subdominios.
+   - **Local**: El script utiliza `robocopy` para espejar instantáneamente los cambios en tus carpetas locales de `erp.batidospitaya.com`, `api.batidospitaya.com`, etc.
+3. **Cambios en Subdominios**: Si detectas cambios en `/core` dentro de un subdominio, estos deben integrarse de vuelta a `PitayaCore` para evitar divergencias. El sistema de GitHub te avisará si hay una propuesta de actualización pendiente.
+
+### 🛠️ Herramientas de Control
+- `PitayaCore/.scripts/gitpush.ps1`: Única vía recomendada para subir cambios al núcleo.
+- **Sincronización Quirúrgica**: Si un repositorio local se desfasa, usa `git checkout origin/main -- core/` para traer solo el núcleo sin afectar el resto del módulo.
+
 ## 📋 Antes de Empezar
 
 Cuando el usuario solicite crear una nueva herramienta, **SIEMPRE pregunta**:

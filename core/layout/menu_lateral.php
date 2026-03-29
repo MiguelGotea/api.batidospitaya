@@ -28,7 +28,7 @@ $menuGlobal = [
             [ //exclusivo para atencion cliente y auxilir 
                 'nombre' => 'Avisos Sucursales',
                 'url' => 'marketing/auditorias_original/index_avisos_publico.php',
-                'cargos_permitidos' => [49, 13, 22, 26, 28, 42, 36]
+                'cargos_permitidos' => [49, 13, 22, 26, 28, 42, 36, 53]
             ],
             [
                 'nombre' => 'Auditorías',
@@ -50,12 +50,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Nuevo Aviso',
                 'url' => 'supervision/auditorias_original/agregarAviso.php',
-                'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26]
+                'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26, 54, 53]
             ],
             [
                 'nombre' => 'Editar Avisos',
                 'url' => 'supervision/auditorias_original/index_avisos.php',
-                'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26]
+                'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26, 54, 53]
             ]
         ]
     ],
@@ -77,12 +77,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8]
+                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8]
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54]
             ],
             [
                 'nombre' => 'Viaticos',
@@ -92,12 +92,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Vacaciones',
                 'url' => 'lideres/vacaciones.php',
-                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28]
+                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54]
             ],
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21]
             ],
             [
                 'nombre' => 'Feriados',
@@ -117,12 +117,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8]
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53]
             ],
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12]
+                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54]
             ],
             [
                 'nombre' => 'Gestion Sucursales',
@@ -149,23 +149,50 @@ $menuGlobal = [
             [
                 'nombre' => 'Colaboradores',
                 'url' => 'rh/colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
             ],
             [
                 'nombre' => 'Nuevo Colaborador',
                 'url' => 'rh/nuevo_colaborador.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
             ],
             [
                 'nombre' => 'Agenda Colaboradores',
                 'url' => 'rh/contactos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
             ],
             [
                 'nombre' => 'Cumpleaños Colaboradores',
                 'url' => 'rh/cumpleanos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
             ],
+        ]
+    ],
+    [
+        'nombre' => 'Reclutamiento',
+        'icon' => 'fas fa-user-plus',
+        'cargos_permitidos' => [],
+        'items' => [
+            [
+                'nombre' => 'Panel de Control',
+                'url' => 'reclutamiento/postulacion_panel_control.php',
+                'cargos_permitidos' => [13]
+            ],
+            [
+                'nombre' => 'Plazas Activas',
+                'url' => 'reclutamiento/postulacion_plazas_activas.php',
+                'cargos_permitidos' => [13, 28, 29, 30, 31, 37, 38, 39, 40, 54]
+            ],
+            [
+                'nombre' => 'Requisición de Personal',
+                'url' => 'reclutamiento/postulacion_requisicion.php',
+                'cargos_permitidos' => [13, 28, 29, 30, 31, 37, 38, 39, 40, 54]
+            ],
+            [
+                'nombre' => 'Calendario de Entrevistas',
+                'url' => 'reclutamiento/postulacion_calendario.php',
+                'cargos_permitidos' => [13, 28, 29, 30, 31, 37, 38, 39, 40, 54]
+            ]
         ]
     ],
     [
@@ -219,7 +246,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Historial Reseñas Google',
                 'url' => 'marketing/resenas_google_descargado.php',
-                'cargos_permitidos' => [49, 16, 28, 50, 42]
+                'cargos_permitidos' => [49, 16, 28, 50, 42, 53]
             ],
         ]
     ],
@@ -236,12 +263,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Clientes Club',
                 'url' => 'atencioncliente/historial_clientes.php',
-                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26]
+                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53]
             ],
             [
                 'nombre' => 'Campañas WSP',
                 'url' => 'marketing/campanas_wsp.php',
-                'cargos_permitidos' => [49, 42]
+                'cargos_permitidos' => [49, 42, 53]
             ]
         ]
     ],
@@ -256,9 +283,14 @@ $menuGlobal = [
                 'cargos_permitidos' => [9, 15, 16, 49]
             ],
             [
-                'nombre' => 'Nueva Solicitud de Cotización',
-                'url' => 'compras/solicitud_cotizacion.php',
-                'cargos_permitidos' => [9, 15, 16, 49]
+                'nombre' => 'Proovedores',
+                'url' => 'compras/proveedores.php',
+                'cargos_permitidos' => [49]
+            ],
+            [
+                'nombre' => 'Solicitudes de Reembolsos',
+                'url' => 'compras/reembolsos_ia_historial.php',
+                'cargos_permitidos' => [49]
             ],
         ]
     ],
@@ -270,12 +302,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 12, 26, 42]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53]
             ],
             [
                 'nombre' => 'Agenda Diaria',
                 'url' => 'mantenimiento/agenda_colaborador.php',
-                'cargos_permitidos' => [49, 14, 16, 35]
+                'cargos_permitidos' => [49, 14, 56, 16, 35]
+            ],
+            [
+                'nombre' => 'Informe Diario',
+                'url' => 'mantenimiento/historial_informes.php',
+                'cargos_permitidos' => [49, 14, 56, 16, 35]
             ],
             [
                 'nombre' => 'Calendario',
@@ -298,12 +335,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Historial Equipos',
                 'url' => 'mantenimiento/equipos_lista.php',
-                'cargos_permitidos' => [49, 16, 14, 35]
+                'cargos_permitidos' => [49, 16, 14, 56, 35]
             ],
             [
                 'nombre' => 'Nuevo Equipo',
                 'url' => 'mantenimiento/equipos_registro.php',
-                'cargos_permitidos' => [49, 16, 14, 35]
+                'cargos_permitidos' => [49, 16, 14, 56, 35]
             ],
             [
                 'nombre' => 'Movimiento de Activos',
@@ -369,7 +406,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Historial Ventas',
                 'url' => 'ventas/historial_ventas.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 42]
+                'cargos_permitidos' => [49, 16, 42, 26, 42, 53]
             ],
             [
                 'nombre' => 'Graficos con IA',
@@ -396,22 +433,22 @@ $menuGlobal = [
             [
                 'nombre' => 'Impulso de Ventas',
                 'url' => 'sucursales/kpi_sucursales.php',
-                'cargos_permitidos' => [5, 11, 26, 27, 42, 43, 49, 50]
+                'cargos_permitidos' => [5, 11, 26, 27, 42, 43, 49, 50, 53]
             ],
             [
-                'nombre' => 'Desempeno de Tienda',
+                'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/promedio.php',
                 'cargos_permitidos' => []
             ],
             [
                 'nombre' => 'Liderazgo',
                 'url' => 'gerencia/indicadores_resultado.php',
-                'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
+                'cargos_permitidos' => [49, 11, 12, 13, 42, 16, 53]
             ],
             [
                 'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50]
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55]
             ],
             [
                 'nombre' => 'Edición de Indicadores',
@@ -433,17 +470,27 @@ $menuGlobal = [
             [
                 'nombre' => 'Unidades',
                 'url' => 'POS/historial_unidades_conversion.php',
-                'cargos_permitidos' => []
+                'cargos_permitidos' => [49]
             ],
             [
                 'nombre' => 'Presentacion',
                 'url' => 'POS/producto_presentacion_gestion.php',
-                'cargos_permitidos' => []
+                'cargos_permitidos' => [55, 49]
             ],
             [
                 'nombre' => 'Producto Maestro',
                 'url' => 'POS/productos_maestro_gestion.php',
-                'cargos_permitidos' => []
+                'cargos_permitidos' => [55, 49]
+            ],
+            [
+                'nombre' => 'Recetas',
+                'url' => 'sistemas/accessantiguo_visor_recetas.php',
+                'cargos_permitidos' => [55, 49]
+            ],
+            [
+                'nombre' => 'Diccionario Access ERP',
+                'url' => 'sistemas/accessantiguo_diccionario_productos.php',
+                'cargos_permitidos' => [55, 49]
             ],
         ]
     ],
@@ -482,8 +529,7 @@ function detectarRutaBase()
         // Generar la ruta base (../../ etc.)
         if ($nivelesProfundidad === 0) {
             return './';
-        }
-        else {
+        } else {
             return str_repeat('../', $nivelesProfundidad);
         }
     }
@@ -568,8 +614,7 @@ function filtrarMenuPorPermisos($menu, $cargoOperario)
             if (!empty($itemsFiltrados)) {
                 $esVisible = true;
             }
-        }
-        else {
+        } else {
             // El grupo no tiene items (enlace directo), usar sus propios cargos
             if (tieneAcceso($cargoOperario, $grupo['cargos_permitidos'])) {
                 $esVisible = true;
@@ -612,7 +657,7 @@ function renderMenuLateral($cargoOperario)
     $moduloActual = detectarModuloActual();
 
     ob_start();
-?>
+    ?>
 
     <!-- Font Awesome Universal -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -1056,30 +1101,28 @@ function renderMenuLateral($cargoOperario)
                     <div class="menu-items" id="items-<?php echo $index; ?>">
                         <?php foreach ($grupo['items'] as $item): ?>
                             <?php
-                $isActive = '';
+                            $isActive = '';
 
-                $urlFile = basename($item['url']);
-                if ($urlFile === $paginaActual) {
-                    $isActive = 'active';
-                }
+                            $urlFile = basename($item['url']);
+                            if ($urlFile === $paginaActual) {
+                                $isActive = 'active';
+                            }
 
-?>
+                            ?>
                             <a href="<?php echo htmlspecialchars(generarUrlModulo($item['url'])); ?>"
                                 class="menu-item <?php echo $isActive; ?>" title="<?php echo htmlspecialchars($item['nombre']); ?>">
                                 <?php echo htmlspecialchars($item['nombre']); ?>
                             </a>
-                        <?php
-            endforeach; ?>
+                        <?php endforeach; ?>
                     </div>
-                <?php
-        else: ?>
+                <?php else: ?>
                     <!-- Grupo sin subitems (enlace directo) -->
                     <?php
-            $isActiveInicio = '';
-            if ($grupo['url'] && basename($grupo['url']) === $paginaActual) {
-                $isActiveInicio = 'active';
-            }
-?>
+                    $isActiveInicio = '';
+                    if ($grupo['url'] && basename($grupo['url']) === $paginaActual) {
+                        $isActiveInicio = 'active';
+                    }
+                    ?>
                     <a href="<?php echo htmlspecialchars(generarUrlModulo($grupo['url'])); ?>"
                         class="menu-group-title direct-link <?php echo $isActiveInicio; ?>"
                         data-tooltip="<?php echo htmlspecialchars($grupo['nombre']); ?>"
@@ -1091,11 +1134,9 @@ function renderMenuLateral($cargoOperario)
                             <?php echo htmlspecialchars($grupo['nombre']); ?>
                         </span>
                     </a>
-                <?php
-        endif; ?>
+                <?php endif; ?>
             </div>
-        <?php
-    endforeach; ?>
+        <?php endforeach; ?>
     </div>
 
     <!-- JavaScript del menú -->
@@ -1233,3 +1274,4 @@ function renderMenuLateral($cargoOperario)
     <?php
     return ob_get_clean();
 }
+

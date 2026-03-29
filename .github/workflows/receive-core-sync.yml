@@ -73,6 +73,12 @@ jobs:
             echo "âœ… 3 carpetas sincronizadas en el repo"
           fi
 
+      - name: ??? Validar Credenciales de Hostinger
+        run: |
+          if [ -z "${{ secrets.HOSTINGER_PATH }}" ]; then echo '? ERROR: HOSTINGER_PATH no está definido en este repo.'; exit 1; fi
+          if [ -z "${{ secrets.HOSTINGER_USER }}" ]; then echo '? ERROR: HOSTINGER_USER no está definido en este repo.'; exit 1; fi
+          if [ -z "${{ secrets.HOSTINGER_HOST }}" ]; then echo '? ERROR: HOSTINGER_HOST no está definido en este repo.'; exit 1; fi
+          echo '? Credenciales detectadas.'
       - name: ðŸ”‘ Configurar SSH para deploy al host
         uses: webfactory/ssh-agent@v0.8.0
         with:

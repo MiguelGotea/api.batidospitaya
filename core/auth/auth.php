@@ -32,7 +32,7 @@ function obtenerUsuarioActual()
         JOIN AsignacionNivelesCargos anc ON o.CodOperario = anc.CodOperario
         JOIN NivelesCargos nc ON anc.CodNivelesCargos = nc.CodNivelesCargos
         WHERE o.CodOperario = ? 
-        AND (anc.Fin IS NULL OR anc.Fin > NOW())
+        AND (anc.Fin IS NULL OR anc.Fin >= NOW())
         ORDER BY anc.Fecha DESC
         LIMIT 1
     ");

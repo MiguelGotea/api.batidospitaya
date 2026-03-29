@@ -88,6 +88,7 @@ font-size: clamp(12px, 2vw, 18px);
 - ❌ **NO usar degradados**
 - ✅ **Estilo minimalista y limpio**
 - ✅ **Mobile-first responsive**
+- ✅ **Modales Premium:** Efecto glassmorphism (blur), animaciones suaves y bordes redondeados.
 
 ## 🔐 Sistema de Permisos
 
@@ -124,6 +125,17 @@ tienePermiso($nombreHerramienta, $nombreAccion, $codNivelCargo)
 - `shortcut` - Acceso rápido en index del módulo
 - `aprobar_gerencia` - Aprobaciones de nivel gerencial
 - `exportar_{modulo}` - Exportar a Excel
+
+### Permisos Específicos por Módulo
+
+#### Mantenimiento (`historial_solicitudes_mantenimiento`)
+- `vista` - Ver el historial de solicitudes.
+- `nuevo_registro` - Acceder a formularios de creación de tickets y equipos.
+- `vista_todas_sucursales` - Ver y filtrar por todas las sucursales en el historial.
+
+#### Reglas de Sucursales en Mantenimiento
+- Usuarios sin `vista_todas_sucursales` solo verán su sucursal asignada.
+- En formularios de creación, el selector de sucursal se elimina para forzar la asignación automática basada en el cargo del usuario (toma la primera sucursal activa encontrada).
 
 ### Cargos Frecuentes
 
@@ -350,6 +362,17 @@ obtenerCredencialesUsuario($codOperario)
 
 ## 📘 Modal de Ayuda Universal (OBLIGATORIO)
 
+**TODAS las herramientas deben incluir un modal de ayuda** con ID estándar `pageHelpModal`. El header universal incluye un botón de ayuda (ícono "i" turquesa) que detecta automáticamente este modal.
+
+## 🗄️ Database Schema Research
+
+When researching database tables, fields, or relations:
+- **Primary Source**: ALWAYS use `docs/u839374897_erp.sql` as the single source of truth for the database schema.
+- **Verification**: Do not assume table structures based on code alone. Search for the `CREATE TABLE` and `ALTER TABLE` statements within the SQL dump to confirm data types, enums, and foreign key constraints.
+- **Updates**: If you identify a discrepancy between the code and the SQL dump, notify the user and prioritize the SQL dump structure.
+
+## 📘 Modal de Ayuda Universal (OBLIGATORIO)
+
 ### Implementación Requerida
 
 **TODAS las herramientas deben incluir un modal de ayuda** con ID estándar `pageHelpModal`. El header universal incluye un botón de ayuda (ícono "i" turquesa) que detecta automáticamente este modal.
@@ -445,6 +468,119 @@ El modal debe documentar:
 - ✅ **Contenido**: Documentación útil y completa
 - ❌ **No**: Modales vacíos o sin información relevante
 
+## 🎭 Modales Premium (Estándar de Diseño)
+
+Para una experiencia de usuario superior, todos los modales nuevos deben seguir el estándar "Premium":
+
+### Modales Premium (Estándar de Diseño)
+Ubicación del CSS: `/core/assets/css/modales_premium.css`
+
+Este CSS debe incluirse en cualquier página que requiera modales modernos con efecto glassmorphism y animaciones.
+```css
+/* Backdrop con desenfoque (Glassmorphism) */
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Contenido del Modal Moderno */
+.modal-content {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: slideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Animación de entrada */
+@keyframes slideUp {
+    from { transform: translateY(50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+/* Header estilizado */
+.modal-header {
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    padding: 20px 25px;
+}
+
+/* Botones Modernos */
+.btn-modern {
+    padding: 10px 25px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+.btn-modern-primary { background: #0E544C; color: white; }
+.btn-modern-secondary { background: #6c757d; color: white; }
+.btn-modern:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+```
+
+### 2. Estructura HTML
+
+```html
+<div class="modal fade" id="miModal" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Título Moderno</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Contenido -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-modern btn-modern-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn-modern btn-modern-primary">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+
+## 🔘 Botón de Acción Flotante (FAB) — ESTÁNDAR OBLIGATORIO
+
+### Regla
+
+**TODA página de historial o listado que permita crear un registro nuevo DEBE usar el botón circular flotante `.btn-floating-pitaya`.**  
+Nunca usar botones pill o inline (`btn btn-success`, `btn btn-primary rounded-pill`, etc.) para esta acción.
+
+### Fuente del CSS
+
+El estilo está en `/core/assets/css/fab_button.css` — **no copiar el CSS a los archivos del módulo**.
+
+Incluir en el `<head>` de la herramienta:
+
+```html
+<link rel="stylesheet" href="/core/assets/css/fab_button.css">
+```
+
+### Implementación
+
+```php
+<?php if (tienePermiso('nombre_herramienta', 'nuevo_registro', $cargoOperario)): ?>
+<a href="nueva_herramienta.php" class="btn-floating-pitaya" title="Nuevo Registro">
+    <i class="fas fa-plus"></i>
+</a>
+<?php endif; ?>
+```
+
+### Comportamiento Visual
+
+- ⭕ Circular (65×65px), **posición fija** — esquina inferior derecha (`bottom: 35px; right: 35px`)
+- 🎨 Color verde Pitaya `#51B8AC` en reposo · oscurece a `#0E544C` en hover
+- ✨ Al hacer hover: escala 1.15× + rotación 90° con animación cúbica
+- 🔲 Borde blanco de 3px · sombra verde suave
+
+### Requisitos
+
+- ✅ El ícono dentro SIEMPRE es `<i class="fas fa-plus"></i>` (Font Awesome 5)
+- ✅ Incluir atributo `title` descriptivo (ej: `title="Nueva Solicitud"`)
+- ✅ Envolver en bloque de permiso PHP con `tienePermiso()`
+- ✅ La página DEBE cargar `/core/assets/css/global_tools.css` en el `<head>`
+- ❌ **PROHIBIDO** redefinir `.btn-floating-pitaya` en CSS del módulo o en `<style>` inline
 
 ## 📊 Sistema de Filtros para Tablas
 
@@ -649,6 +785,8 @@ Preguntar al usuario:
 - ✅ ¿Sigue estructura de carpetas?
 - ✅ ¿Colores corporativos correctos?
 - ✅ ¿AJAX devuelve JSON?
+- ✅ ¿El botón "Nuevo Registro" usa `.btn-floating-pitaya` (no un botón pill/inline)?
+- ✅ ¿Carga `/core/assets/css/global_tools.css` en el `<head>`?
 
 ## 📦 Entregables Esperados
 

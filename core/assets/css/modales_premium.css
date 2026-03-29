@@ -1,0 +1,98 @@
+/* Estilos Premium para Modales (Glassmorphism) */
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.45) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    z-index: 1000;
+    display: none;
+}
+
+.modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 25px;
+    border: none !important;
+    border-radius: 20px !important;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2) !important;
+    animation: modalSlideUp 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+@keyframes modalSlideUp {
+    from { transform: translate(-50%, -40%); opacity: 0; }
+    to { transform: translate(-50%, -50%); opacity: 1; }
+}
+
+/* Header estilizado para modales */
+.modal-content h3 {
+    color: #0E544C;
+    margin-bottom: 25px;
+    font-weight: 700;
+    text-align: center;
+    border-bottom: 2px solid rgba(14, 84, 76, 0.1);
+    padding-bottom: 15px;
+}
+
+/* Botones Modernos */
+.btn-modern {
+    padding: 12px 25px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-modern-primary {
+    background: #0E544C;
+    color: white;
+}
+
+.btn-modern-primary:hover {
+    background: #0a3d37;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(14, 84, 76, 0.3);
+}
+
+.btn-modern-secondary {
+    background: #f1f3f5;
+    color: #495057;
+}
+
+.btn-modern-secondary:hover {
+    background: #e9ecef;
+    transform: translateY(-2px);
+}
+
+.btn-modern-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-modern-danger:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 53, 69, 0.3);
+}
+
+.btn-modern:active {
+    transform: translateY(0);
+}

@@ -1,0 +1,59 @@
+/* =========================================================
+   BOTÓN FLOTANTE DE ACCIÓN (FAB) — Estándar Pitaya ERP
+   Ubicación: /core/assets/css/fab_button.css
+
+   Uso: Incluir en cualquier página de historial/listado
+        que tenga un botón de "Nuevo Registro".
+
+   <link rel="stylesheet" href="/core/assets/css/fab_button.css">
+   ========================================================= */
+
+.btn-floating-pitaya {
+    position: fixed;
+    bottom: 35px;
+    right: 35px;
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background-color: #51B8AC;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    box-shadow: 0 8px 25px rgba(81, 184, 172, 0.5);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1000;
+    text-decoration: none;
+    border: 3px solid white;
+}
+
+.btn-floating-pitaya:hover {
+    transform: scale(1.15) rotate(90deg);
+    background-color: #0E544C;
+    color: white;
+    box-shadow: 0 12px 30px rgba(14, 84, 76, 0.4);
+}
+
+.btn-floating-pitaya i {
+    transition: transform 0.4s ease;
+}
+
+/* =========================================================
+   ADAPTACIÓN MÓVIL Y ESTADOS ACTIVOS
+   ========================================================= */
+@media (max-width: 768px) {
+    .btn-floating-pitaya {
+        width: 55px;
+        height: 55px;
+        font-size: 24px;
+        bottom: 25px;
+        right: 25px;
+    }
+
+    /* Reducción visual al estar "abierto" o presionado */
+    .btn-floating-pitaya.active,
+    .btn-floating-pitaya:active {
+        transform: scale(0.9);
+    }
+}

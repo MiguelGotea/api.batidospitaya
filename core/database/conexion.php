@@ -9,8 +9,8 @@ $dbname = "u839374897_erp";
 // verifica si se puede conectar  al abse de datos local, caso contrairo manda error
 try {
     $conn = new PDO(
-        "mysql:host=$servername;dbname=$dbname;charset=utf8mb4", 
-        $username, 
+        "mysql:host=$servername;dbname=$dbname;charset=utf8mb4",
+        $username,
         $password,
         [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
@@ -21,7 +21,7 @@ try {
     );
 } catch (PDOException $e) {
     error_log("Error de conexión: " . $e->getMessage());
-    
+
     if (strpos($_SERVER['HTTP_HOST'], 'localhost') !== false) {
         die("Error de conexión: " . $e->getMessage());
     } else {
@@ -30,7 +30,8 @@ try {
 }
 
 // Función para ejecutar consultas seguras
-function ejecutarConsulta($sql, $params = []) {
+function ejecutarConsulta($sql, $params = [])
+{
     global $conn;
     try {
         $stmt = $conn->prepare($sql);

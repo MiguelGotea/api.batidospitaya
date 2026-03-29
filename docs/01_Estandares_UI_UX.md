@@ -184,3 +184,38 @@ El contenido debe incluir:
 - Ayuda contextual siempre disponible
 - Mejor experiencia de usuario
 - Documentación integrada en la herramienta
+
+## Estilo Premium para Modales (Glassmorphism)
+
+Para implementar modales premium con efecto de desenfoque, animaciones suaves y botones modernos, se debe incluir el archivo CSS global:
+
+```html
+<link rel="stylesheet" href="/core/assets/css/modales_premium.css?v=<?php echo mt_rand(1, 10000); ?>">
+```
+
+Este estándar reemplaza los estilos de modal antiguos y proporciona:
+- **Glassmorphism**: Fondo semi-transparente con `backdrop-filter: blur(10px)`.
+- **Animaciones**: Entrada suave con `modalSlideUp`.
+- **Botones Modernos**: Clases `.btn-modern`, `.btn-modern-primary`, `.btn-modern-secondary`, `.btn-modern-danger`.
+- **Bordes Redondeados**: Radio de 20px para el contenedor del modal.
+/* Botones con estilo moderno */
+.btn-modern {
+    padding: 12px 30px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-modern-primary { background: #0E544C; color: white; }
+.btn-modern-secondary { background: #f8f9fa; color: #445; }
+```
+
+### 2. Guía de Uso
+- **Bordes:** Siempre usar bordes redondeados pronunciados (`15px` a `20px`).
+- **Sombras:** Usar sombras difusas (`box-shadow`) en lugar de bordes sólidos.
+- **Interacción:** Los botones deben tener efectos de hover (elevación o cambio de brillo).
+- **Consistencia:** Mantener el color institucional `#0E544C` para acciones primarias.

@@ -1,1 +1,1 @@
-pryeba sync 6
+pryeba sync 10

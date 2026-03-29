@@ -22,6 +22,12 @@ jobs:
           
           path: _pitayacore
 
+      - name: ?? Verificación de Versión (Debug)
+        run: |
+          echo '?? Fecha: '03/29/2026 11:29:39
+          echo '?? Último commit recibido de PitayaCore:'
+          git -C _pitayacore log -1 --oneline
+
       - name: ðŸ”„ Actualizar las 3 carpetas desde PitayaCore
         run: |
           rsync -av --delete _pitayacore/core/   ./core/

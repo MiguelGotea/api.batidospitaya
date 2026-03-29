@@ -19,7 +19,7 @@ jobs:
         with:
           repository: MiguelGotea/PitayaCore
           token: ${{ secrets.SYNC_TOKEN }}
-          ref: main
+          
           path: _pitayacore
 
       - name: 🔄 Actualizar las 3 carpetas desde PitayaCore

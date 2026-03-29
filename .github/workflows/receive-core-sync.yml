@@ -1,4 +1,4 @@
-name: 📦 Receive PitayaCore Sync
+name: Receive PitayaCore Sync
 
 on:
   repository_dispatch:
@@ -8,83 +8,80 @@ jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout subdominio
+      - name: Checkout subdomain
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 📥 Clonación Manual (Iron Sync con Reintentos)
+      - name: Iron Sync Implementation (Retry Loop)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
           ATTEMPTS=0
           MAX_ATTEMPTS=5
           SUCCESS=false
           
-          echo "🚀 Iniciando Iron Sync para la versión: $TARGET_SHA"
+          echo "Starting Iron Sync for version: $TARGET_SHA"
           
           while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
             ATTEMPTS=$((ATTEMPTS+1))
-            echo "------------------------------------------------------"
-            echo "🔄 Intento $ATTEMPTS/$MAX_ATTEMPTS: Descargando PitayaCore..."
+            echo "Attempt $ATTEMPTS/$MAX_ATTEMPTS: Fetching PitayaCore..."
             
             rm -rf _pitayacore
             git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
             
             LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
-            echo "🆔 SHA Esperado:  $TARGET_SHA"
-            echo "🆔 SHA Descargado: $LOCAL_SHA"
+            echo "Expected SHA:  $TARGET_SHA"
+            echo "Downloaded SHA: $LOCAL_SHA"
             
             if [ "$LOCAL_SHA" == "$TARGET_SHA" ]; then
-              echo "✅ ¡SHA validado correctamente! Procediendo..."
+              echo "SHA validated successfully!"
               SUCCESS=true
               break
             fi
             
-            echo "⚠️ ADVERTENCIA: Versión obsoleta detectada (Rezagado de GitHub)."
-            echo "😴 Esperando 10 segundos antes del próximo intento..."
+            echo "Warning: Stale version detected. Waiting 10 seconds..."
             sleep 10
           done
           
           if [ "$SUCCESS" = false ]; then
-            echo "❌ ERROR: Agotados los reintentos ($MAX_ATTEMPTS). GitHub sigue devolviendo una versión vieja."
-            echo "❌ La sincronización fallará para proteger la integridad del código."
+            echo "ERROR: GitHub is still returning an old version after $MAX_ATTEMPTS attempts."
             exit 1
           fi
 
-      - name: 🔄 Aplicar cambios al núcleo
+      - name: Apply changes to Core
         run: |
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: 💾 Guardar cambios en GitHub
+      - name: Shield - Validate Credentials
+        run: |
+          if [ -z "${{ secrets.HOSTINGER_PATH }}" ]; then echo "ERROR: HOSTINGER_PATH is missing."; exit 1; fi
+          if [ -z "${{ secrets.HOSTINGER_USER }}" ]; then echo "ERROR: HOSTINGER_USER is missing."; exit 1; fi
+          if [ -z "${{ secrets.HOSTINGER_HOST }}" ]; then echo "ERROR: HOSTINGER_HOST is missing."; exit 1; fi
+          echo "Credentials detected successfully."
+
+      - name: Save changes to GitHub
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
 
           if git diff --staged --quiet; then
-            echo "ℹ️ Sin cambios nuevos que commitear"
+            echo "No new changes to commit."
           else
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
             git push
-            echo "✅ 3 carpetas sincronizadas en el repo"
           fi
 
-      - name: ??? Validar Credenciales de Hostinger
-        run: |
-          if [ -z "${{ secrets.HOSTINGER_PATH }}" ]; then echo '? ERROR: HOSTINGER_PATH no est� definido en este repo.'; exit 1; fi
-          if [ -z "${{ secrets.HOSTINGER_USER }}" ]; then echo '? ERROR: HOSTINGER_USER no est� definido en este repo.'; exit 1; fi
-          if [ -z "${{ secrets.HOSTINGER_HOST }}" ]; then echo '? ERROR: HOSTINGER_HOST no est� definido en este repo.'; exit 1; fi
-          echo '? Credenciales detectadas.'
-      - name: 🔑 Configurar SSH para deploy al host
+      - name: Setup SSH for Hostinger
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: 📤 Deploy core/ → HOST
+      - name: Deploy core to Host
         run: |
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
@@ -95,6 +92,6 @@ jobs:
             ./core/ \
             $DEST_USER@$DEST_HOST:$DEST_PATH/core/
 
-      - name: ✅ Finalizado
+      - name: Update Finished
         run: |
-          echo "✅ Sincronización de Hierro con Reintentos completada exitosamente."
+          echo "Iron Sync with retries completed successfully."

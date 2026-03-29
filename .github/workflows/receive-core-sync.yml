@@ -1,4 +1,4 @@
-name: ?? Receive PitayaCore Sync
+name: 📦 Receive PitayaCore Sync
 
 on:
   repository_dispatch:
@@ -8,69 +8,64 @@ jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: ?? Checkout subdominio
+      - name: 📥 Checkout subdominio
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: ?? Clonaci�n Manual (Iron Sync)
+      - name: 📥 Clonación Manual (Iron Sync)
         run: |
-          echo "?? Clonando PitayaCore de forma fresca para romper cach�..."
+          echo "🚀 Clonando PitayaCore de forma fresca para romper caché..."
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
           
-          # ?? Validaci�n de DNI (SHA) del commit
-          LOCAL_SHA=\
+          # 🔍 Validación de DNI (SHA) del commit
+          LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
           TARGET_SHA="${{ github.event.client_payload.sha }}"
           
-          echo "?? SHA Esperado: \"
-          echo "?? SHA Descargado: \"
+          echo "🆔 SHA Esperado: $TARGET_SHA"
+          echo "🆔 SHA Descargado: $LOCAL_SHA"
           
           # Si no coinciden, forzamos el fallo del Action (Rojo)
-          if [ "\" != "\" ]; then
-            echo "? ERROR: El servidor de GitHub devolvi� una versi�n obsoleta de PitayaCore."
-            echo "? La sincronizaci�n fallar� para evitar inestabilidad. Se reintentar� en el pr�ximo push."
+          if [ "$LOCAL_SHA" != "$TARGET_SHA" ]; then
+            echo "❌ ERROR: El servidor de GitHub devolvió una versión obsoleta."
             exit 1
           fi
-          echo "? SHA validado correctamente."
+          echo "✅ SHA validado correctamente."
 
-      - name: ?? Aplicar cambios al n�cleo
+      - name: 🔄 Aplicar cambios al núcleo
         run: |
-          # Ver qu� archivos est�n cambiando (Verbose Diff)
-          echo "?? Resumen de cambios detectados:"
-          rsync -avz --dry-run _pitayacore/core/ ./core/ | grep .txt | grep .php | grep .md || true
-          
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: ?? Guardar cambios en GitHub
+      - name: 💾 Guardar cambios en GitHub
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
 
           if git diff --staged --quiet; then
-            echo "?? Sin cambios nuevos que commitear"
+            echo "ℹ️ Sin cambios nuevos que commitear"
           else
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
             git push
-            echo "? 3 carpetas sincronizadas en el repo"
+            echo "✅ 3 carpetas sincronizadas en el repo"
           fi
 
-      - name: ?? Configurar SSH para deploy al host
+      - name: 🔑 Configurar SSH para deploy al host
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: ?? Deploy core/ ? HOST
+      - name: 📤 Deploy core/ → HOST
         run: |
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no -p 65002" \
             ./core/ \
             ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH }}/core/
 
-      - name: ? Finalizado
+      - name: ✅ Finalizado
         run: |
-          echo "? Sincronizaci�n de Hierro completada exitosamente."
+          echo "✅ Sincronización de Hierro completada exitosamente."

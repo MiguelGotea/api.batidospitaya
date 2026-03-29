@@ -1,4 +1,4 @@
-name: üì¶ Receive PitayaCore Sync
+name: ?? Receive PitayaCore Sync
 
 on:
   repository_dispatch:
@@ -8,63 +8,69 @@ jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: üì• Checkout subdominio
+      - name: ?? Checkout subdominio
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: üì• Checkout PitayaCore en SHA espec√≠fico
-        uses: actions/checkout@v4
-        with:
-          repository: MiguelGotea/PitayaCore
-          token: ${{ secrets.SYNC_TOKEN }}
+      - name: ?? ClonaciÛn Manual (Iron Sync)
+        run: |
+          echo "?? Clonando PitayaCore de forma fresca para romper cachÈ..."
+          git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
           
-          path: _pitayacore
+          # ?? ValidaciÛn de DNI (SHA) del commit
+          LOCAL_SHA=\
+          TARGET_SHA="${{ github.event.client_payload.sha }}"
+          
+          echo "?? SHA Esperado: \"
+          echo "?? SHA Descargado: \"
+          
+          # Si no coinciden, forzamos el fallo del Action (Rojo)
+          if [ "\" != "\" ]; then
+            echo "? ERROR: El servidor de GitHub devolviÛ una versiÛn obsoleta de PitayaCore."
+            echo "? La sincronizaciÛn fallar· para evitar inestabilidad. Se reintentar· en el prÛximo push."
+            exit 1
+          fi
+          echo "? SHA validado correctamente."
 
-      - name: ?? VerificaciÛn de VersiÛn (Debug)
+      - name: ?? Aplicar cambios al n˙cleo
         run: |
-          echo '?? Fecha: '03/29/2026 11:29:39
-          echo '?? ⁄ltimo commit recibido de PitayaCore:'
-          git -C _pitayacore log -1 --oneline
-
-      - name: üîÑ Actualizar las 3 carpetas desde PitayaCore
-        run: |
+          # Ver quÈ archivos est·n cambiando (Verbose Diff)
+          echo "?? Resumen de cambios detectados:"
+          rsync -avz --dry-run _pitayacore/core/ ./core/ | grep .txt | grep .php | grep .md || true
+          
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: üíæ Commit y push si hay cambios reales
+      - name: ?? Guardar cambios en GitHub
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
 
           if git diff --staged --quiet; then
-            echo "‚ÑπÔ∏è Sin cambios nuevos que commitear"
+            echo "?? Sin cambios nuevos que commitear"
           else
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
             git push
-            echo "‚úÖ 3 carpetas sincronizadas en el repo"
+            echo "? 3 carpetas sincronizadas en el repo"
           fi
 
-      - name: üîë Configurar SSH para deploy al host
+      - name: ?? Configurar SSH para deploy al host
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: üì§ Deploy core/ ‚Üí HOST (SOLO core/, nunca docs/ ni .agent/)
+      - name: ?? Deploy core/ ? HOST
         run: |
-          echo "üì§ Deploying core/ to ${{ secrets.HOSTINGER_PATH_API }}/core/"
-
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no -p 65002" \
             ./core/ \
-            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH_API }}/core/
+            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH }}/core/
 
-      - name: ‚úÖ Verificar deploy
+      - name: ? Finalizado
         run: |
-          echo "‚úÖ core/ deployado exitosamente al host"
-          echo "üìÅ docs/ y .agent/ solo en GitHub, no en host"
-          echo "üåê Repositorio: ${{ github.repository }}"
+          echo "? SincronizaciÛn de Hierro completada exitosamente."

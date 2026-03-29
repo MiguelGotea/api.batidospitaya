@@ -17,6 +17,7 @@ jobs:
       - name: 📥 Clonación Manual (Iron Sync)
         run: |
           echo "🚀 Clonando PitayaCore de forma fresca para romper caché..."
+          # Usamos el token directamente para asegurar acceso y saltar caché de GitHub Actions
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
           
           # 🔍 Validación de DNI (SHA) del commit
@@ -26,15 +27,17 @@ jobs:
           echo "🆔 SHA Esperado: $TARGET_SHA"
           echo "🆔 SHA Descargado: $LOCAL_SHA"
           
-          # Si no coinciden, forzamos el fallo del Action (Rojo)
+          # Si no coinciden, forzamos el fallo del Action (Rojo) para avisar al usuario
           if [ "$LOCAL_SHA" != "$TARGET_SHA" ]; then
-            echo "❌ ERROR: El servidor de GitHub devolvió una versión obsoleta."
+            echo "❌ ERROR: El servidor de GitHub devolvió una versión obsoleta en el clon."
+            echo "❌ Esto suele ser un retraso temporal de GitHub. Se reintentará en el próximo cambio."
             exit 1
           fi
           echo "✅ SHA validado correctamente."
 
       - name: 🔄 Aplicar cambios al núcleo
         run: |
+          # Borramos y copiamos de forma quirúrgica
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
@@ -61,10 +64,16 @@ jobs:
 
       - name: 📤 Deploy core/ → HOST
         run: |
+          # Solo deployamos core/ al host
+          # Usar trim para asegurar que no hay espacios en los secretos
+          DEST_USER="${{ secrets.HOSTINGER_USER }}"
+          DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
+          DEST_PATH="${{ secrets.HOSTINGER_PATH }}"
+          
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no -p 65002" \
             ./core/ \
-            ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }}:${{ secrets.HOSTINGER_PATH }}/core/
+            $DEST_USER@$DEST_HOST:$DEST_PATH/core/
 
       - name: ✅ Finalizado
         run: |

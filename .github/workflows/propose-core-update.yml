@@ -13,30 +13,43 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'chore(core): sync')"
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout subdomain
+      - name: 📥 1. Checkout Subdominio
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Clonación Manual PitayaCore
+      - name: 📥 2. Clonación Manual PitayaCore
         run: |
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: Comparar y Propagar
+      - name: 🔍 3. Comparar y Propagar (v7.3 Audit)
         run: |
-          # Usamos diff ignorando finales de lÃ­nea
-          DIFF_CORE=$(diff -rqZ --exclude='.git' ./core/   _pitayacore/core/   2>/dev/null || true)
-          if [ -n "$DIFF_CORE" ]; then
-            rsync -av --delete ./core/   _pitayacore/core/
-            cd _pitayacore
-            git config user.name "Proposer Bot"
-            git config user.email "bot@batidospitaya.com"
-            git add core/
-            # Solo hacemos commit si Git detecta cambios reales
-            if ! git diff --staged --quiet; then
-              git commit -m "feat(core): update from subdomain (Human Push)"
-              git push
-            else
-              echo "ℹ️ No hay cambios reales detectados por Git."
-            fi
+          echo "🧐 Comparando ./core/ con _pitayacore/core/ ..."
+          
+          # Auditoría visual
+          echo "📄 Local (API/ERP/Talento):"
+          head -n 5 core/testcync.md || echo "Archivo no encontrado"
+          echo "📄 Remoto (PitayaCore):"
+          head -n 5 _pitayacore/core/testcync.md || echo "Archivo no encontrado"
+          
+          # Aplicar cambios
+          rsync -av --delete ./core/   _pitayacore/core/
+          rsync -av --delete ./docs/   _pitayacore/docs/
+          rsync -av --delete .agent/   _pitayacore/.agent/
+          
+          cd _pitayacore
+          git config user.name "Proposer Bot"
+          git config user.email "bot@batidospitaya.com"
+          git add .
+          
+          echo "🧐 Estado de Git en PitayaCore tras rsync:"
+          git status
+          
+          if ! git diff --staged --quiet; then
+            echo "�� ¡Diferencias detectadas! Subiendo a PitayaCore..."
+            git commit -m "feat(core): update from subdomain (Human Push) - v7.3"
+            git push
+            echo "✅ Propagación completada."
+          else
+            echo "ℹ️ INFO: No se detectaron cambios reales tras el rsync. Nada que proponer."
           fi

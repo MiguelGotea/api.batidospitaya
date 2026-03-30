@@ -1,4 +1,4 @@
-﻿name: Receive PitayaCore Sync (v11.1 Rayo)
+name: Receive PitayaCore Sync (v12)
 
 on:
   repository_dispatch:
@@ -18,20 +18,17 @@ jobs:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 🛡️ 2. Iron Sync v11.1 (Laser ls-remote)
+      - name: 🛡️ 2. Iron Sync v12 (Direct SHA)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
-          echo "🚀 Buscando SHA: $TARGET_SHA via ls-remote..."
-          ATTEMPTS=0; MAX_ATTEMPTS=15; SUCCESS=false
-          while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
-            ATTEMPTS=$((ATTEMPTS+1))
-            echo "⚡ Intento $ATTEMPTS/$MAX_ATTEMPTS..."
-            CURRENT_REMOTE_SHA=$(git ls-remote https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git HEAD | awk '{print $1}')
-            if [ "$CURRENT_REMOTE_SHA" == "$TARGET_SHA" ]; then SUCCESS=true; break; fi
-            sleep 10
-          done
-          if [ "$SUCCESS" = false ]; then exit 1; fi
+          echo "🚀 Intentando sincronizar con SHA: $TARGET_SHA"
+          
+          # Clonamos PitayaCore
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
+          cd _pitayacore
+          CURRENT_SHA=$(git rev-parse HEAD)
+          echo "✅ PitayaCore clonado en SHA: $CURRENT_SHA"
+          cd ..
 
       - name: 🛠️ 3. Aplicar y Desplegar
         run: |
@@ -43,7 +40,7 @@ jobs:
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
           if ! git diff --staged --quiet; then
-            git commit -m "chore(core): sync v11.1@${{ github.event.client_payload.sha }}"
+            git commit -m "chore(core): sync v12@${{ github.event.client_payload.sha }}"
             git pull --rebase origin main
             git push || (echo "Warning: Reintentando..." && git push --force)
           fi
@@ -57,7 +54,9 @@ jobs:
         run: |
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
-          DEST_PATH="${{ secrets.HOSTINGER_PATH }}${{ secrets.HOSTINGER_PATH_API }}${{ secrets.HOSTINGER_PATH_ERP }}${{ secrets.HOSTINGER_PATH_TALENTO }}"
+          # Usamos solo el secreto de ruta específico para este repo
+          DEST_PATH="${{ secrets.HOSTINGER_PATH_API }}"
+          
           rsync -avz --delete \
             -e "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p 65002" \
             ./core/ \

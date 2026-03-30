@@ -1,4 +1,4 @@
-name: ⬆️ Propose Core Update → PitayaCore (v12.3)
+name: ⬆️ Propose Core Update → PitayaCore (v12.4)
 
 on:
   push:
@@ -20,12 +20,11 @@ jobs:
 
       - name: 📥 2. Clonacion Completa PitayaCore
         run: |
-          # Clonación completa para evitar problemas de rebase/push en v12.3
           git clone https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
       - name: 🔍 3. Propagar y Forzar Sincronización
         run: |
-          REPRO_ID="api.batidospitaya"
+          REPRO_ID="erp.batidospitaya"
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
           rsync -av --delete .agent/   _pitayacore/.agent/
@@ -36,22 +35,24 @@ jobs:
           git add .
           
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from $REPRO_ID (v12.3)"
+            git commit -m "feat(core): update from $REPRO_ID (v12.4)"
           else
             echo "$(date)" >> core/testcync.md
             git add .
-            git commit -m "feat(core): forced heartbeat $REPRO_ID (v12.3)"
+            git commit -m "feat(core): forced heartbeat $REPRO_ID (v12.4)"
           fi
           
-          # Manejo de concurrencia: Pull con rebase y Push
           git pull origin main --rebase
           git push origin main
-          echo "✅ Cambio subido a PitayaCore."
+          echo "✅ Cambio subido a PitayaCore. Esperando 10s para el Dispatch..."
 
-      - name: 🚀 4. Trigger Force Sync (v12.3 Blindado)
+      - name: 🕒 4. Delay de Estabilización
+        run: sleep 10
+
+      - name: 🛰️ 5. Trigger Force Sync (v12.4 Certeza Total)
         uses: peter-evans/repository-dispatch@v3
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           repository: MiguelGotea/PitayaCore
           event-type: force-sync
-          client-payload: '{"sha": "${{ github.sha }}", "origin": "api.batidospitaya"}'
+          client-payload: '{"sha": "${{ github.sha }}", "confirm": "true"}'

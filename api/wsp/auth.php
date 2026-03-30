@@ -12,6 +12,7 @@ header('Content-Type: application/json; charset=utf-8');
 // Definir el token aquí o leerlo desde una constante/archivo de configuración
 // ⚠️ CAMBIAR ESTE TOKEN POR UNO ALEATORIO SEGURO (mínimo 32 caracteres)
 define('WSP_TOKEN_SECRETO', 'c5b155ba8f6877a2eefca0183ab18e37fe9a6accde340cf5c88af724822cbf50');
+define('ERP_API_TOKEN', 'a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2');
 
 function verificarTokenVPS()
 {
@@ -23,7 +24,8 @@ function verificarTokenVPS()
         $tokenRecibido = $headers['X-WSP-Token'] ?? $headers['x-wsp-token'] ?? '';
     }
 
-    if (empty($tokenRecibido) || $tokenRecibido !== WSP_TOKEN_SECRETO) {
+    // Aceptar cualquiera de los dos tokens válidos
+    if (empty($tokenRecibido) || ($tokenRecibido !== WSP_TOKEN_SECRETO && $tokenRecibido !== ERP_API_TOKEN)) {
         http_response_code(401);
         echo json_encode(['error' => 'No autorizado — token inválido o ausente']);
         exit;

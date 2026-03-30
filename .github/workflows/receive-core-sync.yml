@@ -1,4 +1,4 @@
-﻿name: Receive PitayaCore Sync (v11 Rayo)
+﻿name: Receive PitayaCore Sync (v11.1 Rayo)
 
 on:
   repository_dispatch:
@@ -18,10 +18,10 @@ jobs:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 🛡️ 2. Iron Sync v11 (LÃ¡ser ls-remote)
+      - name: 🛡️ 2. Iron Sync v11.1 (Laser ls-remote)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
-          echo "🚀 Buscando SHA: $TARGET_SHA vía ls-remote..."
+          echo "🚀 Buscando SHA: $TARGET_SHA via ls-remote..."
           ATTEMPTS=0; MAX_ATTEMPTS=15; SUCCESS=false
           while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
             ATTEMPTS=$((ATTEMPTS+1))
@@ -43,9 +43,9 @@ jobs:
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
           if ! git diff --staged --quiet; then
-            git commit -m "chore(core): sync v11@${{ github.event.client_payload.sha }}"
+            git commit -m "chore(core): sync v11.1@${{ github.event.client_payload.sha }}"
             git pull --rebase origin main
-            git push || (echo "âš ï¸ Reintentando..." && git push --force)
+            git push || (echo "Warning: Reintentando..." && git push --force)
           fi
 
       - name: 🔑 4. SSH Hostinger

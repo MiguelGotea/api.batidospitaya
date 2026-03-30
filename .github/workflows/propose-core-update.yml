@@ -10,43 +10,37 @@ on:
 
 jobs:
   propose:
+    # FILTRO CRÍTICO: No proponer si el cambio fue hecho por el sistema de sincronización (evita bucles)
+    if: "!contains(github.event.head_commit.message, 'chore(core): sync')"
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout subdominio (con los cambios del push)
+      - name: 📥 Checkout subdominio (Humano)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 📥 Checkout PitayaCore (HEAD actual)
-        uses: actions/checkout@v4
-        with:
-          repository: MiguelGotea/PitayaCore
-          token: ${{ secrets.SYNC_TOKEN }}
-          path: _pitayacore
-          fetch-depth: 0
+      - name: 📥 Clonación Manual de PitayaCore (Iron Proposal)
+        run: |
+          echo "🔄 Obteniendo estado actual de PitayaCore..."
+          git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 Comparar las 3 carpetas vs PitayaCore
+      - name: 🔍 Comparar cambios vs PitayaCore
         id: diff
         run: |
-          DIFF_CORE=$(diff -rq --exclude='.gitkeep' ./core/   _pitayacore/core/   2>/dev/null || true)
-          DIFF_DOCS=$(diff -rq --exclude='.gitkeep' ./docs/   _pitayacore/docs/   2>/dev/null || true)
-          DIFF_AGENT=$(diff -rq --exclude='.gitkeep' ./.agent/ _pitayacore/.agent/ 2>/dev/null || true)
+          # Detectar si hay diferencias reales en el contenido
+          DIFF_CORE=$(diff -rq --exclude='.git' ./core/   _pitayacore/core/   2>/dev/null || true)
+          DIFF_DOCS=$(diff -rq --exclude='.git' ./docs/   _pitayacore/docs/   2>/dev/null || true)
+          DIFF_AGENT=$(diff -rq --exclude='.git' ./.agent/ _pitayacore/.agent/ 2>/dev/null || true)
 
           if [ -n "$DIFF_CORE" ] || [ -n "$DIFF_DOCS" ] || [ -n "$DIFF_AGENT" ]; then
             echo "has_diff=true" >> $GITHUB_OUTPUT
-            echo "⚡ Diferencias detectadas vs PitayaCore HEAD"
-            echo "--- core diff ---"
-            echo "$DIFF_CORE"
-            echo "--- docs diff ---"
-            echo "$DIFF_DOCS"
-            echo "--- .agent diff ---"
-            echo "$DIFF_AGENT"
+            echo "⚡ Diferencias detectadas. Preparando propuesta para PitayaCore."
           else
             echo "has_diff=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ Sin diferencias vs PitayaCore — no se propaga"
+            echo "ℹ️ El núcleo de PitayaCore ya está al día. Sin acción necesaria."
           fi
 
-      - name: 🔄 Actualizar PitayaCore con los cambios del subdominio
+      - name: 🚀 Enviar cambios a PitayaCore
         if: steps.diff.outputs.has_diff == 'true'
         run: |
           rsync -av --delete ./core/   _pitayacore/core/
@@ -54,20 +48,20 @@ jobs:
           rsync -av --delete ./.agent/ _pitayacore/.agent/
 
           cd _pitayacore
-          git config user.name "Sync Bot — ${{ github.repository }}"
+          git config user.name "Proposer Bot — ${{ github.repository }}"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
 
+          # Verificar de nuevo antes de empujar por si otro subdominio se adelantó
           if git diff --staged --quiet; then
-            echo "ℹ️ PitayaCore ya tenía estos cambios exactos"
+            echo "ℹ️ PitayaCore ya recibió estos cambios recientemente."
           else
-            git commit -m "chore(core): update from ${{ github.repository }}@${{ github.sha }}"
+            git commit -m "feat(core): update from ${{ github.repository }} (Human Push)"
             git push
-            echo "✅ PitayaCore actualizado"
-            echo "🔄 Se activará automáticamente sync-to-subdomains.yml en PitayaCore"
-            echo "   que replicará a todos los subdominios y desplegará core/ en cada host"
+            echo "✅ PitayaCore actualizado exitosamente."
+            echo "ℹ️ Esto disparará 'sync-to-subdomains' en PitayaCore para replicar a todos."
           fi
 
-      - name: 🧹 Limpiar directorio temporal
+      - name: 🧹 Clean up
         if: always()
         run: rm -rf _pitayacore

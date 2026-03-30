@@ -24,32 +24,21 @@ jobs:
           ATTEMPTS=0
           MAX_ATTEMPTS=5
           SUCCESS=false
-          
           echo "🚀 Iniciando Iron Sync para la versión: $TARGET_SHA"
-          
           while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
             ATTEMPTS=$((ATTEMPTS+1))
             echo "------------------------------------------------------"
             echo "🔄 Intento $ATTEMPTS/$MAX_ATTEMPTS: Descargando PitayaCore..."
             rm -rf _pitayacore
             git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
-            
             LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
-            echo "🆔 SHA Esperado:  $TARGET_SHA"
-            echo "🆔 SHA Descargado: $LOCAL_SHA"
-            
             if [ "$LOCAL_SHA" == "$TARGET_SHA" ]; then
-              echo "✅ ¡SHA validado correctamente! Procediendo..."
-              SUCCESS=true
-              break
+              echo "✅ SHA validado."
+              SUCCESS=true; break
             fi
-            echo "⚠️ ADVERTENCIA: Versión no coincide. Reintentando en 10s..."
+            echo "⚠️ Versión no coincide. Reintentando en 10s..."
             sleep 10
           done
-          
-          if [ "$SUCCESS" = false ]; then
-             echo "⚠️ INFO: Procediendo con versión flexible (v3)."
-          fi
 
       - name: Apply changes to Core
         run: |
@@ -63,20 +52,20 @@ jobs:
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
-          if git diff --staged --quiet; then
-            echo "ℹ️ Sin cambios."
-          else
+          if ! git diff --staged --quiet; then
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
             git pull --rebase origin main
             git push
           fi
 
-      - name: Setup SSH and Deploy
+      - name: Setup SSH for Hostinger
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: Deploy core to Host
         run: |
-          # Despliegue a Hostinger
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
           DEST_PATH="${{ secrets.HOSTINGER_PATH }}${{ secrets.HOSTINGER_PATH_API }}${{ secrets.HOSTINGER_PATH_ERP }}${{ secrets.HOSTINGER_PATH_TALENTO }}"
-          
-          # Aquí iría el rsync de despliegue si SSH Agent está listo
-          echo "🚀 Despliegue simulado (necesita ssh-agent)"
+          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -p 65002" ./core/ $DEST_USER@$DEST_HOST:$DEST_PATH/core/

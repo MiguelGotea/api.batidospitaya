@@ -13,16 +13,16 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'chore(core): sync')"
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout
+      - name: Checkout subdomain
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 📥 Clonación Manual PitayaCore
+      - name: Clonación Manual PitayaCore
         run: |
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 Comparar y Propagar
+      - name: Comparar y Propagar
         run: |
           DIFF_CORE=$(diff -rq --exclude='.git' ./core/   _pitayacore/core/   2>/dev/null || true)
           if [ -n "$DIFF_CORE" ]; then
@@ -31,6 +31,6 @@ jobs:
             git config user.name "Proposer Bot"
             git config user.email "bot@batidospitaya.com"
             git add core/
-            git commit -m "feat(core): update from subrepo (Human Push)"
+            git commit -m "feat(core): update from subdomain (Human Push)"
             git push
           fi

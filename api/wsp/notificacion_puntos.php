@@ -11,14 +11,8 @@ require_once __DIR__ . '/../../core/database/conexion.php';
 // Verificamos el token (Access debe enviar X-WSP-Token)
 verificarTokenVPS();
 
-// Log para depuración
-$log_file = __DIR__ . '/log_wsp_puntos.txt';
-$raw_input = file_get_contents('php://input');
-file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] Input recibida: " . $raw_input . PHP_EOL, FILE_APPEND);
-
 // Recibir datos POST
-$data = json_decode($raw_input, true);
-file_put_contents($log_file, "[" . date('Y-m-d H:i:s') . "] Datos JSON: " . print_r($data, true) . PHP_EOL, FILE_APPEND);
+$data = json_decode(file_get_contents('php://input'), true);
 
 $membresia = $data['membresia'] ?? null;
 $puntos_usados = $data['puntos'] ?? null;

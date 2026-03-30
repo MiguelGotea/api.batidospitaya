@@ -20,7 +20,7 @@ Public Sub SincronizarCedulasLocales()
     Dim totalRecibidos As Long
     
     ' 1. Obtener sucursal local (función del sistema)
-    sucursal = codigoLoca()
+    sucursal = codigolocal()
     
     If IsNull(sucursal) Or sucursal = "" Then
         MsgBox "No se pudo determinar el código de sucursal local.", vbExclamation, "Error de Sincronización"
@@ -73,9 +73,9 @@ Public Sub SincronizarCedulasLocales()
             cleanObj = Replace(Replace(obj, "{", ""), "}", "")
             
             ' Extraer membresia
-            membresia = ExtraerValorJSON(cleanObj, "membresia")
+            membresia = ParseSimpleJSONValue(cleanObj, "membresia")
             ' Extraer cedula
-            cedula = ExtraerValorJSON(cleanObj, "cedula")
+            cedula = ParseSimpleJSONValue(cleanObj, "cedula")
             
             If membresia <> "" And cedula <> "" Then
                 totalRecibidos = totalRecibidos + 1
@@ -109,7 +109,7 @@ ErrorHandler:
 End Sub
 
 ' Función auxiliar para extraer valores de un objeto JSON simple "key":value o "key":"value"
-Private Function ExtraerValorJSON(jsonStr As String, key As String) As String
+Private Function ParseSimpleJSONValue(jsonStr As String, key As String) As String
     Dim keySearch As String
     Dim p1 As Long, p2 As Long
     
@@ -129,7 +129,7 @@ Private Function ExtraerValorJSON(jsonStr As String, key As String) As String
         End If
         
         If p2 > p1 Then
-            ExtraerValorJSON = Mid(jsonStr, p1, p2 - p1)
+            ParseSimpleJSONValue = Mid(jsonStr, p1, p2 - p1)
         End If
     End If
 End Function

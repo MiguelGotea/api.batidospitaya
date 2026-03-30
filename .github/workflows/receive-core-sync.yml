@@ -18,7 +18,7 @@ jobs:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 🛡️ 2. Iron Sync v7.2 (Wait for Propagation)
+      - name: 🛡️ 2. Iron Sync v8.1 (Wait for Propagation)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
           ATTEMPTS=0; MAX_ATTEMPTS=10; SUCCESS=false

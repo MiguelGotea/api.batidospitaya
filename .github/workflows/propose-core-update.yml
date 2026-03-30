@@ -1,4 +1,5 @@
-﻿name: ⬆️ Propose Core Update → PitayaCore
+﻿# VersiÃ³n 8.1 con Scanner Auditivo
+name: ⬆️ Propose Core Update → PitayaCore
 
 on:
   push:
@@ -20,49 +21,24 @@ jobs:
 
       - name: 📥 2. Clonación Manual PitayaCore
         run: |
-          echo "🔄 Clonando PitayaCore..."
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Auditoría Quirúrgica (v8)
+      - name: 🔍 3. Auditoría Quirúrgica (v8.1)
         run: |
-          FILE_PATH="core/testcync.md"
-          
-          echo "📂 INSPECCIÓN PRE-SINCRONIZACIÓN"
-          echo "------------------------------------------------"
-          echo "📍 API Local ($FILE_PATH):"
-          cat $FILE_PATH || echo "Archivo no existe en local"
-          
-          echo "📍 PitayaCore Remoto (_pitayacore/$FILE_PATH):"
-          cat _pitayacore/$FILE_PATH || echo "Archivo no existe en remoto"
-          
-          echo "------------------------------------------------"
-          echo "🛠️ Ejecutando rsync..."
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
           rsync -av --delete .agent/   _pitayacore/.agent/
-          
-          echo "📍 PitayaCore TRAS RSYNC (_pitayacore/$FILE_PATH):"
-          cat _pitayacore/$FILE_PATH
-          
           cd _pitayacore
           git config user.name "Proposer Bot"
           git config user.email "bot@batidospitaya.com"
           git add .
-          
-          echo "🧐 Estado de Git en PitayaCore:"
-          git status
-          
           if ! git diff --staged --quiet; then
-            echo "📝 ¡Cambios detectados! Subiendo a PitayaCore..."
-            git commit -m "feat(core): update from subdomain (Human Push) - v8 Audit"
+            git commit -m "feat(core): update from subdomain (Human Push) - v8.1"
             git push origin main
-            echo "✅ ¡Propagación enviada!"
           else
-            echo "⚠️ ADVERTENCIA: Git no detecta cambios a pesar del rsync."
-            # Forzamos un cambio invisible para ver si es problema de Git
-            echo " " >> $FILE_PATH
+            # Forzado por si Git estÃ¡ perezoso con los finales de lÃ­nea
+            echo " " >> core/testcync.md
             git add .
-            git commit -m "feat(core): force update due to git detection delay"
+            git commit -m "feat(core): forced update v8.1"
             git push origin main
-            echo "🦾 Actualización forzada enviada."
           fi

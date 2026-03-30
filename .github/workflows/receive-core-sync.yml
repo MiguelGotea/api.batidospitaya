@@ -18,29 +18,21 @@ jobs:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 🛡️ 2. Iron Sync v6 (Scanner de Propagación)
+      - name: 🛡️ 2. Iron Sync v7.2 (Wait for Propagation)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
-          echo "🚀 Se busca la versión: $TARGET_SHA"
-          ATTEMPTS=0; MAX_ATTEMPTS=8; SUCCESS=false
+          ATTEMPTS=0; MAX_ATTEMPTS=10; SUCCESS=false
           while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
             ATTEMPTS=$((ATTEMPTS+1))
-            echo "------------------------------------------------------"
-            echo "🔄 Intento $ATTEMPTS/$MAX_ATTEMPTS: Descargando PitayaCore..."
             rm -rf _pitayacore
             git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
             LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
             if [ "$LOCAL_SHA" == "$TARGET_SHA" ]; then
-              echo "✅ SHA validado."
               SUCCESS=true; break
             fi
-            echo "⚠️ Versión vieja. Esperando 15s..."
             sleep 15
           done
-          if [ "$SUCCESS" = false ]; then
-            echo "❌ ERROR: No se obtuvo la versión $TARGET_SHA."
-            exit 1
-          fi
+          if [ "$SUCCESS" = false ]; then exit 1; fi
 
       - name: 🛠️ 3. Aplicar cambios Quirúrgicos
         run: |
@@ -49,7 +41,7 @@ jobs:
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: 💾 4. Guardar en GitHub (Auditoría Profunda)
+      - name: 💾 4. Guardar en GitHub
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
@@ -57,10 +49,15 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
             git pull --rebase origin main
-            git push || (echo "⚠️ Push standard falló. Intentando reparación..." && git push --force)
+            git push || (echo "⚠️ FallÃ³ push, reintentando..." && git push --force)
           fi
 
-      - name: 🌍 5. Desplegar al Host (Hostinger)
+      - name: 🔑 5. Configurar SSH para Hostinger
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
+
+      - name: 🌍 6. Desplegar al Host (Hostinger)
         run: |
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"

@@ -24,13 +24,19 @@ jobs:
 
       - name: Comparar y Propagar
         run: |
-          DIFF_CORE=$(diff -rq --exclude='.git' ./core/   _pitayacore/core/   2>/dev/null || true)
+          # Usamos diff ignorando finales de lÃ­nea
+          DIFF_CORE=$(diff -rqZ --exclude='.git' ./core/   _pitayacore/core/   2>/dev/null || true)
           if [ -n "$DIFF_CORE" ]; then
             rsync -av --delete ./core/   _pitayacore/core/
             cd _pitayacore
             git config user.name "Proposer Bot"
             git config user.email "bot@batidospitaya.com"
             git add core/
-            git commit -m "feat(core): update from subdomain (Human Push)"
-            git push
+            # Solo hacemos commit si Git detecta cambios reales
+            if ! git diff --staged --quiet; then
+              git commit -m "feat(core): update from subdomain (Human Push)"
+              git push
+            else
+              echo "ℹ️ No hay cambios reales detectados por Git."
+            fi
           fi

@@ -1,4 +1,4 @@
-name: ⬆️ Propose Core Update → PitayaCore (v12)
+name: ⬆️ Propose Core Update → PitayaCore (v12.3)
 
 on:
   push:
@@ -13,33 +13,45 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'chore(core): sync')"
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 1. Checkout
+      - name: 📥 1. Checkout Subdomain
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 📥 2. Clonacion PitayaCore
+      - name: 📥 2. Clonacion Completa PitayaCore
         run: |
-          git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
+          # Clonación completa para evitar problemas de rebase/push en v12.3
+          git clone https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Propagar con Firma (v12)
+      - name: 🔍 3. Propagar y Forzar Sincronización
         run: |
           REPRO_ID="api.batidospitaya"
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
           rsync -av --delete .agent/   _pitayacore/.agent/
+          
           cd _pitayacore
           git config user.name "Proposer Bot"
           git config user.email "bot@batidospitaya.com"
           git add .
+          
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from $REPRO_ID (v12)"
+            git commit -m "feat(core): update from $REPRO_ID (v12.3)"
           else
-            echo " " >> core/testcync.md
+            echo "$(date)" >> core/testcync.md
             git add .
-            git commit -m "feat(core): forced update $REPRO_ID (v12)"
+            git commit -m "feat(core): forced heartbeat $REPRO_ID (v12.3)"
           fi
           
-          # Manejo de concurrencia: Pull con rebase antes de push
+          # Manejo de concurrencia: Pull con rebase y Push
           git pull origin main --rebase
           git push origin main
+          echo "✅ Cambio subido a PitayaCore."
+
+      - name: 🚀 4. Trigger Force Sync (v12.3 Blindado)
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.SYNC_TOKEN }}
+          repository: MiguelGotea/PitayaCore
+          event-type: force-sync
+          client-payload: '{"sha": "${{ github.sha }}", "origin": "api.batidospitaya"}'

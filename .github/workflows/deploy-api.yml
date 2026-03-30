@@ -28,8 +28,6 @@ jobs:
           --exclude='.scripts/' \
           --exclude='.agent/' \
           --exclude='.gitignore' \
-          --exclude='core/' \
-          --exclude='docs/' \
           --exclude='api/uploads/' \
           -e "ssh -o StrictHostKeyChecking=no -p 65002" \
           ./ \
@@ -41,15 +39,15 @@ jobs:
         
         ssh -o StrictHostKeyChecking=no -p 65002 ${{ secrets.HOSTINGER_USER }}@${{ secrets.HOSTINGER_HOST }} << 'EOF'
           cd ${{ secrets.HOSTINGER_PATH_API }}
-          find api -type d -exec chmod 755 {} \;
-          find api -type f -exec chmod 644 {} \;
+          find api core docs -type d -exec chmod 755 {} \;
+          find api core docs -type f -exec chmod 644 {} \;
           chmod -R 777 api/uploads/ || true
         EOF
         
     - name: ✅ Verificar deploy
       run: |
         echo "✅ Deploy completado exitosamente"
-        echo "📁 Carpeta sincronizada: api/"
+        echo "📁 Carpeta sincronizada: api/, core/, docs/"
         echo "📁 Carpeta excluida: api/uploads/"
         echo "🌐 Sitio: https://api.batidospitaya.com"
         echo "🖥️ Servidor: ${{ secrets.HOSTINGER_HOST }}:65002"

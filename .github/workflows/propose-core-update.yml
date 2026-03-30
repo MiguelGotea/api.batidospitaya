@@ -1,4 +1,4 @@
-name: ⬆️ Propose Core Update → PitayaCore (v12.4)
+name: ⬆️ Propose Core Update → PitayaCore (v13)
 
 on:
   push:
@@ -22,9 +22,9 @@ jobs:
         run: |
           git clone https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Propagar y Forzar Sincronización
+      - name: 🔍 3. Propagar a Maestro (v13)
         run: |
-          REPRO_ID="erp.batidospitaya"
+          REPRO_ID="api.batidospitaya"
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
           rsync -av --delete .agent/   _pitayacore/.agent/
@@ -35,24 +35,10 @@ jobs:
           git add .
           
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from $REPRO_ID (v12.4)"
+            git commit -m "feat(core): update from $REPRO_ID (v13)"
+            git pull origin main --rebase
+            git push origin main
+            echo "✅ Cambio subido a PitayaCore Maestro."
           else
-            echo "$(date)" >> core/testcync.md
-            git add .
-            git commit -m "feat(core): forced heartbeat $REPRO_ID (v12.4)"
+            echo "⏭️ Sin cambios que proponer."
           fi
-          
-          git pull origin main --rebase
-          git push origin main
-          echo "✅ Cambio subido a PitayaCore. Esperando 10s para el Dispatch..."
-
-      - name: 🕒 4. Delay de Estabilización
-        run: sleep 10
-
-      - name: 🛰️ 5. Trigger Force Sync (v12.4 Certeza Total)
-        uses: peter-evans/repository-dispatch@v3
-        with:
-          token: ${{ secrets.SYNC_TOKEN }}
-          repository: MiguelGotea/PitayaCore
-          event-type: force-sync
-          client-payload: '{"sha": "${{ github.sha }}", "confirm": "true"}'

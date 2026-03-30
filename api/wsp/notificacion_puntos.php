@@ -8,18 +8,15 @@
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/../../core/database/conexion.php';
 
-// Soporte para GET y POST para facilitar pruebas desde el navegador
-$tokenRecibido = $_SERVER['HTTP_X_WSP_TOKEN'] ?? $_GET['token'] ?? '';
-if (empty($tokenRecibido) || $tokenRecibido !== WSP_TOKEN_SECRETO) {
-    respuestaError('No autorizado — token inválido o ausente', 401);
-}
+// Verificamos el token (Access debe enviar X-WSP-Token)
+verificarTokenVPS();
 
-// Recibir datos (POST JSON o GET)
+// Recibir datos POST
 $data = json_decode(file_get_contents('php://input'), true);
 
-$membresia = $data['membresia'] ?? $_GET['membresia'] ?? null;
-$puntos_usados = $data['puntos'] ?? $_GET['puntos'] ?? null;
-$sucursal = $data['sucursal'] ?? $_GET['sucursal'] ?? null;
+$membresia = $data['membresia'] ?? null;
+$puntos_usados = $data['puntos'] ?? null;
+$sucursal = $data['sucursal'] ?? null;
 
 if (!$membresia || $puntos_usados === null || !$sucursal) {
     respuestaError('Faltan parámetros requeridos: membresia, puntos, sucursal');

@@ -1,4 +1,4 @@
-﻿name: ⬆️ Propose Core Update → PitayaCore
+﻿name: ⬆️ Propose Core Update → PitayaCore (v11)
 
 on:
   push:
@@ -18,11 +18,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📥 2. Clonación Manual PitayaCore
+      - name: 📥 2. ClonaciÃ³n PitayaCore
         run: |
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Comparar y Propagar (v10 Firma Identidad)
+      - name: 🔍 3. Propagar con Firma (v11)
         run: |
           REPRO_ID="api.batidospitaya"
           rsync -av --delete ./core/   _pitayacore/core/
@@ -33,11 +33,11 @@ jobs:
           git config user.email "bot@batidospitaya.com"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from $REPRO_ID (Human Push) - v10"
+            git commit -m "feat(core): update from $REPRO_ID (v11 Audit)"
             git push origin main
           else
             echo " " >> core/testcync.md
             git add .
-            git commit -m "feat(core): forced update from $REPRO_ID v10"
+            git commit -m "feat(core): forced update $REPRO_ID (v11)"
             git push origin main
           fi

@@ -1,4 +1,4 @@
-﻿name: Receive PitayaCore Sync
+﻿name: Receive PitayaCore Sync (v11 Rayo)
 
 on:
   repository_dispatch:
@@ -12,52 +12,53 @@ jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 1. Checkout Subdominio
+      - name: 📥 1. Checkout
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 🛡️ 2. Iron Sync v8.2 (Wait for Propagation)
+      - name: 🛡️ 2. Iron Sync v11 (LÃ¡ser ls-remote)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
-          ATTEMPTS=0; MAX_ATTEMPTS=10; SUCCESS=false
+          echo "🚀 Buscando SHA: $TARGET_SHA vía ls-remote..."
+          ATTEMPTS=0; MAX_ATTEMPTS=15; SUCCESS=false
           while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
             ATTEMPTS=$((ATTEMPTS+1))
-            rm -rf _pitayacore
-            git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
-            LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
-            if [ "$LOCAL_SHA" == "$TARGET_SHA" ]; then SUCCESS=true; break; fi
-            sleep 15
+            echo "⚡ Intento $ATTEMPTS/$MAX_ATTEMPTS..."
+            CURRENT_REMOTE_SHA=$(git ls-remote https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git HEAD | awk '{print $1}')
+            if [ "$CURRENT_REMOTE_SHA" == "$TARGET_SHA" ]; then SUCCESS=true; break; fi
+            sleep 10
           done
           if [ "$SUCCESS" = false ]; then exit 1; fi
+          git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🛠️ 3. Aplicar cambios Quirúrgicos
+      - name: 🛠️ 3. Aplicar y Desplegar
         run: |
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
-
-      - name: 💾 4. Guardar en GitHub
-        run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
           if ! git diff --staged --quiet; then
-            git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
+            git commit -m "chore(core): sync v11@${{ github.event.client_payload.sha }}"
             git pull --rebase origin main
-            git push || (echo "⚠️ FallÃ³ push, reintentando..." && git push --force)
+            git push || (echo "âš ï¸ Reintentando..." && git push --force)
           fi
 
-      - name: 🔑 5. Configurar SSH para Hostinger
+      - name: 🔑 4. SSH Hostinger
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: 🌍 6. Desplegar al Host (Hostinger)
+      - name: 🌍 5. Hostinger Deploy
         run: |
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
           DEST_PATH="${{ secrets.HOSTINGER_PATH }}${{ secrets.HOSTINGER_PATH_API }}${{ secrets.HOSTINGER_PATH_ERP }}${{ secrets.HOSTINGER_PATH_TALENTO }}"
-          rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -p 65002" ./core/ $DEST_USER@$DEST_HOST:$DEST_PATH/core/
+          rsync -avz --delete \
+            -e "ssh -o StrictHostKeyChecking=no -o ConnectTimeout=15 -p 65002" \
+            ./core/ \
+            $DEST_USER@$DEST_HOST:$DEST_PATH/core/

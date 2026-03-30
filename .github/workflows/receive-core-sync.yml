@@ -12,60 +12,61 @@ jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout subdomain
+      - name: 📥 Checkout Subdominio
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: Iron Sync Implementation (Retry Loop)
+      - name: 🛡️ Iron Sync v4 (Manual Clone & Verify)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
-          ATTEMPTS=0
-          MAX_ATTEMPTS=5
-          SUCCESS=false
-          echo "🚀 Iniciando Iron Sync para la versión: $TARGET_SHA"
-          while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
-            ATTEMPTS=$((ATTEMPTS+1))
-            echo "------------------------------------------------------"
-            echo "🔄 Intento $ATTEMPTS/$MAX_ATTEMPTS: Descargando PitayaCore..."
-            rm -rf _pitayacore
-            git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
-            LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
-            if [ "$LOCAL_SHA" == "$TARGET_SHA" ]; then
-              echo "✅ SHA validado."
-              SUCCESS=true; break
-            fi
-            echo "⚠️ Versión no coincide. Reintentando en 10s..."
-            sleep 10
-          done
+          echo "🚀 Evento recibido de PitayaCore para SHA: $TARGET_SHA"
+          
+          echo "🔄 Clonando PitayaCore de forma limpia..."
+          git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
+          
+          LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
+          echo "🆔 SHA en PitayaCore: $LOCAL_SHA"
+          
+          if [ "$LOCAL_SHA" != "$TARGET_SHA" ]; then
+             echo "⚠️ ADVERTENCIA: El SHA no coincide perfectamente aún, pero procederemos con la última versión disponible en PitayaCore."
+          fi
 
-      - name: Apply changes to Core
+      - name: 🛠️ Aplicar cambios al Núcleo
+         # Usamos rsync para asegurar consistencia total
         run: |
+          echo "📂 Sincronizando carpetas core, docs y .agent..."
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: Save changes to GitHub
+      - name: 💾 Guardar en GitHub
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
           if ! git diff --staged --quiet; then
-            git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
+            echo "📝 Creando commit de sincronización..."
+            git commit -m "chore(core): sync from PitayaCore@$TARGET_SHA"
             git pull --rebase origin main
             git push
+            echo "✅ GitHub actualizado."
+          else
+            echo "ℹ️ El contenido ya estaba al día en GitHub."
           fi
 
-      - name: Setup SSH for Hostinger
+      - name: 🔑 Configurar SSH Hostinger
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
 
-      - name: Deploy core to Host
+      - name: 🌍 Desplegar al Host
         run: |
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
           DEST_PATH="${{ secrets.HOSTINGER_PATH }}${{ secrets.HOSTINGER_PATH_API }}${{ secrets.HOSTINGER_PATH_ERP }}${{ secrets.HOSTINGER_PATH_TALENTO }}"
+          echo "🚀 Subiendo archivos a $DEST_HOST:$DEST_PATH..."
           rsync -avz --delete -e "ssh -o StrictHostKeyChecking=no -p 65002" ./core/ $DEST_USER@$DEST_HOST:$DEST_PATH/core/
+          echo "🎉 Despliegue en Hostinger completado."

@@ -13,43 +13,56 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'chore(core): sync')"
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 1. Checkout Subdominio
+      - name: 📥 1. Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
       - name: 📥 2. Clonación Manual PitayaCore
         run: |
+          echo "🔄 Clonando PitayaCore..."
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Comparar y Propagar (v7.3 Audit)
+      - name: 🔍 3. Auditoría Quirúrgica (v8)
         run: |
-          echo "🧐 Comparando ./core/ con _pitayacore/core/ ..."
+          FILE_PATH="core/testcync.md"
           
-          # Auditoría visual
-          echo "📄 Local (API/ERP/Talento):"
-          head -n 5 core/testcync.md || echo "Archivo no encontrado"
-          echo "📄 Remoto (PitayaCore):"
-          head -n 5 _pitayacore/core/testcync.md || echo "Archivo no encontrado"
+          echo "📂 INSPECCIÓN PRE-SINCRONIZACIÓN"
+          echo "------------------------------------------------"
+          echo "📍 API Local ($FILE_PATH):"
+          cat $FILE_PATH || echo "Archivo no existe en local"
           
-          # Aplicar cambios
+          echo "📍 PitayaCore Remoto (_pitayacore/$FILE_PATH):"
+          cat _pitayacore/$FILE_PATH || echo "Archivo no existe en remoto"
+          
+          echo "------------------------------------------------"
+          echo "🛠️ Ejecutando rsync..."
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
           rsync -av --delete .agent/   _pitayacore/.agent/
+          
+          echo "📍 PitayaCore TRAS RSYNC (_pitayacore/$FILE_PATH):"
+          cat _pitayacore/$FILE_PATH
           
           cd _pitayacore
           git config user.name "Proposer Bot"
           git config user.email "bot@batidospitaya.com"
           git add .
           
-          echo "🧐 Estado de Git en PitayaCore tras rsync:"
+          echo "🧐 Estado de Git en PitayaCore:"
           git status
           
           if ! git diff --staged --quiet; then
-            echo "�� ¡Diferencias detectadas! Subiendo a PitayaCore..."
-            git commit -m "feat(core): update from subdomain (Human Push) - v7.3"
-            git push
-            echo "✅ Propagación completada."
+            echo "📝 ¡Cambios detectados! Subiendo a PitayaCore..."
+            git commit -m "feat(core): update from subdomain (Human Push) - v8 Audit"
+            git push origin main
+            echo "✅ ¡Propagación enviada!"
           else
-            echo "ℹ️ INFO: No se detectaron cambios reales tras el rsync. Nada que proponer."
+            echo "⚠️ ADVERTENCIA: Git no detecta cambios a pesar del rsync."
+            # Forzamos un cambio invisible para ver si es problema de Git
+            echo " " >> $FILE_PATH
+            git add .
+            git commit -m "feat(core): force update due to git detection delay"
+            git push origin main
+            echo "🦾 Actualización forzada enviada."
           fi

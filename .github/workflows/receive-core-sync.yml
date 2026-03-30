@@ -12,54 +12,44 @@ jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout Subdominio
+      - name: 📥 1. Checkout Subdominio
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.SYNC_TOKEN }}
           fetch-depth: 0
 
-      - name: 🛡️ Iron Sync v5 (Wait for Propagation)
+      - name: 🛡️ 2. Iron Sync v6 (Scanner de Propagación)
         run: |
           TARGET_SHA="${{ github.event.client_payload.sha }}"
           echo "🚀 Se busca la versión: $TARGET_SHA"
-          
-          ATTEMPTS=0
-          MAX_ATTEMPTS=10
-          SUCCESS=false
-          
+          ATTEMPTS=0; MAX_ATTEMPTS=8; SUCCESS=false
           while [ $ATTEMPTS -lt $MAX_ATTEMPTS ]; do
             ATTEMPTS=$((ATTEMPTS+1))
             echo "------------------------------------------------------"
             echo "🔄 Intento $ATTEMPTS/$MAX_ATTEMPTS: Descargando PitayaCore..."
             rm -rf _pitayacore
             git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
-            
             LOCAL_SHA=$(git -C _pitayacore rev-parse HEAD)
-            echo "🆔 SHA en PitayaCore: $LOCAL_SHA"
-            
             if [ "$LOCAL_SHA" == "$TARGET_SHA" ]; then
-              echo "✅ ¡SHA validado perfectamente!"
-              SUCCESS=true
-              break
+              echo "✅ SHA validado."
+              SUCCESS=true; break
             fi
-            
-            echo "⚠️ ADVERTENCIA: GitHub aún tiene una versión vieja. Reintentando en 15s..."
+            echo "⚠️ Versión vieja. Esperando 15s..."
             sleep 15
           done
-          
           if [ "$SUCCESS" = false ]; then
-            echo "❌ ERROR: No se pudo obtener la versión $TARGET_SHA tras varios intentos."
+            echo "❌ ERROR: No se obtuvo la versión $TARGET_SHA."
             exit 1
           fi
 
-      - name: 🛠️ Aplicar cambios al Núcleo
+      - name: 🛠️ 3. Aplicar cambios Quirúrgicos
         run: |
           rsync -av --delete _pitayacore/core/   ./core/
           rsync -av --delete _pitayacore/docs/   ./docs/
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: 💾 Guardar en GitHub
+      - name: 💾 4. Guardar en GitHub (Auditoría Profunda)
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
@@ -67,18 +57,10 @@ jobs:
           if ! git diff --staged --quiet; then
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
             git pull --rebase origin main
-            git push
-            echo "✅ GitHub actualizado con éxito."
-          else
-            echo "ℹ️ El contenido ya estaba al día."
+            git push || (echo "⚠️ Push standard falló. Intentando reparación..." && git push --force)
           fi
 
-      - name: 🔑 Configurar SSH Hostinger
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
-
-      - name: 🌍 Desplegar al Host
+      - name: 🌍 5. Desplegar al Host (Hostinger)
         run: |
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"

@@ -1,5 +1,4 @@
-﻿# VersiÃ³n 8.1 con Scanner Auditivo
-name: ⬆️ Propose Core Update → PitayaCore
+﻿name: ⬆️ Propose Core Update → PitayaCore
 
 on:
   push:
@@ -23,7 +22,7 @@ jobs:
         run: |
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Auditoría Quirúrgica (v8.1)
+      - name: 🔍 3. Auditoría Quirúrgica (v8.2)
         run: |
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
@@ -33,12 +32,11 @@ jobs:
           git config user.email "bot@batidospitaya.com"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from subdomain (Human Push) - v8.1"
+            git commit -m "feat(core): update from subdomain (Human Push) - v8.2"
             git push origin main
           else
-            # Forzado por si Git estÃ¡ perezoso con los finales de lÃ­nea
             echo " " >> core/testcync.md
             git add .
-            git commit -m "feat(core): forced update v8.1"
+            git commit -m "feat(core): forced update v8.2"
             git push origin main
           fi

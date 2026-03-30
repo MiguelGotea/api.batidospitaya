@@ -22,8 +22,9 @@ jobs:
         run: |
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Auditoría Quirúrgica (v8.2)
+      - name: 🔍 3. Comparar y Propagar (v10 Firma Identidad)
         run: |
+          REPRO_ID="api.batidospitaya"
           rsync -av --delete ./core/   _pitayacore/core/
           rsync -av --delete ./docs/   _pitayacore/docs/
           rsync -av --delete .agent/   _pitayacore/.agent/
@@ -32,11 +33,11 @@ jobs:
           git config user.email "bot@batidospitaya.com"
           git add .
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from subdomain (Human Push) - v8.2"
+            git commit -m "feat(core): update from $REPRO_ID (Human Push) - v10"
             git push origin main
           else
             echo " " >> core/testcync.md
             git add .
-            git commit -m "feat(core): forced update v8.2"
+            git commit -m "feat(core): forced update from $REPRO_ID v10"
             git push origin main
           fi

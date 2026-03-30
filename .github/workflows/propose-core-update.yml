@@ -1,4 +1,4 @@
-name: ⬆️ Propose Core Update → PitayaCore (v13)
+name: ⬆️ Propose Core Update → PitayaCore (v13.1)
 
 on:
   push:
@@ -22,23 +22,27 @@ jobs:
         run: |
           git clone https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 3. Propagar a Maestro (v13)
+      - name: 🔍 3. Propagar a Maestro (v13.1 Checksum)
         run: |
           REPRO_ID="api.batidospitaya"
-          rsync -av --delete ./core/   _pitayacore/core/
-          rsync -av --delete ./docs/   _pitayacore/docs/
-          rsync -av --delete .agent/   _pitayacore/.agent/
+          # Sincronización por Checksum para ignorar fechas
+          rsync -rvhc --delete ./core/   _pitayacore/core/
+          rsync -rvhc --delete ./docs/   _pitayacore/docs/
+          rsync -rvhc --delete .agent/   _pitayacore/.agent/
           
           cd _pitayacore
           git config user.name "Proposer Bot"
           git config user.email "bot@batidospitaya.com"
           git add .
           
+          echo "🔍 ANALIZANDO CAMBIOS DETECTADOS:"
+          git status
+          
           if ! git diff --staged --quiet; then
-            git commit -m "feat(core): update from $REPRO_ID (v13)"
+            git commit -m "feat(core): update from $REPRO_ID (v13.1 checksum)"
             git pull origin main --rebase
             git push origin main
-            echo "✅ Cambio subido a PitayaCore Maestro."
+            echo "✅ Cambio inyectado con éxito en PitayaCore Maestro."
           else
-            echo "⏭️ Sin cambios que proponer."
+            echo "⏭️ NADA QUE PROPONER (Checksum idéntico)."
           fi

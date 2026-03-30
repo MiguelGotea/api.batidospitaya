@@ -1,4 +1,4 @@
-name: ⬆️ Propose Core Update → PitayaCore
+﻿name: ⬆️ Propose Core Update → PitayaCore
 
 on:
   push:
@@ -10,58 +10,27 @@ on:
 
 jobs:
   propose:
-    # FILTRO CRÍTICO: No proponer si el cambio fue hecho por el sistema de sincronización (evita bucles)
     if: "!contains(github.event.head_commit.message, 'chore(core): sync')"
     runs-on: ubuntu-latest
     steps:
-      - name: 📥 Checkout subdominio (Humano)
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 📥 Clonación Manual de PitayaCore (Iron Proposal)
+      - name: 📥 Clonación Manual PitayaCore
         run: |
-          echo "🔄 Obteniendo estado actual de PitayaCore..."
           git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
 
-      - name: 🔍 Comparar cambios vs PitayaCore
-        id: diff
+      - name: 🔍 Comparar y Propagar
         run: |
-          # Detectar si hay diferencias reales en el contenido
           DIFF_CORE=$(diff -rq --exclude='.git' ./core/   _pitayacore/core/   2>/dev/null || true)
-          DIFF_DOCS=$(diff -rq --exclude='.git' ./docs/   _pitayacore/docs/   2>/dev/null || true)
-          DIFF_AGENT=$(diff -rq --exclude='.git' ./.agent/ _pitayacore/.agent/ 2>/dev/null || true)
-
-          if [ -n "$DIFF_CORE" ] || [ -n "$DIFF_DOCS" ] || [ -n "$DIFF_AGENT" ]; then
-            echo "has_diff=true" >> $GITHUB_OUTPUT
-            echo "⚡ Diferencias detectadas. Preparando propuesta para PitayaCore."
-          else
-            echo "has_diff=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ El núcleo de PitayaCore ya está al día. Sin acción necesaria."
-          fi
-
-      - name: 🚀 Enviar cambios a PitayaCore
-        if: steps.diff.outputs.has_diff == 'true'
-        run: |
-          rsync -av --delete ./core/   _pitayacore/core/
-          rsync -av --delete ./docs/   _pitayacore/docs/
-          rsync -av --delete ./.agent/ _pitayacore/.agent/
-
-          cd _pitayacore
-          git config user.name "Proposer Bot — ${{ github.repository }}"
-          git config user.email "bot@batidospitaya.com"
-          git add core/ docs/ .agent/
-
-          # Verificar de nuevo antes de empujar por si otro subdominio se adelantó
-          if git diff --staged --quiet; then
-            echo "ℹ️ PitayaCore ya recibió estos cambios recientemente."
-          else
-            git commit -m "feat(core): update from ${{ github.repository }} (Human Push)"
+          if [ -n "$DIFF_CORE" ]; then
+            rsync -av --delete ./core/   _pitayacore/core/
+            cd _pitayacore
+            git config user.name "Proposer Bot"
+            git config user.email "bot@batidospitaya.com"
+            git add core/
+            git commit -m "feat(core): update from subrepo (Human Push)"
             git push
-            echo "✅ PitayaCore actualizado exitosamente."
-            echo "ℹ️ Esto disparará 'sync-to-subdomains' en PitayaCore para replicar a todos."
           fi
-
-      - name: 🧹 Clean up
-        if: always()
-        run: rm -rf _pitayacore

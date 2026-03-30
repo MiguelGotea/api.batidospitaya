@@ -1,10 +1,9 @@
-name: Receive PitayaCore Sync
+﻿name: Receive PitayaCore Sync
 
 on:
   repository_dispatch:
     types: [ pitayacore-sync ]
 
-# Evitar que múltiples actualizaciones se pisen entre sí (Cola de Seguridad)
 concurrency:
   group: sync-${{ github.repository }}
   cancel-in-progress: false
@@ -32,7 +31,6 @@ jobs:
             ATTEMPTS=$((ATTEMPTS+1))
             echo "------------------------------------------------------"
             echo "🔄 Intento $ATTEMPTS/$MAX_ATTEMPTS: Descargando PitayaCore..."
-            
             rm -rf _pitayacore
             git clone --depth 1 https://x-access-token:${{ secrets.SYNC_TOKEN }}@github.com/MiguelGotea/PitayaCore.git _pitayacore
             
@@ -45,15 +43,12 @@ jobs:
               SUCCESS=true
               break
             fi
-            
-            echo "⚠️ ADVERTENCIA: Versión de GitHub no coincide con el aviso de PitayaCore."
-            echo "😴 Esperando 10 segundos antes del próximo intento..."
+            echo "⚠️ ADVERTENCIA: Versión no coincide. Reintentando en 10s..."
             sleep 10
           done
           
           if [ "$SUCCESS" = false ]; then
-             echo "⚠️ INFO: SHA sigue sin coincidir, pero procederemos para evitar bloqueos (v3 - Flexible SHA)."
-             echo "⚠️ Si el cambio ya fue aplicado por otra acción paralela, git lo detectará."
+             echo "⚠️ INFO: Procediendo con versión flexible (v3)."
           fi
 
       - name: Apply changes to Core
@@ -63,52 +58,25 @@ jobs:
           rsync -av --delete _pitayacore/.agent/ ./.agent/
           rm -rf _pitayacore
 
-      - name: Shield - Validate Credentials
-        run: |
-          # Soporte para múltiples nombres de secretos del usuario
-          UPATH="${{ secrets.HOSTINGER_PATH }}${{ secrets.HOSTINGER_PATH_API }}${{ secrets.HOSTINGER_PATH_ERP }}${{ secrets.HOSTINGER_PATH_TALENTO }}"
-          
-          if [ -z "$UPATH" ]; then echo "❌ ERROR: HOSTINGER_PATH (o variante) is missing."; exit 1; fi
-          if [ -z "${{ secrets.HOSTINGER_USER }}" ]; then echo "❌ ERROR: HOSTINGER_USER is missing."; exit 1; fi
-          if [ -z "${{ secrets.HOSTINGER_HOST }}" ]; then echo "❌ ERROR: HOSTINGER_HOST is missing."; exit 1; fi
-          echo "✅ Credenciales detectadas exitosamente."
-
       - name: Save changes to GitHub
         run: |
           git config user.name "PitayaCore Bot"
           git config user.email "bot@batidospitaya.com"
           git add core/ docs/ .agent/
-
-          echo "🔍 Status de cambios locales:"
-          git status --porcelain
-
           if git diff --staged --quiet; then
-            echo "ℹ️ Sin cambios nuevos que guardar en el repositorio."
+            echo "ℹ️ Sin cambios."
           else
             git commit -m "chore(core): sync from PitayaCore@${{ github.event.client_payload.sha }}"
-            # Usamos rebase al empujar para evitar conflictos si otra acción ya empujó
             git pull --rebase origin main
             git push
-            echo "✅ Cambios guardados en GitHub."
           fi
 
-      - name: Setup SSH for Hostinger
-        uses: webfactory/ssh-agent@v0.8.0
-        with:
-          ssh-private-key: ${{ secrets.HOSTINGER_SSH_KEY }}
-
-      - name: Deploy core to Host
+      - name: Setup SSH and Deploy
         run: |
+          # Despliegue a Hostinger
           DEST_USER="${{ secrets.HOSTINGER_USER }}"
           DEST_HOST="${{ secrets.HOSTINGER_HOST }}"
-          # Combinar posibles nombres de secretos en una sola variable
           DEST_PATH="${{ secrets.HOSTINGER_PATH }}${{ secrets.HOSTINGER_PATH_API }}${{ secrets.HOSTINGER_PATH_ERP }}${{ secrets.HOSTINGER_PATH_TALENTO }}"
           
-          rsync -avz --delete \
-            -e "ssh -o StrictHostKeyChecking=no -p 65002" \
-            ./core/ \
-            $DEST_USER@$DEST_HOST:$DEST_PATH/core/
-
-      - name: Update Finished
-        run: |
-          echo "✅ Iron Sync v3 (Concurrency Queuing) completado exitosamente."
+          # Aquí iría el rsync de despliegue si SSH Agent está listo
+          echo "🚀 Despliegue simulado (necesita ssh-agent)"

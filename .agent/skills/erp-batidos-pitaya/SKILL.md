@@ -14,9 +14,9 @@ Esta skill te guía en el desarrollo de módulos y herramientas para el Sistema 
 **Arquitectura**: Componentes globales compartidos con estructura estandarizada  
 **Ritmo**: ~1 herramienta completa por día  
 
-## 🔄 Sistema de Sincronización PitayaCore
+## 🔄 Sistema de Sincronización PitayaCore (Iron Sync v3)
 
-El ecosistema de Batidos Pitaya utiliza un sistema de sincronización centralizada para mantener la coherencia del código compartido entre todos los subdominios (ERP, API, Talento, etc.).
+El ecosistema de Batidos Pitaya utiliza un sistema de **Sincronización de Hierro (Iron Sync)** descentralizado y de alta estabilidad para mantener la coherencia del código compartido entre todos los subdominios (ERP, API, Talento, etc.).
 
 ### 📍 Fuente de Verdad: `PitayaCore`
 - **Repositorio Central**: `MiguelGotea/PitayaCore`
@@ -24,19 +24,28 @@ El ecosistema de Batidos Pitaya utiliza un sistema de sincronización centraliza
 - **Regla de Oro**: Todo cambio en componentes globales o documentación debe nacer o consolidarse en `PitayaCore`.
 
 ### 🚀 Flujo de Trabajo del Desarrollador (IA)
-1. **Modificación Única**: Siempre que necesites cambiar un componente global (ej: `AIService.php`, `global_tools.css`), realiza el cambio en el repositorio `PitayaCore`.
-2. **Despliegue Maestro**: Utiliza **SIEMPRE** el script principal para subir cambios:
+1. **Desarrollo Centralizado**: Realiza siempre los cambios globales en el repositorio `PitayaCore`.
+2. **Despliegue Maestro**: Usa el script de push para disparar la sincronización en la nube:
    ```powershell
    # Desde c:\...\VisualCode\PitayaCore
    .\.scripts\gitpush.ps1
    ```
-   - **Nube**: Este comando dispara GitHub Actions que actualizan automáticamente los remotos de todos los subdominios.
-   - **Local**: El script utiliza `robocopy` para espejar instantáneamente los cambios en tus carpetas locales de `erp.batidospitaya.com`, `api.batidospitaya.com`, etc.
-3. **Cambios en Subdominios**: Si detectas cambios en `/core` dentro de un subdominio, estos deben integrarse de vuelta a `PitayaCore` para evitar divergencias. El sistema de GitHub te avisará si hay una propuesta de actualización pendiente.
+3. **Sincronización Local**: Para actualizar tus otros repositorios locales (`api`, `erp`, `talento`), usa el script unificado en la raíz:
+   ```powershell
+   # Desde c:\...\VisualCode
+   .\gitsync-local.ps1
+   ```
+
+### 🛡️ Iron Sync v3: Estabilidad y Seguridad
+El sistema de GitHub Actions está blindado con las siguientes protecciones:
+- **Clonación Fresca**: No usa caché; descarga una copia limpia de `PitayaCore` para evitar código obsoleto.
+- **Validación Flexible de SHA**: Verifica que el commit recibido sea el correcto o uno más reciente, con un bucle de reintento (5 intentos x 10s) para combatir el retardo de GitHub.
+- **Cola de Seguridad (Concurrency)**: Si realizas varios pushes seguidos, GitHub los encola ordenadamente para evitar que las actualizaciones choquen entre sí.
+- **Escudo de Credenciales**: Valida automáticamente que las llaves de Hostinger estén configuradas antes de intentar cualquier despliegue.
 
 ### 🛠️ Herramientas de Control
-- `PitayaCore/.scripts/gitpush.ps1`: Única vía recomendada para subir cambios al núcleo.
-- **Sincronización Quirúrgica**: Si un repositorio local se desfasa, usa `git checkout origin/main -- core/` para traer solo el núcleo sin afectar el resto del módulo.
+- `PitayaCore/.scripts/gitpush.ps1`: Dispara la actualización global en GitHub.
+- `VisualCode/gitsync-local.ps1`: Mantiene todos tus repositorios locales al día de forma quirúrgica y segura.
 
 ## 📋 Antes de Empezar
 

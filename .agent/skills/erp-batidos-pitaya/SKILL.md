@@ -1,4 +1,4 @@
-﻿---
+---
 name: ERP Batidos Pitaya Development
 description: Comprehensive skill for developing modules and tools in the Batidos Pitaya ERP system following established standards and architecture
 ---
@@ -14,38 +14,31 @@ Esta skill te guÃ­a en el desarrollo de mÃ³dulos y herramientas para el Sist
 **Arquitectura**: Componentes globales compartidos con estructura estandarizada  
 **Ritmo**: ~1 herramienta completa por dÃ­a  
 
-## ðŸ”„ Sistema de SincronizaciÃ³n PitayaCore (Iron Sync v6)
+## ðŸ”„ Sistema de SincronizaciÃ³n PitayaCore (Mano de Hierro v13.1)
 
-El ecosistema de Batidos Pitaya utiliza un sistema de **SincronizaciÃ³n de Hierro (Iron Sync)** descentralizado y de alta estabilidad para mantener la coherencia del cÃ³digo compartido entre todos los subdominios (ERP, API, Talento, etc.).
+El ecosistema utiliza el modelo **Mano de Hierro (Iron Sync v13.1)** de Inyección Directa por Checksum para garantizar la coherencia absoluta del código compartido.
 
-### ðŸ“ Fuente de Verdad: `PitayaCore`
-- **Repositorio Central**: `MiguelGotea/PitayaCore`
+### ðŸ“  Fuente de Verdad: `PitayaCore`
+- **Orquestador Central**: `MiguelGotea/PitayaCore`
 - **Carpetas Gestionadas**: `/core`, `/docs`, `/.agent`
-- **Regla de Oro**: Todo cambio en componentes globales o documentaciÃ³n debe nacer o consolidarse en `PitayaCore`.
+- **Regla de Oro**: `PitayaCore` inyecta físicamente los cambios en los subdominios (API, ERP, Talento) mediante push directo desde su acción de GitHub.
 
 ### ðŸš€ Flujo de Trabajo del Desarrollador (IA)
-1. **Desarrollo Centralizado**: Realiza siempre los cambios globales en el repositorio `PitayaCore`.
-2. **Despliegue Maestro**: Usa el script de push para disparar la sincronizaciÃ³n en la nube:
+1. **Desarrollo en el Maestro**: Realiza cambios globales exclusivamente en `PitayaCore`.
+2. **Inyección Maestro**: Usa el script de push para disparar la orquestación global:
    ```powershell
-   # Desde c:\...\VisualCode\PitayaCore
-   .\.scripts\gitpush.ps1
+   ./PitayaCore/.scripts/gitpush.ps1
    ```
-3. **SincronizaciÃ³n Local**: Para actualizar tus otros repositorios locales (`api`, `erp`, `talento`), usa el script unificado en la raÃ­z:
+3. **Sincronización Local**: Actualiza todos tus repositorios locales con:
    ```powershell
-   # Desde c:\...\VisualCode
-   .\gitsync-local.ps1
+   ./gitsync-local.ps1
    ```
 
-### ðŸ›¡ï¸ Iron Sync v6: Estabilidad y Seguridad
-El sistema de GitHub Actions estÃ¡ blindado con las siguientes protecciones:
-- **ClonaciÃ³n Fresca**: No usa cachÃ©; descarga una copia limpia de `PitayaCore` para evitar cÃ³digo obsoleto.
-- **ValidaciÃ³n Flexible de SHA**: Verifica que el commit recibido sea el correcto o uno mÃ¡s reciente, con un bucle de reintento (5 intentos x 10s) para combatir el retardo de GitHub.
-- **Cola de Seguridad (Concurrency)**: Si realizas varios pushes seguidos, GitHub los encola ordenadamente para evitar que las actualizaciones choquen entre sÃ­.
-- **Escudo de Credenciales**: Valida automÃ¡ticamente que las llaves de Hostinger estÃ©n configuradas antes de intentar cualquier despliegue.
-
-### ðŸ› ï¸ Herramientas de Control
-- `PitayaCore/.scripts/gitpush.ps1`: Dispara la actualizaciÃ³n global en GitHub.
-- `VisualCode/gitsync-local.ps1`: Mantiene todos tus repositorios locales al dÃ­a de forma quirÃºrgica y segura.
+### ðŸ›¡ï¸  Iron Sync v13.1: Certeza Total
+- **Inyección por Checksum (`-c`)**: El sistema compara el contenido real de los archivos, no sus fechas. Ignora los errores de sellos de tiempo de GitHub.
+- **Orquestación Secuencial**: Las inyecciones se realizan una tras otra (`max-parallel: 1`) para evitar colisiones.
+- **Transparencia Directa**: Si una inyección falla, el semáforo de `PitayaCore` se pone en Rojo (Alerta Máxima).
+Mantiene todos tus repositorios locales al dÃ­a de forma quirÃºrgica y segura.
 
 ## ðŸ“‹ Antes de Empezar
 

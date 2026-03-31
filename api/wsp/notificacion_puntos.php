@@ -49,16 +49,14 @@ try {
     $fecha = date('d/m/Y');
     $hora = date('h:i A');
 
-    $mensaje = "🌵 *Pitaya Club — Uso de puntos*\n\n";
-    $mensaje .= "Hola, *{$nombre_cliente}* 👋\n\n";
-    $mensaje .= "Te informamos que se han *canjeado puntos* en tu cuenta Pitaya Club. Aquí el resumen de tu transacción:\n\n";
-    $mensaje .= "📍 *Sucursal:* {$sucursal}\n";
-    $mensaje .= "📅 *Fecha:* {$fecha} — {$hora}\n";
-    $mensaje .= "🔖 *Puntos utilizados:* {$puntos_usados} pts\n\n";
-    $mensaje .= "⚠️ ¿No reconoces esta transacción? Comunícate de inmediato con nuestro equipo de atención al cliente:\n\n";
-    $mensaje .= "📞 *+505 7685-9041*\n";
-    $mensaje .= "_Este número es exclusivo para soporte y reportes._\n\n";
-    $mensaje .= "¡Gracias por ser parte de nuestra comunidad! 🌵✨";
+    $mensaje = "✨ Club Pitaya \n\n";
+    $mensaje .= "Hola, {$nombre_cliente} 👋\n\n";
+    $mensaje .= "Acabas de canjear puntos en tu cuenta💥🥤:\n\n";
+    $mensaje .= "🔖 {$puntos_usados} pts\n";
+    $mensaje .= "📍 {$sucursal}\n";
+    $mensaje .= "📅 {$fecha} — {$hora}\n\n";
+    $mensaje .= "⚠️ ¿No reconoces este movimiento? 📞 +505 7685-9041\n\n";
+    $mensaje .= " Seguimos recargando tu día 💚";
 
     // 3. Insertar en la cola de notificaciones
     $stmtIns = $conn->prepare("

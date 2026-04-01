@@ -198,6 +198,9 @@ Este estándar reemplaza los estilos de modal antiguos y proporciona:
 - **Animaciones**: Entrada suave con `modalSlideUp`.
 - **Botones Modernos**: Clases `.btn-modern`, `.btn-modern-primary`, `.btn-modern-secondary`, `.btn-modern-danger`.
 - **Bordes Redondeados**: Radio de 20px para el contenedor del modal.
+
+### Guía de Uso de Botones
+```css
 /* Botones con estilo moderno */
 .btn-modern {
     padding: 12px 30px;
@@ -214,8 +217,32 @@ Este estándar reemplaza los estilos de modal antiguos y proporciona:
 .btn-modern-secondary { background: #f8f9fa; color: #445; }
 ```
 
-### 2. Guía de Uso
 - **Bordes:** Siempre usar bordes redondeados pronunciados (`15px` a `20px`).
 - **Sombras:** Usar sombras difusas (`box-shadow`) en lugar de bordes sólidos.
 - **Interacción:** Los botones deben tener efectos de hover (elevación o cambio de brillo).
 - **Consistencia:** Mantener el color institucional `#0E544C` para acciones primarias.
+
+## Sistema de Filtros Avanzados (Header Filters)
+
+Todas las tablas que requieran filtrado dinámico deben implementar el sistema de **Header Filters** de alta fidelidad.
+
+### Visuales Obligatorios
+1. **Punto Rojo de Actividad**: Cuando una columna tiene un filtro activo, el icono de embudo debe mostrar un punto rojo superior derecho.
+   ```css
+   .filter-icon.has-filter::after {
+       content: '';
+       position: absolute;
+       top: -5px; right: -5px;
+       width: 10px; height: 10px;
+       background-color: #dc3545;
+       border-radius: 50%;
+       border: 2px solid #0E544C;
+   }
+   ```
+2. **Posiciones Fijas**: Los paneles de filtro deben ser `position: fixed` para evitar recortes por `overflow-hidden` de la tabla o card.
+3. **Z-Index**: Los paneles deben tener un `z-index: 1050` o superior para flotar sobre cualquier otro elemento.
+
+### Comportamiento Estándar
+- **Orden**: Usar etiquetas `A→Z` y `Z→A`.
+- **Rango de Fechas**: El calendario debe permitir seleccionar Mes y Año. No cerrar el panel hasta que el usuario haga clic fuera.
+- **Limpieza**: Siempre incluir un botón "Limpiar" rojo (`.clear`) dentro del panel de cada columna.

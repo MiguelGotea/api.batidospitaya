@@ -608,59 +608,59 @@ Incluir en el `<head>` de la herramienta:
 - âœ… La pÃ¡gina DEBE cargar `/core/assets/css/global_tools.css` en el `<head>`
 - âŒ **PROHIBIDO** redefinir `.btn-floating-pitaya` en CSS del mÃ³dulo o en `<style>` inline
 
-## ðŸ“Š Sistema de Filtros para Tablas
+## 📊 Sistema de Filtros para Tablas (Estándar Premium)
+
+Todas las herramientas que incluyan tablas de datos deben implementar el sistema de filtros por encabezado siguiendo el patrón de **Mano de Hierro (Iron Sync)**.
 
 ### Tipos de Filtro
 
 1. **Texto Libre** (`data-type="text"`)
-   - Para textos grandes o cÃ³digos autogenerados
-   - Input de bÃºsqueda libre
+   - Input de búsqueda libre. Ideal para nombres, proveedores o folios.
 
-2. **NÃºmero con Rango** (`data-type="number"`)
-   - Para cantidades
-   - Inputs min y max
+2. **Número con Rango** (`data-type="number"`)
+   - Inputs de mínimo y máximo para filtrar cantidades.
 
-3. **Rango de Fechas** (`data-type="daterange"`)
-   - Un solo calendario inteligente: desde/hasta
-   - **LÃ³gica de SelecciÃ³n**:
-     - El panel **no se cierra** automÃ¡ticamente tras la selecciÃ³n.
+3. **Rango de Fechas Inteligente** (`data-type="daterange"`)
+   - Un solo calendario compacto con selectores de **Mes y Año**.
+   - **Lógica de Selección**:
      - 1er clic: Define el inicio.
-     - 2do clic: Define el fin (con auto-intercambio si es menor al inicio).
-     - 3er clic en adelante: 
-       - Si es antes del inicio: actualiza `desde`.
-       - Si es despuÃ©s del fin o dentro del rango: actualiza `hasta`.
-   - Incluir mensaje informativo: "Haz clic en dos fechas para definir el rango."
+     - 2do clic: Define el fin (auto-intercambia si es anterior al inicio).
+     - Clics posteriores: Ajustan el límite más cercano.
+   - **Obligatorio**: Mostrar mensaje informativo "Haz clic en dos fechas para definir el rango."
 
-4. **Lista Definida** (`data-type="list"`)
-   - Para datos con enum o consultas limitadas
-   - Checkboxes con bÃºsqueda
-   - Aplica para: sucursales, cargos, tipos, estados, etc.
+4. **Lista de Selección** (`data-type="list"`)
+   - Checkboxes con buscador integrado. Ideal para Estados, CECOs o Sucursales.
 
-### Estructura de Encabezado de Tabla
+### Estándar de Diseño y Comportamiento
+
+Para garantizar una experiencia premium, se deben seguir estas reglas estrictas:
+
+- **Posicionamiento**: El panel (`.filter-panel`) debe ser `position: fixed` para evitar recortes dentro de contenedores con `overflow`.
+- **Indicador de Actividad**: Cuando un filtro está activo, el icono (`.filter-icon`) debe mostrar un **punto rojo** superior derecho (`.has-filter::after`).
+- **Etiquetas de Orden**: Usar exclusivamente `A→Z` y `Z→A` con iconos de Bootstrap `bi-sort-alpha-down` y `bi-sort-alpha-up`.
+- **Estética**: Bordes redondeados (`8px`), sombras suaves (`0 4px 16px rgba(0,0,0,0.15)`), y tipografía de 13-14px.
+
+### Estructura de Encabezado (HTML)
 
 ```html
 <thead>
     <tr>
-        <th data-column="nombre_columna" data-type="text">
-            Nombre Columna
-            <i class="bi bi-funnel filter-icon" onclick="toggleFilter(this)"></i>
-        </th>
-        <th data-column="monto" data-type="number">
-            Monto
+        <th data-column="nombre" data-type="text">
+            Nombre
             <i class="bi bi-funnel filter-icon" onclick="toggleFilter(this)"></i>
         </th>
         <th data-column="fecha" data-type="daterange">
             Fecha
             <i class="bi bi-funnel filter-icon" onclick="toggleFilter(this)"></i>
         </th>
-        <th data-column="estado" data-type="list">
-            Estado
-            <i class="bi bi-funnel filter-icon" onclick="toggleFilter(this)"></i>
-        </th>
         <th style="width: 150px;">Acciones</th>
     </tr>
 </thead>
 ```
+
+### Referencia Maestra
+El archivo de referencia absoluta para este sistema es:  
+`modulos/marketing/cupones.php` (y sus respectivos .js y .css).
 
 ## ðŸŽ¯ Columnas EstÃ¡ndar en Tablas
 

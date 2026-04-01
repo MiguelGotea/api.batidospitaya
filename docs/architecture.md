@@ -29,9 +29,11 @@ graph TD
     C[Cambio en PitayaCore Maestro] -->|Inyección Directa| D[API Subdomain]
     C -->|Inyección Directa| E[ERP Subdomain]
     C -->|Inyección Directa| F[Talento Subdomain]
+    C -->|Inyección Directa| P[POS Subdomain]
     D -->|Push Automático| G[Hostinger API]
     E -->|Push Automático| H[Hostinger ERP]
     F -->|Push Automático| I[Hostinger Talento]
+    P -->|Push Automático| J[Hostinger POS]
     B --> C
 ```
 
@@ -43,6 +45,15 @@ graph TD
 2. **Despliegue**: El archivo `deploy-*.yml` del nuevo repo debe sincronizar las carpetas `core/` y `docs/` hacia Hostinger.
 3. **Propuesta**: Añadir el archivo `.github/workflows/propose-core-update.yml` al nuevo repo.
 4. **Matriz Maestro**: En `PitayaCore/.github/workflows/sync-to-subdomains.yml`, añadir el nombre del nuevo repo a la lista `repo: [...]`.
+
+## 🌐 Subdominios Activos
+
+| Subdominio | Repositorio | Estado |
+|---|---|---|
+| `api.batidospitaya.com` | `api.batidospitaya` | ✅ Activo |
+| `erp.batidospitaya.com` | `erp.batidospitaya` | ✅ Activo |
+| `talento.batidospitaya.com` | `talento.batidospitaya` | ✅ Activo |
+| `pos.batidospitaya.com` | `pos.batidospitaya` | ✅ Activo |
 
 ---
 

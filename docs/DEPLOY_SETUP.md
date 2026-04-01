@@ -111,7 +111,20 @@ La clave privada se encuentra configurada en el servidor Hostinger. Para obtener
 - `HOSTINGER_HOST`: `145.223.105.42`
 - `HOSTINGER_PATH_API`: `/home/u839374897/domains/api.batidospitaya.com/public_html`
 
----
+### POS - `pos.batidospitaya.com`
+
+**Repository:** https://github.com/MiguelGotea/pos.batidospitaya  
+**Workflow:** `.github/workflows/deploy-pos.yml`  
+**Trigger:** Cualquier push a `main`  
+**Sincroniza:** `modulos/` (dinámico), `core/`, `docs/`  
+**Excluye:** `uploads/` por módulo
+
+**Secrets:**
+- `HOSTINGER_SSH_KEY`: Clave privada compartida
+- `HOSTINGER_USER`: `u839374897`
+- `HOSTINGER_HOST`: `145.223.105.42`
+- `HOSTINGER_PATH_POS`: `/home/u839374897/domains/pos.batidospitaya.com/public_html`
+- `SYNC_TOKEN`: Token de acceso GitHub (compartido con los otros repos)
 
 ## 🚀 Uso Diario
 
@@ -134,6 +147,7 @@ La clave privada se encuentra configurada en el servidor Hostinger. Para obtener
 
 - **ERP:** https://github.com/MiguelGotea/erp.batidospitaya/actions
 - **API:** https://github.com/MiguelGotea/api.batidospitaya/actions
+- **POS:** https://github.com/MiguelGotea/pos.batidospitaya/actions
 
 ---
 

@@ -115,9 +115,9 @@ La clave privada se encuentra configurada en el servidor Hostinger. Para obtener
 
 **Repository:** https://github.com/MiguelGotea/pos.batidospitaya  
 **Workflow:** `.github/workflows/deploy-pos.yml`  
-**Trigger:** Cualquier push a `main`  
-**Sincroniza:** `modulos/` (dinámico), `core/`, `docs/`  
-**Excluye:** `uploads/` por módulo
+**Trigger:** Push a `main`  
+**Sincroniza:** Raíz del proyecto (excluyendo carpetas de sistema)  
+**Excluye:** `uploads/`, `.agent/`, `.scripts/`, `.github/`
 
 **Secrets:**
 - `HOSTINGER_SSH_KEY`: Clave privada compartida

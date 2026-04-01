@@ -300,4 +300,12 @@ Para cada módulo nuevo, generar:
 - Validar en frontend Y backend
 - Responsive design obligatorio
 - Usar permisos granulares
+ 
+ ---
+ 
+ ## ⚙️ INFRAESTRUCTURA Y CONFIGURACIÓN
+ 
+ Para configuración de nuevos entornos o ingreso de nuevos desarrolladores, consultar:
+ - [**05_Guia_Instalacion_Nueva_PC.md**](05_Guia_Instalacion_Nueva_PC.md): Pasos detallados para configurar GitHub, Git, SSH y sincronización en una máquina nueva.
+- [**DEPLOY_SETUP.md**](DEPLOY_SETUP.md): Detalles técnicos del servidor y llaves SSH.
 

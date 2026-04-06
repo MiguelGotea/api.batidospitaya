@@ -777,7 +777,25 @@ let registrosPorPagina = 25;
 
 (Ver esquema completo en docs/03_Esquema_BaseDatos.md)
 
-## ðŸš€ Proceso de GeneraciÃ³n de Nueva Herramienta
+## 🧠 Estándares de Integración con IA (Gemini)
+
+Para asegurar baja latencia y alta precisión en el sistema, se deben seguir estas reglas al integrar Google Gemini:
+
+### 1. Configuración del Modelo
+- **Modelo Estándar**: `gemini-1.5-flash-latest` (o alias `gemini-flash-latest`).
+- **Formato**: Siempre usar `response_mime_type: 'application/json'` en `generationConfig`.
+- **Temperatura**: `0.1` para tareas de clasificación/extracción.
+
+### 2. Seguridad y Bloqueos
+- **Configuración Crítica**: Se deben desactivar los filtros de seguridad (`BLOCK_NONE`) en todas las categorías (`HARM_CATEGORY_*`). Los términos de negocio (ERP/Tareas) suelen causar falsos positivos en los filtros predeterminados de Google.
+
+### 3. Implementación Robusta
+- **Extracción de JSON**: No asumas que la respuesta es JSON puro. Usa siempre un método de extracción que busque los caracteres `{` y `}`.
+- **Cascada de Clasificación**: Implementa capas (Local Regex → Direct API → Fallback) para reducir la latencia percibida por el usuario.
+
+Ver más detalles en: `docs/10_IA_Best_Practices.md`.
+
+## 🚀 Proceso de Generación de Nueva Herramienta
 
 ### 1. Recopilar InformaciÃ³n
 

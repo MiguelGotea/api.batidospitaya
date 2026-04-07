@@ -59,7 +59,7 @@ function posVerificarDispositivo()
     if (empty($tokenCookie)) {
         return [
             'status'  => false,
-            'msg'     => 'Este dispositivo no está autorizado para operar el POS. Solicita la autorización en: Sistemas → Autorizar Dispositivo POS.',
+            'msg'     => 'Este dispositivo no cuenta con una autorización activa. Por favor, contacta al área de TI para configurar este dispositivo.',
             'sucursal_codigo' => null,
         ];
     }
@@ -73,7 +73,7 @@ function posVerificarDispositivo()
         if (!$sucursal) {
             return [
                 'status'  => false,
-                'msg'     => 'Dispositivo POS no reconocido o sucursal inactiva. Solicita re-autorización en: Sistemas → Autorizar Dispositivo POS.',
+                'msg'     => 'La autorización de este dispositivo ya no es válida o la sucursal ha sido desactivada. Por favor, contacta al área de TI.',
                 'sucursal_codigo' => null,
             ];
         }

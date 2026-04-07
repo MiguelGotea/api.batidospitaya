@@ -53,26 +53,27 @@ function posVerificarDispositivo()
         ];
     }
 
-    // 2. Verificar cookie
-    $tokenCookie = $_COOKIE['erp_device_token'] ?? null;
+    // 2. Verificar cookie exclusiva del POS (pos_device_token)
+    //    Completamente independiente de erp_device_token del ERP
+    $tokenCookie = $_COOKIE['pos_device_token'] ?? null;
     if (empty($tokenCookie)) {
         return [
             'status'  => false,
-            'msg'     => 'Este dispositivo no está autorizado para operar el POS. Contáctate con Sistemas TI.',
+            'msg'     => 'Este dispositivo no está autorizado para operar el POS. Solicita la autorización en: Sistemas → Autorizar Dispositivo POS.',
             'sucursal_codigo' => null,
         ];
     }
 
-    // 3. Buscar el token en la BD para identificar la sucursal
+    // 3. Buscar el token en la columna pos_cookie_token (exclusiva del POS)
     try {
-        $stmt = $conn->prepare("SELECT codigo FROM sucursales WHERE cookie_token = ? AND activa = 1 LIMIT 1");
+        $stmt = $conn->prepare("SELECT codigo FROM sucursales WHERE pos_cookie_token = ? AND activa = 1 LIMIT 1");
         $stmt->execute([$tokenCookie]);
         $sucursal = $stmt->fetch();
 
         if (!$sucursal) {
             return [
                 'status'  => false,
-                'msg'     => 'Dispositivo no reconocido o sucursal inactiva. Contáctate con Sistemas TI.',
+                'msg'     => 'Dispositivo POS no reconocido o sucursal inactiva. Solicita re-autorización en: Sistemas → Autorizar Dispositivo POS.',
                 'sucursal_codigo' => null,
             ];
         }
@@ -90,7 +91,7 @@ function posVerificarDispositivo()
         error_log("POS - Error validando dispositivo: " . $e->getMessage());
         return [
             'status'  => false,
-            'msg'     => 'Error de sistema al validar el dispositivo.',
+            'msg'     => 'Error de sistema al validar el dispositivo POS.',
             'sucursal_codigo' => null,
         ];
     }

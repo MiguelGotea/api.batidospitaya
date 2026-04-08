@@ -1,3 +1,4 @@
+<?php
 // ✅ INTEGRACIÓN POS (Doble Autenticación)
 // Este archivo actúa como puente para que los módulos copiados del ERP
 // cumplan con la seguridad del POS: Dispositivo + Tienda + Colaborador.
@@ -11,7 +12,7 @@ posRequiereColaborador();
 // Los módulos originales usan $_SESSION['usuario_id'], lo sincronizamos con el colaborador del POS.
 if (isset($_SESSION['pos_colaborador_id'])) {
     $_SESSION['usuario_id'] = $_SESSION['pos_colaborador_id'];
-    
+
     // Si no tenemos el código de cargo en sesión, lo buscamos una vez para compatibilidad
     if (!isset($_SESSION['cargo_cod'])) {
         global $conn;

@@ -15,7 +15,7 @@
 ```bash
 wget https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
 chmod +x wireguard-install.sh
-bash wireguard-install.sh
+bash wireguard-install.sh (repetir para crear nuevo usuario)
 ```
 
 **Respuestas usadas durante la instalación:**

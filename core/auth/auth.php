@@ -1,29 +1,9 @@
 <?php
-// ✅ INTEGRACIÓN POS (Doble Autenticación)
-// Este archivo actúa como puente para que los módulos copiados del ERP
-// cumplan con la seguridad del POS: Dispositivo + Tienda + Colaborador.
-require_once $_SERVER['DOCUMENT_ROOT'] . '/core/auth/auth_pos.php';
+// /public_html/core/auth/auth.php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-// Exigir que tanto la tienda como el colaborador estén autenticados
-// Esto protege automáticamente todos los archivos que incluyen auth.php
-posRequiereColaborador();
-
-// ✅ Mapeo de sesión para compatibilidad con funciones de este archivo
-// Los módulos originales usan $_SESSION['usuario_id'], lo sincronizamos con el colaborador del POS.
-if (isset($_SESSION['pos_colaborador_id'])) {
-    $_SESSION['usuario_id'] = $_SESSION['pos_colaborador_id'];
-
-    // Si no tenemos el código de cargo en sesión, lo buscamos una vez para compatibilidad
-    if (!isset($_SESSION['cargo_cod'])) {
-        global $conn;
-        $stmtC = $conn->prepare("SELECT CodNivelesCargos FROM AsignacionNivelesCargos WHERE CodOperario = ? AND (Fin IS NULL OR Fin >= CURDATE()) ORDER BY Fecha DESC LIMIT 1");
-        $stmtC->execute([$_SESSION['pos_colaborador_id']]);
-        $rowC = $stmtC->fetch();
-        if ($rowC) {
-            $_SESSION['cargo_cod'] = $rowC['CodNivelesCargos'];
-        }
-    }
-}
+session_start();
 
 // ✅ USAR RUTAS ABSOLUTAS basadas en DOCUMENT_ROOT
 require_once $_SERVER['DOCUMENT_ROOT'] . '/core/helpers/funciones.php';

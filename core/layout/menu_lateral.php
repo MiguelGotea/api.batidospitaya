@@ -459,7 +459,13 @@ $menuGlobal = [
                 'nombre' => 'Tareas',
                 'url' => 'gerencia/gestion_proyectos.php',
                 'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
+            ],
+            [
+                'nombre' => 'Analisis RFM',
+                'url' => 'marketing/dashboard_rfm.php',
+                'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
             ]
+
         ]
     ],
     [

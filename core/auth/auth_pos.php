@@ -212,6 +212,12 @@ function posValidarLoginTienda($usuario, $clave)
     $_SESSION['pos_store_sucursal'] = $user['Sucursal'];
     $_SESSION['pos_store_sucursal_nombre'] = $user['sucursal_nombre'];
 
+    // --- COMPATIBILIDAD LEGACY ---
+    // Mapeo inicial para módulos que esperen estas variables desde la Etapa 1
+    $_SESSION['usuario_id']  = $user['CodOperario'];
+    $_SESSION['usuario_rol'] = 'sucursal'; // Rol genérico para POS
+    $_SESSION['cargo_cod']   = 27;
+
     return ['status' => true];
 }
 
@@ -301,6 +307,17 @@ function posValidarColaborador($clave)
     $_SESSION['pos_colaborador_id']     = $encontrado['CodOperario'];
     $_SESSION['pos_colaborador_nombre'] = trim($encontrado['Nombre'] . ' ' . $encontrado['Apellido']);
 
+    // --- COMPATIBILIDAD LEGACY ---
+    // Sobrescribimos usuario_id con el del colaborador real que está operando
+    $_SESSION['usuario_id']     = $encontrado['CodOperario'];
+    $_SESSION['usuario_nombre'] = $_SESSION['pos_colaborador_nombre'];
+    // Buscamos su cargo real para permisos (compatibilidad con tienePermiso)
+    $stmtCargo = ejecutarConsulta("SELECT CodNivelesCargos FROM AsignacionNivelesCargos WHERE CodOperario = ? AND (Fin IS NULL OR Fin >= CURDATE()) ORDER BY Fecha DESC LIMIT 1", [$encontrado['CodOperario']]);
+    if ($stmtCargo) {
+        $cargoRow = $stmtCargo->fetch();
+        $_SESSION['cargo_cod'] = $cargoRow['CodNivelesCargos'] ?? 2; // 2 = operario por defecto
+    }
+
     return ['status' => true];
 }
 
@@ -326,5 +343,48 @@ function posCerrarSesionCompleta()
 {
     session_unset();
     session_destroy();
+}
+
+/**
+ * Middleware: verifica colaborador en endpoints AJAX.
+ */
+function posRequiereColaboradorAjax()
+{
+    if (!posColaboradorAutenticado()) {
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'mensaje' => 'Sesión expirada o no autorizada.', 'relogin' => true]);
+        exit();
+    }
+}
+
+/**
+ * COMPATIBILIDAD ERP: Replicamos funciones de auth.php para que los módulos
+ * importados funcionen sin cambios estructurales.
+ */
+function obtenerUsuarioActual()
+{
+    // Prioridad: Colaborador actual (Stage 2)
+    $id = $_SESSION['pos_colaborador_id'] ?? ($_SESSION['pos_store_id'] ?? null);
+    
+    if (!$id) return null;
+
+    global $conn;
+    try {
+        $stmt = $conn->prepare("
+            SELECT o.*, nc.Nombre as cargo_nombre, nc.CodNivelesCargos, anc.Sucursal as sucursal_codigo
+            FROM Operarios o
+            JOIN AsignacionNivelesCargos anc ON o.CodOperario = anc.CodOperario
+            JOIN NivelesCargos nc ON anc.CodNivelesCargos = nc.CodNivelesCargos
+            WHERE o.CodOperario = ? 
+              AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
+            ORDER BY anc.Fecha DESC
+            LIMIT 1
+        ");
+        $stmt->execute([$id]);
+        return $stmt->fetch();
+    } catch (Exception $e) {
+        error_log("POS - Error en obtenerUsuarioActual: " . $e->getMessage());
+        return null;
+    }
 }
 ?>

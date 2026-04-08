@@ -136,51 +136,6 @@ function posRequiereColaborador()
     }
 }
 
-/**
- * Middleware para AJAX: retorna error JSON si no hay colaborador autenticado.
- */
-function posRequiereColaboradorAjax()
-{
-    if (!posTiendaAutenticada() || !posColaboradorAutenticado()) {
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode([
-            'ok' => false,
-            'status' => 'error',
-            'mensaje' => 'Sesión expirada o no autorizada. Por favor, recarga la página.'
-        ]);
-        exit();
-    }
-}
-
-/**
- * Obtiene información del colaborador actual (compatible con módulos ERP).
- * Reemplaza la función original de auth.php
- */
-function obtenerUsuarioActual()
-{
-    $id = $_SESSION['pos_colaborador_id'] ?? null;
-    if (!$id) return null;
-
-    global $conn;
-    try {
-        $stmt = $conn->prepare("
-            SELECT o.*, nc.Nombre as cargo_nombre, nc.CodNivelesCargos, anc.Sucursal as sucursal_codigo
-            FROM Operarios o
-            JOIN AsignacionNivelesCargos anc ON o.CodOperario = anc.CodOperario
-            JOIN NivelesCargos nc ON anc.CodNivelesCargos = nc.CodNivelesCargos
-            WHERE o.CodOperario = ? 
-            AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
-            ORDER BY anc.Fecha DESC
-            LIMIT 1
-        ");
-        $stmt->execute([$id]);
-        return $stmt->fetch();
-    } catch (Exception $e) {
-        error_log("POS - Error en obtenerUsuarioActual: " . $e->getMessage());
-        return null;
-    }
-}
-
 // ---------------------------------------------------------------------------
 // ETAPA 1: INICIO DE SESIÓN DE TIENDA (Usuario CodNivelesCargos = 27)
 // ---------------------------------------------------------------------------

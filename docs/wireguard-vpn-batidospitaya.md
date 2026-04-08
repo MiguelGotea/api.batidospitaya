@@ -60,10 +60,10 @@ Debe mostrar `active (running)`.
 
 | # | Nombre del cliente | IP asignada | Archivo |
 |---|---|---|---|
-| 1 | `pitaya` | `10.66.66.2` | `/root/wg0-client-pitaya.conf` |
-| 2 | `tienda-altamira` | `10.66.66.3` | `/root/tienda-altamira.conf` |
-| 3 | `tienda-villafontana` | `10.66.66.4` | `/root/tienda-villafontana.conf` |
-| 4 | `tienda-natura` | `10.66.66.5` | `/root/tienda-natura.conf` |
+| 1 | `main` | `10.66.66.2` | `/root/wg0-client-pitaya.conf` |
+| 2 | `altamira` | `10.66.66.3` | `/root/wg0-client-altamira.conf` |
+| 3 | `villafontana` | `10.66.66.4` | `/root/wg0-client-villafontana.conf` |
+| 4 | `natura` | `10.66.66.5` | `/root/wg0-client-natura.conf` |
 | 5 | _(siguiente)_ | `10.66.66.6` | `/root/nombre.conf` |
 | 6 | _(siguiente)_ | `10.66.66.7` | `/root/nombre.conf` |
 | 7 | _(siguiente)_ | `10.66.66.8` | `/root/nombre.conf` |

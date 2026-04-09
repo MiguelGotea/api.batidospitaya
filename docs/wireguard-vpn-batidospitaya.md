@@ -16,6 +16,7 @@
 wget https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
 chmod +x wireguard-install.sh
 bash wireguard-install.sh (repetir para crear nuevo usuario)
+scp root@198.211.97.243:/root/wg0-client-contabilidad.conf "C:\Users\migue\Google Drive BP\Sistema Ultima Version\Llaves WireGuard\wg0-client-contabilidad.conf" (descargar archivo .conf)
 ```
 
 **Respuestas usadas durante la instalación:**

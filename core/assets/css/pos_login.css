@@ -33,10 +33,9 @@ html,
 body {
     height: 100%;
     font-family: 'Outfit', 'Calibri', system-ui, sans-serif;
-    background: var(--bg);
+    background: #F6F6F6 !important;
     color: var(--text);
     overflow: auto;
-    /* Permite scroll si la pantalla es pequeña */
 }
 
 /* ── Wrapper principal ─────────────────────────────────────── */
@@ -49,13 +48,14 @@ body {
     min-height: 100vh;
     padding: 24px;
     gap: 20px;
+    background: #F6F6F6 !important;
 }
 
 /* ── Tarjeta Estándar ───────────────────────────────────────── */
 .pos-card {
     width: 100%;
     max-width: 440px;
-    background: var(--surface);
+    background: #FFFFFF !important;
     border: 1px solid var(--border);
     border-radius: 16px;
     padding: 40px;

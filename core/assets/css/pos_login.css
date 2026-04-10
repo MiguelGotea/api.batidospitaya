@@ -251,15 +251,15 @@ body {
 }
 
 .pos-avatar {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: var(--pitaya-dark-teal);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 1rem;
     color: #fff;
     flex-shrink: 0;
 }
@@ -289,159 +289,10 @@ body {
     color: var(--error);
 }
 
-/* ── Dashboard Layout ──────────────────────────────────────── */
-.pos-wrapper.dashboard {
-    display: block;
-    padding: 20px;
-}
-
-.pos-dashboard {
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.pos-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 14px 22px;
-    gap: 16px;
-    margin-bottom: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
-}
-
-.pos-user-info {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-}
-
-.pos-header-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.pos-btn-exit {
-    padding: 8px 14px;
-    border-radius: 9px;
-    font-size: .8rem;
-    font-weight: 600;
-    font-family: inherit;
-    cursor: pointer;
-    border: 1px solid rgba(224, 85, 85, .35);
-    background: rgba(224, 85, 85, .1);
-    color: #e05555;
-    transition: .2s;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-.pos-btn-exit:hover {
-    background: #e05555;
-    color: #fff;
-}
-
-.pos-btn-exit.secondary:hover {
-    background: #F1F5F9;
-    color: var(--text);
-}
-
-.pos-welcome {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 60px 40px;
-    text-align: center;
-}
-
-.pos-welcome h2 {
-    font-size: 1.6rem;
-    font-weight: 800;
-    margin-bottom: 12px;
-    color: var(--pitaya-teal);
-}
-
-.pos-welcome p {
-    color: var(--text-muted);
-    max-width: 480px;
-    margin: 0 auto 32px;
-}
-
-.pos-actions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.pos-action-btn {
-    padding: 14px 28px;
-    border-radius: 13px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font-family: inherit;
-    font-size: .95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: .2s;
-    text-decoration: none;
-}
-
-.pos-action-btn:hover {
-    background: var(--surface-hover);
-    border-color: #51B8AC;
-}
-
-.pos-action-btn.primary {
-    background: #51B8AC;
-    color: #06110f;
-    border-color: #51B8AC;
-}
-
-.pos-action-btn.primary:hover {
-    background: var(--pitaya-dark-teal);
-    color: #fff;
-}
-
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 480px) {
     .pos-card {
         padding: 30px 20px;
         border-radius: 12px;
     }
-}
-
-/* ── Overlay Modal (index.php) ────────────────────────────── */
-.pos-pin-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--bg);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.pos-pin-card {
-    width: 100%;
-    max-width: 420px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: var(--shadow-soft);
-}
-
-/* ── Input PIN específico ──────────────────────────────────── */
-.pos-input-pin {
-    text-align: center;
-    letter-spacing: 8px;
-    font-size: 1.5rem !important;
-    color: #000 !important;
-    border: 1.5px solid #475569 !important;
 }

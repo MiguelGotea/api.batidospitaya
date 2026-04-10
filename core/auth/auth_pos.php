@@ -54,7 +54,6 @@ function posVerificarDispositivo()
     }
 
     // 2. Verificar cookie exclusiva del POS (pos_device_token)
-    //    Completamente independiente de erp_device_token del ERP
     $tokenCookie = $_COOKIE['pos_device_token'] ?? null;
     if (empty($tokenCookie)) {
         return [
@@ -64,9 +63,9 @@ function posVerificarDispositivo()
         ];
     }
 
-    // 3. Buscar el token en la columna pos_cookie_token (exclusiva del POS)
+    // 3. Buscar el token y el nombre de la sucursal
     try {
-        $stmt = $conn->prepare("SELECT codigo FROM sucursales WHERE pos_cookie_token = ? AND activa = 1 LIMIT 1");
+        $stmt = $conn->prepare("SELECT codigo, nombre FROM sucursales WHERE pos_cookie_token = ? AND activa = 1 LIMIT 1");
         $stmt->execute([$tokenCookie]);
         $sucursal = $stmt->fetch();
 
@@ -78,13 +77,27 @@ function posVerificarDispositivo()
             ];
         }
 
-        // Guardar en sesión para uso posterior
-        $_SESSION['pos_device_sucursal'] = $sucursal['codigo'];
+        // --- AUTO-LOGIN DE SUCURSAL ---
+        // Si el dispositivo es válido, poblamos la sesión de tienda automáticamente
+        // para obviar el login manual de Nivel 1.
+        if (!isset($_SESSION['pos_store_sucursal']) || $_SESSION['pos_store_sucursal'] != $sucursal['codigo']) {
+            $_SESSION['pos_device_sucursal'] = $sucursal['codigo'];
+            $_SESSION['pos_store_sucursal']  = $sucursal['codigo'];
+            $_SESSION['pos_store_sucursal_nombre'] = $sucursal['nombre'];
+            $_SESSION['pos_store_usuario']   = 'Terminal Autorizada';
+            $_SESSION['pos_store_id']        = 0; // ID virtual para auto-login
+
+            // Compatibilidad legacy para módulos ERP
+            $_SESSION['usuario_id']  = 0;
+            $_SESSION['usuario_rol'] = 'sucursal';
+            $_SESSION['cargo_cod']   = 27;
+        }
 
         return [
             'status'  => true,
             'msg'     => '',
             'sucursal_codigo' => $sucursal['codigo'],
+            'sucursal_nombre' => $sucursal['nombre']
         ];
 
     } catch (Exception $e) {
@@ -102,7 +115,13 @@ function posVerificarDispositivo()
  */
 function posTiendaAutenticada()
 {
-    return isset($_SESSION['pos_store_id']) && isset($_SESSION['pos_store_sucursal']);
+    if (isset($_SESSION['pos_store_id']) && isset($_SESSION['pos_store_sucursal'])) {
+        return true;
+    }
+
+    // Si no hay sesión, intentamos auto-login mediante el token del dispositivo
+    $check = posVerificarDispositivo();
+    return $check['status'];
 }
 
 /**

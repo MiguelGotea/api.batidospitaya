@@ -152,6 +152,10 @@ body {
 }
 
 .pos-input {
+    text-align: center;
+    letter-spacing: 8px;
+    font-size: 1.5rem;
+    color: #000;
     width: 100%;
     background: #fff;
     border: 1.5px solid #475569;

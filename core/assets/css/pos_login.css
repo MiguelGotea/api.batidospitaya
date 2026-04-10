@@ -72,7 +72,7 @@ html, body {
     font-weight: 800;
     text-align: center;
     letter-spacing: -.3px;
-    color: var(--pitaya-dark-teal);
+    color: var(--pitaya-teal);
 }
 
 .pos-subtitle {
@@ -159,7 +159,7 @@ html, body {
 }
 
 .pos-btn:hover {
-    filter: brightness(0.95);
+    background: var(--pitaya-dark-teal);
     transform: translateY(-1px);
 }
 

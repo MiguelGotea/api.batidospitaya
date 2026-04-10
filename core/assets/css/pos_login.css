@@ -126,7 +126,7 @@ html, body {
     padding: 12px 14px;
     font-size: 1rem;
     font-family: inherit;
-    color: var(--text);
+    color: #000 !important;
     transition: border-color .2s, box-shadow .2s;
     outline: none;
 }

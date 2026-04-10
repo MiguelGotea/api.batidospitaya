@@ -1,10 +1,6 @@
 Attribute VB_Name = "SyncClientesClub"
 Option Explicit
 
-' ========== CONFIGURACIÓN ==========
-Const API_BASE_URL = "https://api.batidospitaya.com/api/"
-Const API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
-
 ' ========== SUB: SINCRONIZAR CÉDULAS LOCALES ==========
 ' Descarga y actualiza las cédulas del host para la sucursal actual
 Public Sub SincronizarCedulasLocales()
@@ -18,6 +14,8 @@ Public Sub SincronizarCedulasLocales()
     Dim rs As DAO.Recordset
     Dim totalActualizados As Long
     Dim totalRecibidos As Long
+    Const API_BASE_URL = "https://api.batidospitaya.com/api/"
+    Const API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
     
     ' 1. Obtener sucursal local (función del sistema)
     sucursal = codigolocal()
@@ -123,6 +121,8 @@ Public Sub SincronizarDatosLocales()
     Dim rs As DAO.Recordset
     Dim totalActualizados As Long
     Dim totalRecibidos As Long
+    Const API_BASE_URL = "https://api.batidospitaya.com/api/"
+    Const API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
 
     ' 1. Obtener sucursal local (función del sistema)
     sucursal = codigolocal()

@@ -76,10 +76,16 @@ body {
 }
 
 /* ── Logo / Encabezado ─────────────────────────────────────── */
+.logo-container {
+    text-align: center;
+    margin-bottom: 24px;
+    width: 100%;
+}
+
 .pos-logo {
     display: block;
-    width: 100px;
-    margin: 0 auto 24px;
+    width: 120px;
+    margin: 0 auto;
 }
 
 .pos-title {

@@ -7,28 +7,36 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
 
 :root {
-    --pitaya-teal:       #51B8AC;
-    --pitaya-dark-teal:  #0E544C;
-    --bg:                #F6F6F6;
-    --surface:           #FFFFFF;
-    --surface-hover:     #F9FAFB;
-    --border:            #E2E8F0;
-    --text:              #333333;
-    --text-muted:        #64748B;
-    --error:             #E05555;
-    --error-bg:          #FFF5F5;
-    --success:           #51B8AC;
-    --shadow-soft:       0 1px 6px rgba(0,0,0,.05), 0 10px 30px rgba(0,0,0,.03);
+    --pitaya-teal: #51B8AC;
+    --pitaya-dark-teal: #0E544C;
+    --bg: #F6F6F6;
+    --surface: #FFFFFF;
+    --surface-hover: #F9FAFB;
+    --border: #E2E8F0;
+    --text: #333333;
+    --text-muted: #64748B;
+    --error: #E05555;
+    --error-bg: #FFF5F5;
+    --success: #51B8AC;
+    --shadow-soft: 0 1px 6px rgba(0, 0, 0, .05), 0 10px 30px rgba(0, 0, 0, .03);
 }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-html, body {
+html,
+body {
     height: 100%;
     font-family: 'Outfit', 'Calibri', system-ui, sans-serif;
     background: var(--bg);
     color: var(--text);
-    overflow: auto; /* Permite scroll si la pantalla es pequeña */
+    overflow: auto;
+    /* Permite scroll si la pantalla es pequeña */
 }
 
 /* ── Wrapper principal ─────────────────────────────────────── */
@@ -56,8 +64,15 @@ html, body {
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(15px); }
-    to   { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* ── Logo / Encabezado ─────────────────────────────────────── */
@@ -94,13 +109,31 @@ html, body {
     margin-bottom: 24px;
 }
 
-.pos-alert.error  { background: var(--error-bg); border: 1px solid rgba(224,85,85,.2); color: var(--error); }
-.pos-alert.show   { display: block; animation: shake .4s ease; }
+.pos-alert.error {
+    background: var(--error-bg);
+    border: 1px solid rgba(224, 85, 85, .2);
+    color: var(--error);
+}
+
+.pos-alert.show {
+    display: block;
+    animation: shake .4s ease;
+}
 
 @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    25%     { transform: translateX(-4px); }
-    75%     { transform: translateX(4px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-4px);
+    }
+
+    75% {
+        transform: translateX(4px);
+    }
 }
 
 /* ── Campos de formulario ──────────────────────────────────── */
@@ -131,11 +164,13 @@ html, body {
     outline: none;
 }
 
-.pos-input::placeholder { color: #94A3B8; }
+.pos-input::placeholder {
+    color: #94A3B8;
+}
 
 .pos-input:focus {
     border-color: var(--pitaya-teal);
-    box-shadow: 0 0 0 3px rgba(81,184,172,.15);
+    box-shadow: 0 0 0 3px rgba(81, 184, 172, .15);
 }
 
 /* ── Botón principal ───────────────────────────────────────── */
@@ -163,7 +198,9 @@ html, body {
     transform: translateY(-1px);
 }
 
-.pos-btn:active { transform: translateY(0); }
+.pos-btn:active {
+    transform: translateY(0);
+}
 
 /* ── PIN Pad / Numeric Input ───────────────────────────────── */
 /* Nota: Aunque ahora usamos password estándar en Stage 2, mantenemos estilos básicos por compatibilidad */
@@ -210,15 +247,20 @@ html, body {
     border-radius: 12px;
     padding: 12px 20px;
     gap: 16px;
-    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
 }
 
 .pos-avatar {
-    width: 40px; height: 40px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background: var(--pitaya-dark-teal);
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 1rem; color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #fff;
     flex-shrink: 0;
 }
 
@@ -235,7 +277,11 @@ html, body {
     text-decoration: none;
 }
 
-.pos-btn-exit:hover { background: #F1F5F9; border-color: #94A3B8; color: #1E293B; }
+.pos-btn-exit:hover {
+    background: #F1F5F9;
+    border-color: #94A3B8;
+    color: #1E293B;
+}
 
 .pos-btn-exit.danger:hover {
     background: var(--error-bg);
@@ -245,5 +291,8 @@ html, body {
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 480px) {
-    .pos-card { padding: 30px 20px; border-radius: 12px; }
+    .pos-card {
+        padding: 30px 20px;
+        border-radius: 12px;
+    }
 }

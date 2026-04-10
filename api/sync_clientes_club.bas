@@ -110,7 +110,7 @@ End Sub
 ' Descarga y actualiza desde el host: Cedula, Nombre, Apellidos, Celular, Cumpleanos y Correo
 ' para todos los clientes de la sucursal actual.
 ' Solo sobreescribe campos que vengan con valor en el host (no pisa datos locales con nulos).
-Public Sub SincronizarDatosLocales()
+Public Sub SincronizarDatosClientesLocales()
     On Error GoTo ErrorHandler
 
     Dim http As Object

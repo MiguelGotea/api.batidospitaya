@@ -184,17 +184,25 @@ AllowedIPs = 0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1
 
 ### 2.4 Configurar procesos excluidos del VPN (Split Tunneling)
 
-Este es el paso clave que diferencia WireSock de la app oficial. Aquí se configura **qué programas NO pasan por el VPN**, para evitar que Google Drive consuma el ancho de banda del plan de DigitalOcean.
+Este es el paso clave que diferencia WireSock de la app oficial. Aquí se configura **qué programas NO pasan por el VPN**, para evitar consumo excesivo del plan de DigitalOcean o bloqueos de aplicaciones.
 
 1. En WireSock, ir al menú **Edit**
 2. Seleccionar **Not-tunneled** (procesos que no usarán el VPN)
 3. Clic en **Select Process**
-4. Buscar y seleccionar **`GoogleDriveFS`** (o el ejecutable de Google Drive For Desktop)
-5. Confirmar la selección
+4. Repetir para agregar **cada uno** de los siguientes procesos:
 
-> ✅ A partir de este momento, Google Drive usará la conexión directa a internet (Claro) y **no** consumirá el plan del VPS de DigitalOcean.
+| Proceso | Ejecutable | Razón |
+|---|---|---|
+| Google Drive for Desktop | `GoogleDriveFS.exe` | Consume ancho de banda del VPS con sincronización constante |
+| Microsoft Outlook | `OUTLOOK.EXE` | Se bloquea con el VPN y deja de recibir/enviar correos |
 
-> ℹ️ Se pueden agregar otros programas que consuman mucho ancho de banda y no necesiten pasar por el VPN, como actualizaciones de Windows o Dropbox.
+5. Confirmar cada selección
+
+> ✅ A partir de este momento, Google Drive y Outlook usarán la conexión directa a internet (Claro) y **no** pasarán por el VPN.
+
+> ⚠️ **Importante:** Si Outlook no recibe correos o muestra error de conexión, verificar que `OUTLOOK.EXE` esté en la lista de procesos excluidos.
+
+> ℹ️ Se pueden agregar otros programas que consuman mucho ancho de banda o que se bloqueen con el VPN, como actualizaciones de Windows o Dropbox.
 
 ---
 
@@ -211,14 +219,29 @@ Debe mostrar la IP del VPS de DigitalOcean — no la IP de Claro.
 
 ---
 
-### 2.6 Inicio automático con Windows (recomendado)
+### 2.6 Inicio automático con Windows (recomendado — configurar en todas las PCs)
 
-WireSock soporta inicio de la conexión antes incluso del inicio de sesión del usuario:
+WireSock tiene **tres opciones de arranque automático** que deben activarse para que el VPN funcione sin intervención del usuario. Ir a **File → Preferences** (o el ícono de engrane/configuración) y activar:
 
-1. En la app WireSock, ir a las opciones del perfil
-2. Activar **"Connect on startup"** o **"Start on login"**
+| Opción | Qué hace | Activar |
+|---|---|---|
+| **Connect at Windows startup** | Conecta el VPN **antes de que el usuario inicie sesión** — funciona a nivel de sistema | ✅ Siempre activar |
+| **Start app on sign-in** | Abre WireSock en la barra de tareas cuando el usuario entra a Windows | ✅ Activar |
+| **Start minimized to tray** | WireSock abre directo como ícono en la bandeja del sistema, sin ventana grande | ✅ Activar |
 
-Así las sucursales nunca tienen que recordar activarlo manualmente.
+**Pasos para activarlas:**
+
+1. Abrir **WireSock Secure Connect**
+2. Ir a **File → Preferences** (o el ícono de configuración ⚙️)
+3. En la sección de **Startup / Autostart**, activar las tres opciones mencionadas arriba
+4. Hacer clic en **Save** o **Apply**
+5. Reiniciar la PC para verificar que el VPN conecta solo al arrancar
+
+> ✅ Con estas tres opciones activas, el VPN se conecta automáticamente **antes del inicio de sesión** y permanece activo en segundo plano sin molestar al usuario.
+
+> ℹ️ Si solo se activa **"Start app on sign-in"** sin **"Connect at Windows startup"**, el VPN se conecta un poco después — igualmente funcional pero con un pequeño retraso al arrancar.
+
+Así las sucursales **nunca tienen que recordar activarlo manualmente** — el VPN siempre estará activo.
 
 ---
 

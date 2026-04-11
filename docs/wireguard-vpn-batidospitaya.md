@@ -16,7 +16,12 @@
 wget https://raw.githubusercontent.com/angristan/wireguard-install/master/wireguard-install.sh
 chmod +x wireguard-install.sh
 bash wireguard-install.sh (repetir para crear nuevo usuario)
-scp root@198.211.97.243:/root/wg0-client-contabilidad.conf "C:\Users\migue\Google Drive BP\Sistema Ultima Version\Llaves WireGuard\wg0-client-contabilidad.conf" (descargar archivo .conf)
+sed -i 's|AllowedIPs = 0.0.0.0/0,::/0|AllowedIPs = 0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1|g' /root/wg0-client-contabilidad.conf && echo 'Listo:' && grep AllowedIPs /root/wg0-client-contabilidad.conf
+```
+
+**Powershell (descargar archivo .conf)**
+```bash
+scp root@198.211.97.243:/root/wg0-client-contabilidad.conf "C:\Users\migue\Google Drive BP\Sistema Ultima Version\Llaves WireGuard\wg0-client-contabilidad.conf"
 ```
 
 **Respuestas usadas durante la instalación:**
@@ -59,6 +64,11 @@ Debe mostrar `active (running)`.
 
 ### 1.4 Clientes creados
 
+```bash
+bash wireguard-install.sh
+opcion 2
+```
+ 
 | # | Nombre del cliente | IP asignada | Archivo |
 |---|---|---|---|
 | 1 | `main` | `10.66.66.2` | `/root/wg0-client-pitaya.conf` |
@@ -108,27 +118,41 @@ Repetir desde el **Paso 1.1**. WireGuard arranca automáticamente tras la instal
 
 ---
 
-## PARTE 2 — Configuración en cada PC de sucursal (Windows)
+## PARTE 2 — Configuración en cada PC de sucursal (Windows) con WireSock
 
-> Repetir estos pasos en cada computadora de sucursal.
+> Repetir estos pasos en cada computadora de sucursal.  
+> Se usa **WireSock Secure Connect** en lugar de la app oficial de WireGuard porque permite excluir programas específicos (como Google Drive) del túnel VPN, evitando consumo excesivo del plan de DigitalOcean.
 
-### 2.1 Instalar WireGuard para Windows
+---
 
-1. Ir a: **https://www.wireguard.com/install/**
-2. Descargar el instalador para Windows
-3. Instalar normalmente (siguiente → siguiente → finalizar)
+### 2.1 Instalar WireSock Secure Connect
+
+1. Ir a: **https://www.wiresock.net/wiresock-secure-connect/download**
+2. Descargar la versión correspondiente a la arquitectura del equipo:
+   - **Windows 64-bit** → opción más común (sistemas modernos)
+   - **Windows 32-bit** → sistemas más antiguos
+   - **Windows ARM64** → equipos con procesador ARM
+3. Alternativamente, instalar con **Winget** desde PowerShell:
+   ```powershell
+   winget install NTKERNEL.WireSockVPNClient
+   ```
+4. Ejecutar el instalador y seguir los pasos (siguiente → siguiente → finalizar)
 
 ---
 
 ### 2.2 Obtener el archivo .conf de la sucursal
 
-En el VPS, ejecutar el siguiente comando según la sucursal que se va a configurar:
+El archivo `.conf` ya fue modificado en el servidor para usar `AllowedIPs` divididos, lo que permite mantener la comunicación con impresoras y dispositivos en la misma red local.
 
-```bash
-cat /root/tienda-altamira.conf
+**Descargar el archivo .conf directamente desde el VPS (PowerShell):**
+
+```powershell
+scp root@198.211.97.243:/root/wg0-client-contabilidad.conf "C:\Users\migue\Google Drive BP\Sistema Ultima Version\Llaves WireGuard\wg0-client-contabilidad.conf"
 ```
 
-Aparecerá algo similar a esto (cada sucursal tiene sus propias claves únicas):
+> ⚠️ Ajustar el nombre del archivo y la ruta de destino según la sucursal que se esté configurando.
+
+El archivo `.conf` se ve similar a esto:
 
 ```ini
 [Interface]
@@ -140,34 +164,46 @@ DNS = 1.1.1.1,1.0.0.1
 PublicKey = 13V3BxymzYdB2hH7vV0mv052YpPiT7hbydJZBtLFJFY=
 PresharedKey = <clave compartida única de esta sucursal>
 Endpoint = 198.211.97.243:49966
-AllowedIPs = 0.0.0.0/0,::/0
+AllowedIPs = 0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1
 ```
+
+> ℹ️ El `AllowedIPs` dividido (`0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1`) es equivalente a enrutar todo el tráfico por el VPN pero sin bloquear la conectividad con dispositivos locales como impresoras en la misma red.
 
 > ⚠️ Nunca compartir el mismo `.conf` entre dos PCs — cada sucursal debe tener el suyo propio.
 
-**Pasos:**
-1. Seleccionar y copiar todo el contenido
-2. En la PC de la sucursal, abrir el **Bloc de notas**
-3. Pegar el contenido
-4. Guardar el archivo como `tienda-altamira.conf`  
-   *(importante: extensión `.conf`, no `.txt`)*
+---
+
+### 2.3 Importar el perfil en WireSock
+
+1. Abrir la app **WireSock Secure Connect** en Windows
+2. Ir a **File → Import** (o usar el botón de importar perfil en la interfaz)
+3. Seleccionar el archivo `.conf` descargado
+4. El perfil aparece en la lista con el nombre del archivo
 
 ---
 
-### 2.3 Importar el perfil en WireGuard
+### 2.4 Configurar procesos excluidos del VPN (Split Tunneling)
 
-1. Abrir la app **WireGuard** en Windows
-2. Clic en **"Import tunnel(s) from file"**
-3. Seleccionar el archivo `.conf` guardado
-4. El túnel aparece en la lista con el nombre de la sucursal
+Este es el paso clave que diferencia WireSock de la app oficial. Aquí se configura **qué programas NO pasan por el VPN**, para evitar que Google Drive consuma el ancho de banda del plan de DigitalOcean.
+
+1. En WireSock, ir al menú **Edit**
+2. Seleccionar **Not-tunneled** (procesos que no usarán el VPN)
+3. Clic en **Select Process**
+4. Buscar y seleccionar **`GoogleDriveFS`** (o el ejecutable de Google Drive For Desktop)
+5. Confirmar la selección
+
+> ✅ A partir de este momento, Google Drive usará la conexión directa a internet (Claro) y **no** consumirá el plan del VPS de DigitalOcean.
+
+> ℹ️ Se pueden agregar otros programas que consuman mucho ancho de banda y no necesiten pasar por el VPN, como actualizaciones de Windows o Dropbox.
 
 ---
 
-### 2.4 Activar la conexión
+### 2.5 Activar la conexión
 
-- Clic en **"Activate"**
-- En 2-3 segundos el túnel se pone en **verde** ✅
-- Desde ese momento todo el tráfico sale por la IP del VPS
+1. En WireSock, seleccionar el perfil importado
+2. Clic en **Connect** (o el botón de activar)
+3. En pocos segundos el túnel se activa ✅
+4. Los procesos configurados en "Not-tunneled" seguirán usando la IP normal de Claro
 
 **Verificar que funciona:**  
 Abrir el navegador e ir a **https://whatismyip.com**  
@@ -175,21 +211,21 @@ Debe mostrar la IP del VPS de DigitalOcean — no la IP de Claro.
 
 ---
 
-### 2.5 Inicio automático con Windows (recomendado)
+### 2.6 Inicio automático con Windows (recomendado)
 
-Para que el VPN siempre esté activo al encender la PC:
+WireSock soporta inicio de la conexión antes incluso del inicio de sesión del usuario:
 
-1. En la app WireGuard, clic derecho sobre el túnel
-2. Seleccionar **"Start on Login"**
+1. En la app WireSock, ir a las opciones del perfil
+2. Activar **"Connect on startup"** o **"Start on login"**
 
 Así las sucursales nunca tienen que recordar activarlo manualmente.
 
 ---
 
-### 2.6 Desactivar cuando no se necesite
+### 2.7 Desactivar cuando no se necesite
 
-- Clic en **"Deactivate"** en la app WireGuard
-- La conexión vuelve a usar la IP normal de Claro
+- En WireSock, clic en **Disconnect**
+- La conexión vuelve a usar la IP normal de Claro para todo el tráfico
 
 ---
 
@@ -231,7 +267,7 @@ Muestra cada cliente con su IP, cuándo se conectó por última vez y cuánto tr
 
 Verificar en orden:
 
-1. **¿La app WireGuard está instalada?** → Verificar en la PC
+1. **¿La app WireSock está instalada?** → Verificar en la PC
 2. **¿El túnel está activado?** → Debe estar verde en la app
 3. **¿El VPS está corriendo?** → Verificar en panel de DigitalOcean
 4. **¿WireGuard está activo en el VPS?**

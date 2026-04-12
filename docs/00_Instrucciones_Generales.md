@@ -56,6 +56,17 @@ Todas las herramientas deben incluir un modal con ID `pageHelpModal`. El header 
 - `auxiliaradministrativo/` - Módulos de asistente adminsitrativo de rrhh 
 - `atencionalcliente/` - atencion a cliente de clientes , seguimiento de reclamos, etc
 - `legal/` - registro de documentos legales
+- `productos/` - Catálogo de productos, recetas, insumos y presentaciones
+
+### Sincronización y Despliegue de Módulos (GitHub vs Host)
+
+El sistema utiliza una arquitectura modular donde solo los módulos autorizados son sincronizados con GitHub y desplegados al servidor Hostinger.
+
+1. **Módulos Trackeados**: Solo los módulos listados en el `.gitignore` (vía `!/modulos/{nombre}/`) se suben a GitHub.
+2. **Despliegue Automático**: El workflow `deploy-erp.yml` sincroniza estos mismos módulos al host. Si un módulo no está en la lista `MODULES` del workflow, no se subirá al servidor.
+3. **Subida de Cambios**:
+   - **Global**: `./.scripts/gitpush.ps1` (Sube todo el ERP de forma unificada).
+
 ---
 
 ## 🎨 IDENTIDAD VISUAL

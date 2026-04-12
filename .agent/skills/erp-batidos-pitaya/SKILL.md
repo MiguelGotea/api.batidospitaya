@@ -83,7 +83,18 @@ Cuando el usuario solicite crear una nueva herramienta, **SIEMPRE pregunta**:
 - `gerencia/` - DirecciÃ³n general
 - `compras/` - GestiÃ³n de OC, facturas
 - `contabilidad/` - Descarga de datos
-- Y mÃ¡s... (ver docs/00_Instrucciones_Generales.md lÃ­neas 31-54)
+- `productos/` - Catálogo de productos, recetas, insumos y presentaciones
+- Y mÃ¡s... (ver docs/00_Instrucciones_Generales.md lÃ­neas 35-70)
+
+### ðŸ“¦ GestiÃ³n de MÃ³dulos (GitHub y Deploy)
+
+No todos los mÃ³dulos en la carpeta `modulos/` se suben a GitHub o al host. Esto se controla mediante:
+
+1. **GitHub (`.gitignore`)**: Solo las carpetas con una regla `!/modulos/{nombre}/` son rastreadas.
+2. **Deploy (`deploy-erp.yml`)**: El script de despliegue tiene una lista `MODULES` que define quÃ© se sincroniza con el host.
+3. **Push de Cambios**:
+   - Usa `./.scripts/gitpush.ps1` para subir todos los cambios de forma unificada.
+
 
 ## ðŸŽ¨ Identidad Visual
 

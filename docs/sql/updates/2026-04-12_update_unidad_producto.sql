@@ -46,3 +46,4 @@ UPDATE unidad_producto SET abreviado = 'cajilla', nombres_opcionales = '' WHERE 
 
 -- ID 13: Onzas Liquidas
 UPDATE unidad_producto SET abreviado = 'oz fl', nombres_opcionales = 'fl oz, onza liquida, onzas liquidas' WHERE id = 13;
+

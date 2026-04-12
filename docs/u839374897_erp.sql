@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Mar 26, 2026 at 09:11 PM
+-- Generation Time: Apr 12, 2026 at 05:36 PM
 -- Server version: 11.8.6-MariaDB-log
 -- PHP Version: 7.2.34
 
@@ -1676,7 +1676,8 @@ CREATE TABLE `gestion_tareas_reuniones_items` (
   `prioridad` enum('alta','media','baja') NOT NULL DEFAULT 'media',
   `duracion_min` int(11) DEFAULT 60,
   `ics_sequence` int(11) DEFAULT 0,
-  `lugar` varchar(200) DEFAULT NULL
+  `lugar` varchar(200) DEFAULT NULL,
+  `hora_tarea` time DEFAULT NULL COMMENT 'Hora estimada de inicio de la tarea'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Tareas, subtareas y reuniones del equipo de liderazgo';
 
 -- --------------------------------------------------------
@@ -2940,6 +2941,76 @@ CREATE TABLE `postulacion_plaza` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pos_caja_inicial`
+--
+
+CREATE TABLE `pos_caja_inicial` (
+  `id` int(11) NOT NULL,
+  `fecha` date NOT NULL COMMENT 'Fecha del conteo',
+  `sucursal_id` varchar(10) NOT NULL COMMENT 'Código de sucursal (s.codigo)',
+  `tipo_cambio_usado` decimal(10,4) NOT NULL COMMENT 'Tipo de cambio NIO/USD al momento del conteo',
+  `total_cordobas` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Suma de denominaciones en córdobas',
+  `total_dolares` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Suma de denominaciones en dólares',
+  `total_dolares_en_cordobas` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'total_dolares * tipo_cambio_usado',
+  `total_efectivo_global` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'total_cordobas + total_dolares_en_cordobas',
+  `cod_usuario` int(11) DEFAULT NULL COMMENT 'FK a Operarios/usuarios – quién hizo el conteo',
+  `fecha_hora_regsys` timestamp NOT NULL DEFAULT current_timestamp() COMMENT 'Fecha y hora de inserción automática del sistema'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Registro maestro de conteo de caja inicial';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pos_caja_inicial_detalle`
+--
+
+CREATE TABLE `pos_caja_inicial_detalle` (
+  `id` int(11) NOT NULL,
+  `caja_inicial_id` int(11) NOT NULL COMMENT 'FK a pos_caja_inicial',
+  `moneda` enum('NIO','USD') NOT NULL COMMENT 'Tipo de moneda',
+  `denominacion` decimal(10,2) NOT NULL COMMENT 'Valor facial del billete/moneda',
+  `cantidad` int(11) NOT NULL DEFAULT 0 COMMENT 'Cantidad de billetes/monedas',
+  `total` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'denominacion * cantidad'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Detalle de denominaciones por conteo de caja inicial';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pos_facturas`
+--
+
+CREATE TABLE `pos_facturas` (
+  `id` int(11) NOT NULL,
+  `numero_factura` varchar(50) NOT NULL COMMENT 'Número/código de factura (editable)',
+  `fecha` date NOT NULL,
+  `id_proveedor` int(11) NOT NULL COMMENT 'FK a proveedores',
+  `total_factura` decimal(12,2) DEFAULT 0.00,
+  `notas` text DEFAULT NULL,
+  `estado` enum('activa','anulada') NOT NULL DEFAULT 'activa',
+  `registrado_por` int(11) NOT NULL COMMENT 'FK a Operarios',
+  `fecha_hora_regsys` timestamp NOT NULL DEFAULT current_timestamp(),
+  `fecha_modificacion` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  `modificado_por` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Facturas de compra de tienda (abastecimiento)';
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pos_facturas_detalle`
+--
+
+CREATE TABLE `pos_facturas_detalle` (
+  `id` int(11) NOT NULL,
+  `id_factura` int(11) NOT NULL COMMENT 'FK a pos_facturas',
+  `id_presentacion` int(11) NOT NULL COMMENT 'FK a producto_presentacion',
+  `cantidad` decimal(10,2) NOT NULL DEFAULT 1.00,
+  `costo_unitario` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Calculado = costo_total_iva / cantidad',
+  `costo_total_iva` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'Ingresado por usuario',
+  `fecha_hora_regsys` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Detalle de productos/servicios en facturas de tienda';
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `productos`
 --
 
@@ -3002,8 +3073,8 @@ CREATE TABLE `producto_presentacion` (
   `id` int(11) NOT NULL,
   `SKU` varchar(100) NOT NULL COMMENT 'Código único del producto',
   `Nombre` varchar(255) NOT NULL COMMENT 'Nombre de la presentación',
-  `id_producto_maestro` int(11) NOT NULL COMMENT 'FK a producto_maestro',
-  `id_unidad_producto` int(11) NOT NULL COMMENT 'FK a unidad_producto',
+  `id_producto_maestro` int(11) DEFAULT NULL COMMENT 'FK a producto_maestro',
+  `id_unidad_producto` int(11) DEFAULT NULL COMMENT 'FK a unidad_producto',
   `es_vendible` enum('SI','NO') NOT NULL DEFAULT 'NO' COMMENT '¿Se puede vender?',
   `es_comprable` enum('SI','NO') NOT NULL DEFAULT 'NO' COMMENT '¿Se puede comprar?',
   `es_fabricable` enum('SI','NO') NOT NULL DEFAULT 'NO' COMMENT '¿Se fabrica?',
@@ -3014,7 +3085,8 @@ CREATE TABLE `producto_presentacion` (
   `usuario_creacion` int(11) NOT NULL COMMENT 'FK a Operarios',
   `fecha_modificacion` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `usuario_modificacion` int(11) DEFAULT NULL COMMENT 'FK a Operarios',
-  `cantidad` decimal(10,2) DEFAULT 0.00
+  `cantidad` decimal(10,2) DEFAULT 0.00,
+  `compra_tienda` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 indica que el producto puede ser seleccionado para facturas de compra de tienda'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestión de presentaciones de productos';
 
 -- --------------------------------------------------------
@@ -3889,6 +3961,7 @@ CREATE TABLE `subgrupo_presentacion_producto` (
   `nombre` varchar(100) NOT NULL,
   `descripcion` varchar(255) DEFAULT NULL,
   `id_grupo_presentacion_producto` int(11) NOT NULL COMMENT 'FK a grupo_presentacion_producto',
+  `categoria_insumo` varchar(11) DEFAULT NULL COMMENT 'Letra de la categoría de insumo para mapeo',
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `usuario_creacion` int(11) NOT NULL COMMENT 'FK a Operarios',
   `fecha_modificacion` datetime DEFAULT NULL ON UPDATE current_timestamp(),
@@ -3939,7 +4012,8 @@ CREATE TABLE `sucursales` (
   `cod_googlebusiness` varchar(100) DEFAULT NULL,
   `fecha_hora_regsys` timestamp NOT NULL DEFAULT current_timestamp(),
   `VMTAP` tinyint(4) DEFAULT 1,
-  `cookie_token` varchar(255) DEFAULT NULL
+  `cookie_token` varchar(255) DEFAULT NULL,
+  `pos_cookie_token` varchar(64) DEFAULT NULL COMMENT 'Token de autorizacion exclusivo del dominio pos.batidospitaya.com'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4032,8 +4106,7 @@ CREATE TABLE `tipos_falta` (
 CREATE TABLE `tipo_cambio` (
   `id` int(11) NOT NULL,
   `fecha` date NOT NULL DEFAULT curdate(),
-  `tasa` decimal(10,1) NOT NULL,
-  `usuario_id` int(11) NOT NULL
+  `tasa` decimal(10,1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4722,6 +4795,23 @@ CREATE TABLE `wsp_logs_` (
   `tipo` enum('info','exito','error','sesion') NOT NULL,
   `detalle` text DEFAULT NULL,
   `fecha` datetime DEFAULT convert_tz(current_timestamp(),'+00:00','-06:00')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wsp_notificaciones_clientesclub_pendientes_`
+--
+
+CREATE TABLE `wsp_notificaciones_clientesclub_pendientes_` (
+  `id` int(11) NOT NULL,
+  `celular` varchar(20) NOT NULL COMMENT 'Número de WhatsApp con código de país',
+  `mensaje` text NOT NULL COMMENT 'Contenido del mensaje personalizado',
+  `estado` enum('pendiente','enviando','enviado','error') DEFAULT 'pendiente',
+  `instancia` varchar(30) DEFAULT 'wsp-clientes' COMMENT 'Para discriminar qué VPS lo procesa',
+  `creado_at` timestamp NULL DEFAULT current_timestamp(),
+  `enviado_at` datetime DEFAULT NULL,
+  `error_detalle` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -5894,6 +5984,36 @@ ALTER TABLE `postulacion_plaza`
   ADD KEY `idx_fecha_postulacion` (`fecha_postulacion`);
 
 --
+-- Indexes for table `pos_caja_inicial`
+--
+ALTER TABLE `pos_caja_inicial`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_caja_inicial_fecha` (`fecha`),
+  ADD KEY `idx_caja_inicial_usuario` (`cod_usuario`),
+  ADD KEY `idx_caja_inicial_sucursal` (`sucursal_id`);
+
+--
+-- Indexes for table `pos_caja_inicial_detalle`
+--
+ALTER TABLE `pos_caja_inicial_detalle`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_detalle_caja` (`caja_inicial_id`);
+
+--
+-- Indexes for table `pos_facturas`
+--
+ALTER TABLE `pos_facturas`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `pos_facturas_detalle`
+--
+ALTER TABLE `pos_facturas_detalle`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_detalle_factura` (`id_factura`),
+  ADD KEY `fk_detalle_presentacion` (`id_presentacion`);
+
+--
 -- Indexes for table `productos`
 --
 ALTER TABLE `productos`
@@ -6322,8 +6442,7 @@ ALTER TABLE `tipos_falta`
 -- Indexes for table `tipo_cambio`
 --
 ALTER TABLE `tipo_cambio`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `usuario_id` (`usuario_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `tipo_pago_proveedores`
@@ -6521,6 +6640,13 @@ ALTER TABLE `wsp_logs_`
   ADD PRIMARY KEY (`id`),
   ADD KEY `idx_campana` (`campana_id`),
   ADD KEY `idx_fecha` (`fecha`);
+
+--
+-- Indexes for table `wsp_notificaciones_clientesclub_pendientes_`
+--
+ALTER TABLE `wsp_notificaciones_clientesclub_pendientes_`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_wsp_notif_estado_instancia` (`estado`,`instancia`);
 
 --
 -- Indexes for table `wsp_planilla_programaciones_`
@@ -7333,6 +7459,30 @@ ALTER TABLE `postulacion_plaza`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `pos_caja_inicial`
+--
+ALTER TABLE `pos_caja_inicial`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pos_caja_inicial_detalle`
+--
+ALTER TABLE `pos_caja_inicial_detalle`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pos_facturas`
+--
+ALTER TABLE `pos_facturas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `pos_facturas_detalle`
+--
+ALTER TABLE `pos_facturas_detalle`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `productos`
 --
 ALTER TABLE `productos`
@@ -7768,6 +7918,12 @@ ALTER TABLE `wsp_destinatarios_`
 -- AUTO_INCREMENT for table `wsp_logs_`
 --
 ALTER TABLE `wsp_logs_`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `wsp_notificaciones_clientesclub_pendientes_`
+--
+ALTER TABLE `wsp_notificaciones_clientesclub_pendientes_`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -8498,6 +8654,12 @@ ALTER TABLE `postulacion_plaza`
   ADD CONSTRAINT `postulacion_plaza_ibfk_2` FOREIGN KEY (`sucursal_aplicada`) REFERENCES `sucursales` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
+-- Constraints for table `pos_caja_inicial_detalle`
+--
+ALTER TABLE `pos_caja_inicial_detalle`
+  ADD CONSTRAINT `fk_caja_inicial_detalle` FOREIGN KEY (`caja_inicial_id`) REFERENCES `pos_caja_inicial` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
 -- Constraints for table `productos_delivery`
 --
 ALTER TABLE `productos_delivery`
@@ -8691,12 +8853,6 @@ ALTER TABLE `TardanzasManuales`
 --
 ALTER TABLE `TardanzasStatus`
   ADD CONSTRAINT `fk_tardanza_operario` FOREIGN KEY (`cod_operario`) REFERENCES `Operarios` (`CodOperario`);
-
---
--- Constraints for table `tipo_cambio`
---
-ALTER TABLE `tipo_cambio`
-  ADD CONSTRAINT `tipo_cambio_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`);
 
 --
 -- Constraints for table `tipo_receta_producto`

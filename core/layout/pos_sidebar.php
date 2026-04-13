@@ -1,10 +1,12 @@
 <?php
+
 /**
  * POS Sidebar Component
  * Modular layout with hover expansion and accordion categories
  */
 
-function renderPOSSidebar($activeModule = 'inicio') {
+function renderPOSSidebar($activeModule = 'inicio')
+{
     $menu = [
         [
             'id' => 'inicio',
@@ -61,7 +63,7 @@ function renderPOSSidebar($activeModule = 'inicio') {
     ];
 
     ob_start();
-    ?>
+?>
     <style>
         :root {
             --sidebar-width: 70px;
@@ -77,7 +79,7 @@ function renderPOSSidebar($activeModule = 'inicio') {
             height: 100vh;
             width: var(--sidebar-width);
             background: #FFFFFF;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
             z-index: 1000;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
@@ -134,7 +136,9 @@ function renderPOSSidebar($activeModule = 'inicio') {
         }
 
         /* Ocultar scrollbar */
-        .pos-sidebar-menu::-webkit-scrollbar { width: 0px; }
+        .pos-sidebar-menu::-webkit-scrollbar {
+            width: 0px;
+        }
 
         .pos-menu-item {
             position: relative;
@@ -151,12 +155,13 @@ function renderPOSSidebar($activeModule = 'inicio') {
             border-left: 4px solid transparent;
         }
 
-        .pos-menu-link:hover, .pos-menu-item.active > .pos-menu-link {
+        .pos-menu-link:hover,
+        .pos-menu-item.active>.pos-menu-link {
             color: var(--pos-teal);
             background: #F8FAFC;
         }
 
-        .pos-menu-item.active > .pos-menu-link {
+        .pos-menu-item.active>.pos-menu-link {
             border-left-color: var(--pos-teal);
             background: #F0FDFA;
             color: var(--pos-dark);
@@ -194,7 +199,7 @@ function renderPOSSidebar($activeModule = 'inicio') {
             opacity: 1;
         }
 
-        .pos-menu-item.open > .pos-menu-link > .pos-menu-chevron {
+        .pos-menu-item.open>.pos-menu-link>.pos-menu-chevron {
             transform: rotate(90deg);
         }
 
@@ -248,20 +253,20 @@ function renderPOSSidebar($activeModule = 'inicio') {
     <div class="pos-sidebar" id="posSidebar">
         <div class="pos-sidebar-header">
             <div class="pos-sidebar-logo">
-                <img src="/core/assets/img/icon.png" alt="Logo">
+                <img src="/core/assets/img/icon12.png" alt="Logo">
             </div>
             <span class="pos-sidebar-brand">POS Pitaya</span>
         </div>
 
         <nav class="pos-sidebar-menu">
-            <?php foreach ($menu as $item): 
+            <?php foreach ($menu as $item):
                 $hasSub = !empty($item['sub']);
                 $isActive = ($activeModule === $item['id']);
             ?>
                 <div class="pos-menu-item <?= $isActive ? 'active' : '' ?> <?= $hasSub ? 'has-sub' : '' ?>" id="menu-<?= $item['id'] ?>">
-                    <a href="<?= $hasSub ? 'javascript:void(0)' : $item['url'] ?>" 
-                       class="pos-menu-link" 
-                       onclick="<?= $hasSub ? "toggleSubmenu('menu-".$item['id']."')" : "" ?>">
+                    <a href="<?= $hasSub ? 'javascript:void(0)' : $item['url'] ?>"
+                        class="pos-menu-link"
+                        onclick="<?= $hasSub ? "toggleSubmenu('menu-" . $item['id'] . "')" : "" ?>">
                         <div class="pos-menu-icon"><i class="<?= $item['icon'] ?>"></i></div>
                         <span class="pos-menu-text"><?= $item['titulo'] ?></span>
                         <?php if ($hasSub): ?>
@@ -288,17 +293,17 @@ function renderPOSSidebar($activeModule = 'inicio') {
         function toggleSubmenu(id) {
             const sidebar = document.getElementById('posSidebar');
             const item = document.getElementById(id);
-            
+
             // Si el sidebar no está expandido, no hacer nada o expandirlo primero?
             // El usuario pidió tipo ERP. En ERP al clickear categoría se expande.
-            
+
             const isOpen = item.classList.contains('open');
-            
+
             // Cerrar otros
             document.querySelectorAll('.pos-menu-item.has-sub').forEach(el => {
                 if (el.id !== id) el.classList.remove('open');
             });
-            
+
             if (isOpen) {
                 item.classList.remove('open');
             } else {
@@ -306,6 +311,6 @@ function renderPOSSidebar($activeModule = 'inicio') {
             }
         }
     </script>
-    <?php
+<?php
     return ob_get_clean();
 }

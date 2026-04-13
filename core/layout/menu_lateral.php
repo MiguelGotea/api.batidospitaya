@@ -512,7 +512,7 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Diccionario Access ERP',
+                'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
                 'cargos_permitidos' => [55, 49]
             ],

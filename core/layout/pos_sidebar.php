@@ -59,6 +59,13 @@ function renderPOSSidebar($activeModule = 'inicio')
             'icon' => 'fas fa-cog',
             'url' => '/modulos/sistemas/',
             'sub' => []
+        ],
+        [
+            'id' => 'logout',
+            'titulo' => 'Cerrar Sesión',
+            'icon' => 'fas fa-sign-out-alt',
+            'url' => '/logout.php?type=colaborador',
+            'sub' => []
         ]
     ];
 
@@ -148,7 +155,7 @@ function renderPOSSidebar($activeModule = 'inicio')
             display: flex;
             align-items: center;
             height: 50px;
-            color: #64748B;
+            color: var(--pos-teal);
             text-decoration: none;
             transition: all 0.2s;
             cursor: pointer;
@@ -157,7 +164,7 @@ function renderPOSSidebar($activeModule = 'inicio')
 
         .pos-menu-link:hover,
         .pos-menu-item.active>.pos-menu-link {
-            color: var(--pos-teal);
+            color: var(--pos-dark);
             background: #F8FAFC;
         }
 
@@ -218,7 +225,7 @@ function renderPOSSidebar($activeModule = 'inicio')
             display: flex;
             align-items: center;
             padding: 10px 20px 10px 70px;
-            color: #64748B;
+            color: var(--pos-teal);
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 500;
@@ -227,7 +234,7 @@ function renderPOSSidebar($activeModule = 'inicio')
         }
 
         .pos-submenu-link:hover {
-            color: var(--pos-teal);
+            color: var(--pos-dark);
             padding-left: 75px;
         }
 
@@ -294,9 +301,6 @@ function renderPOSSidebar($activeModule = 'inicio')
             const sidebar = document.getElementById('posSidebar');
             const item = document.getElementById(id);
 
-            // Si el sidebar no está expandido, no hacer nada o expandirlo primero?
-            // El usuario pidió tipo ERP. En ERP al clickear categoría se expande.
-
             const isOpen = item.classList.contains('open');
 
             // Cerrar otros
@@ -310,6 +314,13 @@ function renderPOSSidebar($activeModule = 'inicio')
                 item.classList.add('open');
             }
         }
+
+        // Auto-colapsar cuando el mouse sale del sidebar
+        document.getElementById('posSidebar').addEventListener('mouseleave', function() {
+            document.querySelectorAll('.pos-menu-item.has-sub').forEach(el => {
+                el.classList.remove('open');
+            });
+        });
     </script>
 <?php
     return ob_get_clean();

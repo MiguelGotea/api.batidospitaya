@@ -470,10 +470,15 @@ $menuGlobal = [
         ]
     ],
     [
-        'nombre' => 'POS',
-        'icon' => 'fas fa-tag',
+        'nombre' => 'Productos',
+        'icon' => 'fas fa-boxes',
         'cargos_permitidos' => [],
         'items' => [
+            [
+                'nombre' => 'Dashboard Consumo',
+                'url' => 'productos/dashboard_consumo.php',
+                'cargos_permitidos' => [49, 55]
+            ],
             [
                 'nombre' => 'Unidades',
                 'url' => 'POS/historial_unidades_conversion.php',
@@ -499,6 +504,19 @@ $menuGlobal = [
                 'url' => 'sistemas/accessantiguo_diccionario_productos.php',
                 'cargos_permitidos' => [55, 49]
             ],
+        ]
+    ],
+    [
+        'nombre' => 'POS',
+        'icon' => 'fas fa-tag',
+        'cargos_permitidos' => [],
+        'items' => [
+            [
+                'nombre' => 'Diccionario Access ERP',
+                'url' => 'sistemas/accessantiguo_diccionario_productos.php',
+                'cargos_permitidos' => []
+            ],
+
         ]
     ],
     [

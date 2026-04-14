@@ -303,7 +303,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21]
             ],
             [
                 'nombre' => 'Agenda Diaria',

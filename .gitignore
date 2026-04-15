@@ -5,7 +5,6 @@
 
 # Dependencias
 node_modules/
-vendor/
 # core/ → trackeado en GitHub, excluido del host por --exclude en deploy-api.yml
 
 # Archivos de Sistema / IDE

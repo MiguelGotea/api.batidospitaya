@@ -34,12 +34,12 @@ function renderHeader($usuario, $esAdmin = false, $titulo = '')
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            padding: 12px 20px;
-            border-bottom: 2px solid #e0e0e0;
+            padding: 14px 24px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
             margin-bottom: 30px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
             gap: 20px;
         }
 

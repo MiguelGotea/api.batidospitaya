@@ -1,6 +1,30 @@
 ---
-name: ERP Batidos Pitaya Development
-description: Comprehensive skill for developing modules and tools in the Batidos Pitaya ERP system following established standards and architecture
+name: Pitaya System Development
+description: >
+  Skill maestra para el desarrollo de módulos, herramientas y servicios del
+  ecosistema Batidos Pitaya (ERP, API, Talento, POS). Cubre arquitectura,
+  estándares de código PHP/MySQL/PDO, identidad visual, permisos, sincronización
+  PitayaCore (Iron Sync v13.1) y flujos de despliegue.
+triggers:
+  - pitaya
+  - erp
+  - batidos
+  - modulo
+  - módulo
+  - herramienta
+  - php
+  - mysql
+  - pdo
+  - sucursal
+  - operario
+  - dashboard
+  - pitayacore
+  - iron sync
+  - core
+  - talento
+  - pos
+  - api batidos
+alwaysApply: false
 ---
 
 # ERP Batidos Pitaya Development Skill

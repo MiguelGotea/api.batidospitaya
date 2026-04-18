@@ -26,9 +26,9 @@ The term was coined by Michał Malewicz (CEO of Hype4) in 2019. Elements appear 
 ## Core Visual Principles
 
 ### 1. Unified Surface Color
-- Background and UI elements share the **same base color** (or very close shades)
+- Unified Surface Color: Background and UI elements share the same base color (or very close shades)
 - No dramatic color changes between container and element
-- Typical base: light gray (`#e0e5ec`), off-white (`#f0f0f3`), or soft pastels
+- Typical base: Pitaya Pastel (`#f6f6f6`), off-white (`#f0f0f3`), or soft gray (`#e0e5ec`)
 
 ### 2. Dual Shadow System (THE KEY TECHNIQUE)
 Every raised element needs **two box-shadows simultaneously**:
@@ -38,14 +38,14 @@ Every raised element needs **two box-shadows simultaneously**:
 ```css
 /* RAISED element (button at rest, card) */
 box-shadow:
-  6px 6px 12px #b8bec7,   /* dark shadow: bottom-right */
-  -6px -6px 12px #ffffff;  /* light shadow: top-left */
+  8px 8px 16px #d6d6d6,   /* dark shadow: bottom-right */
+  -8px -8px 16px #ffffff;  /* light shadow: top-left */
 ```
 
 ```css
 /* PRESSED / INSET element (active button, input field) */
 box-shadow:
-  inset 4px 4px 8px #b8bec7,   /* dark inset: top-left inside */
+  inset 4px 4px 8px #d6d6d6,   /* dark inset: top-left inside */
   inset -4px -4px 8px #ffffff;  /* light inset: bottom-right inside */
 ```
 
@@ -79,13 +79,13 @@ When migrating a page, process these elements in order:
 ### Step 2 — Rewrite the CSS Custom Properties
 ```css
 :root {
-  --neu-bg: #e0e5ec;
-  --neu-shadow-dark: #b8bec7;
+  --neu-bg: #f6f6f6;
+  --neu-shadow-dark: #d6d6d6;
   --neu-shadow-light: #ffffff;
-  --neu-radius: 16px;
-  --neu-blur: 12px;
-  --neu-distance: 6px;
-  --neu-accent: #7b61ff; /* use sparingly */
+  --neu-radius: 20px;
+  --neu-blur: 14px;
+  --neu-distance: 8px;
+  --neu-accent: #51B8AC; /* Pitaya Aqua-Teal */
 }
 ```
 
@@ -191,9 +191,9 @@ input, textarea, select {
 ```
 
 ### Step 4 — Typography adjustments
-- Body text: keep dark for readability (`#333` or `#444`) — contrast is critical
-- Labels: medium gray (`#888`–`#aaa`)
-- Headings: near-black (`#1a1a2e`) or dark accent
+- Body text: use deep slate or neutral gray (`#455a64` or `#333`)
+- Labels: neutral muted gray (`#757575`)
+- Headings: dark accent or near-black (`#1a1a2e`)
 - **NEVER** use very light gray text on the neumorphic background — it disappears
 - Use font-weight `400`–`600` (avoid ultra-thin weights)
 
@@ -240,7 +240,7 @@ Neumorphism is known for potential accessibility issues. Always:
 
 | ❌ Wrong | ✅ Correct |
 |----------|-----------|
-| White background (`#fff`) with neumorphic elements | Soft gray background (`#e0e5ec`) that matches elements |
+| White background (`#fff`) with neumorphic elements | Pastel background (`#f6f6f6`) that matches elements |
 | Only one box-shadow | Always TWO shadows (dark + light) |
 | Sharp blur (small px) | Soft blur (10–20px) |
 | `border: 1px solid #ccc` on elements | No borders, or use very subtle inner border |
@@ -260,6 +260,18 @@ Given base color `H S L%`:
 | Raised | `hsl(H, S, L-15%)` at bottom-right | `#fff` or `hsl(H, S, L+10%)` at top-left |
 | Pressed (inset) | `hsl(H, S, L-15%)` inset top-left | `#fff` inset bottom-right |
 | Flat (no effect) | Remove both shadows | — |
+
+---
+
+## Reference: Pitaya Standard Palette (Soft UI)
+
+Our standardized pastel neumorphic theme:
+- Background: `#f6f6f6`
+- Dark shadow: `#d6d6d6`  
+- Light shadow: `#ffffff`
+- Accent Aqua:  `#51B8AC`
+- Text primary: `#455a64`
+- Text secondary: `#757575`
 
 ---
 

@@ -469,7 +469,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Consumo de Insumos',
                 'url' => 'productos/dashboard_consumo.php',
-                'cargos_permitidos' => [5, 11, 26, 27, 42, 43, 49, 50, 53]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49] // equipo liderazgo
             ],
 
         ]

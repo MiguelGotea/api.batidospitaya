@@ -466,7 +466,11 @@ $menuGlobal = [
                 'url' => 'productos/dashboard_consumo.php',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49] // equipo liderazgo
             ],
-
+            [
+                'nombre' => 'Analisis RFM',
+                'url' => 'marketing/dashboard_rfm.php',
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49] // equipo liderazgo
+            ],
         ]
     ],
     [

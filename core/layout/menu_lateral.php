@@ -462,10 +462,15 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
             ],
             [
-                'nombre' => 'Analisis RFM',
-                'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
-            ]
+                'nombre' => 'Impulso de Ventas',
+                'url' => 'sucursales/kpi_sucursales.php',
+                'cargos_permitidos' => [5, 11, 26, 27, 42, 43, 49, 50, 53]
+            ],
+            [
+                'nombre' => 'Consumo de Insumos',
+                'url' => 'productos/dashboard_consumo.php',
+                'cargos_permitidos' => [5, 11, 26, 27, 42, 43, 49, 50, 53]
+            ],
 
         ]
     ],

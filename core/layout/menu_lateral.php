@@ -449,7 +449,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55]
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21]
             ],
             [
                 'nombre' => 'Edición de Indicadores',

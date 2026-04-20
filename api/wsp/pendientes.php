@@ -14,7 +14,7 @@ header('Content-Type: application/json; charset=utf-8');
 verificarTokenVPS();
 
 try {
-    $LIMITE_DESTINATARIOS = 50;
+    $LIMITE_DESTINATARIOS = 1; // Un destinatario por ciclo → el VPS hace polling y respeta la distribución horaria
 
     // Campañas programadas cuya fecha de envío ya llegó
     $stmtCamp = $conn->prepare("
@@ -39,14 +39,18 @@ try {
     $resultado = [];
 
     foreach ($campanas as $campana) {
-        // Destinatarios pendientes de esta campaña
+        // Solo destinatarios cuya hora individual ya llegó (o sin hora asignada = legado)
         $stmtDest = $conn->prepare("
             SELECT id, id_cliente, nombre, telefono, sucursal
             FROM wsp_destinatarios_
             WHERE campana_id = :cid
               AND enviado = 0
               AND (error IS NULL OR error = '')
-            ORDER BY id ASC
+              AND (
+                hora_envio_programada IS NULL
+                OR hora_envio_programada <= CONVERT_TZ(NOW(), '+00:00', '-06:00')
+              )
+            ORDER BY hora_envio_programada ASC
             LIMIT :lim
         ");
         $stmtDest->bindValue(':cid', (int) $campana['id'], PDO::PARAM_INT);

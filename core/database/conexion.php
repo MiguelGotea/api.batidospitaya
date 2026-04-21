@@ -19,6 +19,8 @@ try {
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
         ]
     );
+    // Sincronizar zona horaria de MySQL con Nicaragua
+    $conn->exec("SET time_zone = '-06:00'");
 } catch (PDOException $e) {
     error_log("Error de conexión: " . $e->getMessage());
     

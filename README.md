@@ -14,6 +14,7 @@ Repositorio de la API central para los servicios de Batidos Pitaya.
 ### Gestión de Archivos (Estandarización)
 Para mantener el repositorio limpio y seguro, se aplican las siguientes reglas:
 
+
 | Carpeta/Archivo | Subir a GitHub | Subir al Host |
 | :--- | :---: | :---: |
 | `.scripts/` | ✅ Sí | ❌ No |

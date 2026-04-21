@@ -20,6 +20,7 @@ try {
         SELECT estado, qr_base64, numero_telefono, ultimo_ping, ip_vps
         FROM wsp_sesion_vps_
         WHERE instancia = :inst
+        ORDER BY ultimo_ping DESC
         LIMIT 1
     ");
     $stmt->execute([':inst' => $instancia]);

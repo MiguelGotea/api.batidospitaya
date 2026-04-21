@@ -43,9 +43,11 @@ try {
         $numero = null;
 
     // Upsert: actualizar la fila de esta instancia, o insertar si no existe
+    // NOTA: Se usa NOW() directamente porque el servidor MySQL ya está en CST (UTC-6).
+    // CONVERT_TZ(NOW(),'+00:00','-06:00') restaba 6h extra de forma incorrecta.
     $stmt = $conn->prepare("
         INSERT INTO wsp_sesion_vps_ (instancia, estado, qr_base64, numero_telefono, ultimo_ping, ip_vps)
-        VALUES (:instancia, :estado, :qr, :numero, CONVERT_TZ(NOW(),'+00:00','-06:00'), :ip)
+        VALUES (:instancia, :estado, :qr, :numero, NOW(), :ip)
         ON DUPLICATE KEY UPDATE
             estado          = VALUES(estado),
             qr_base64       = VALUES(qr_base64),
@@ -61,8 +63,8 @@ try {
         ':ip' => $ipVPS
     ]);
 
-    // Verificar si hay un reset solicitado para esta instancia
-    $stmtCheck = $conn->prepare("SELECT reset_solicitado FROM wsp_sesion_vps_ WHERE instancia = :inst LIMIT 1");
+    // Verificar si hay un reset solicitado para esta instancia (leer la fila más reciente)
+    $stmtCheck = $conn->prepare("SELECT reset_solicitado FROM wsp_sesion_vps_ WHERE instancia = :inst ORDER BY ultimo_ping DESC LIMIT 1");
     $stmtCheck->execute([':inst' => $instancia]);
     $resetSolicitado = (int) ($stmtCheck->fetchColumn() ?: 0) === 1;
 

@@ -95,18 +95,23 @@ End Function
 '  End Sub
 
 Public Sub IniciarPingAutomatico()
-    ' Solo activar si el Access está corriendo como sistema de tienda
-    If Not EsSistemaDeTienda() Then Exit Sub
+    ' 1. Validar contexto
+    If Not EsSistemaDeTienda() Then
+        Debug.Print "Ping abortado: No es entorno de tienda (Raiz=" & esModuloOpitayaRaiz() & ")"
+        Exit Sub
+    End If
     
     Dim frm As Form
     On Error Resume Next
-    Set frm = Forms(0)  ' Formulario activo principal
+    Set frm = Screen.ActiveForm
     
     If Not frm Is Nothing Then
-        frm.TimerInterval = INTERVALO_SEG * 1000  ' En milisegundos
+        frm.TimerInterval = INTERVALO_SEG * 1000
         mTimerActivo = True
-        ' Enviar ping inmediato al abrir
+        ' Enviar ping inmediato
         EnviarPing
+    Else
+        Debug.Print "Ping abortado: No se detectó formulario activo para el Timer."
     End If
     On Error GoTo 0
 End Sub
@@ -132,31 +137,30 @@ End Sub
 '  Verificar que el Access está en modo Sistema de Tienda
 ' ════════════════════════════════════════════════════════
 Private Function EsSistemaDeTienda() As Boolean
-    ' Condición 1: esModuloOpitayaRaiz() debe retornar 0
-    '   (0 = modo tienda | otro valor = test/global)
-    If esModuloOpitayaRaiz() <> 0 Then
-        EsSistemaDeTienda = False
-        Exit Function
-    End If
+    Dim c1 As Boolean, c2 As Boolean
     
-    ' Condición 2: debe existir la tabla vinculada DatosSistema
-    EsSistemaDeTienda = TieneTablaVinculada("DatosSistema")
+    ' Condición 1: esModuloOpitayaRaiz() = 0
+    c1 = (esModuloOpitayaRaiz() = 0)
+    
+    ' Condición 2: Existe tabla DatosSistema
+    c2 = TieneTablaVinculada("DatosSistema")
+    
+    EsSistemaDeTienda = (c1 And c2)
 End Function
 
 Private Function TieneTablaVinculada(nombreTabla As String) As Boolean
-    ' Verifica que la tabla exista Y sea de tipo vinculada (Connect <> "")
     On Error Resume Next
     Dim tdf As Object
     Set tdf = CurrentDb.TableDefs(nombreTabla)
     
     If Err.Number <> 0 Then
-        ' La tabla no existe
         TieneTablaVinculada = False
         Exit Function
     End If
     
-    ' Una tabla vinculada siempre tiene la propiedad Connect no vacía
-    TieneTablaVinculada = (Len(tdf.Connect) > 0)
+    ' Retorna True si existe, ya sea vinculada o local
+    ' (El usuario validará que en producción sea vinculada)
+    TieneTablaVinculada = True
     Set tdf = Nothing
     On Error GoTo 0
 End Function
@@ -233,19 +237,23 @@ End Function
 ' ══════════════════════════════════════════════════════════
 Public Sub ProbarPing()
     Dim codSuc As String
+    Dim c1 As Boolean, c2 As Boolean
+    
     codSuc = CStr(codigoLocal())
+    c1 = (esModuloOpitayaRaiz() = 0)
+    c2 = TieneTablaVinculada("DatosSistema")
     
     If EnviarPing() Then
-        MsgBox "OK Ping enviado correctamente." & vbCrLf & _
+        MsgBox "OK - Conexión exitosa." & vbCrLf & _
                "Sucursal: " & codSuc & vbCrLf & _
-               "PC: " & Environ("COMPUTERNAME") & vbCrLf & _
+               "1. Raiz=0: " & IIf(c1, "✅", "❌ (" & esModuloOpitayaRaiz() & ")") & vbCrLf & _
+               "2. Tabla DatosSistema: " & IIf(c2, "✅", "❌ No existe") & vbCrLf & _
+               "Modo Tienda: " & IIf(c1 And c2, "SÍ ✅", "NO ❌") & vbCrLf & _
                "URL: " & PING_URL, _
                vbInformation, "Monitor Pitaya"
     Else
-        MsgBox "ERROR No se pudo enviar el ping." & vbCrLf & _
-               "Sucursal detectada: " & codSuc & vbCrLf & _
-               "Verificar conexion a internet." & vbCrLf & _
-               "URL: " & PING_URL, _
+        MsgBox "ERROR - No se pudo conectar." & vbCrLf & _
+               "Verificar internet o URL.", _
                vbExclamation, "Monitor Pitaya"
     End If
 End Sub

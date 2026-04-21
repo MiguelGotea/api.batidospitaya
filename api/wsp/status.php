@@ -30,22 +30,25 @@ try {
         exit;
     }
 
-    // Considerar inactivo si el último ping fue hace más de 2 minutos
+    // Considerar inactivo si el último ping fue hace más de 3 minutos
+    // (El VPS envía heartbeat cada 60s — damos margen para latencias)
     $activo = false;
+    $diffSegundos = null;
     if ($fila['ultimo_ping']) {
-        $diff = time() - strtotime($fila['ultimo_ping']);
-        $activo = ($diff < 120);
+        $diffSegundos = time() - strtotime($fila['ultimo_ping']);
+        $activo = ($diffSegundos < 180);
     }
 
     $estadoFinal = $activo ? $fila['estado'] : 'desconectado';
 
     echo json_encode([
-        'estado' => $estadoFinal,
-        'instancia' => $instancia,
-        'activo' => $activo,
+        'estado'      => $estadoFinal,
+        'instancia'   => $instancia,
+        'activo'      => $activo,
         'ultimo_ping' => $fila['ultimo_ping'],
-        'numero' => ($estadoFinal === 'conectado') ? $fila['numero_telefono'] : null,
-        'qr' => ($estadoFinal === 'qr_pendiente') ? $fila['qr_base64'] : null
+        'seg_desde_ping' => $diffSegundos,   // útil para debug desde el ERP
+        'numero'      => ($estadoFinal === 'conectado') ? $fila['numero_telefono'] : null,
+        'qr'          => ($estadoFinal === 'qr_pendiente') ? $fila['qr_base64'] : null
     ]);
 
 }

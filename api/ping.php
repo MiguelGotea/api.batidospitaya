@@ -76,8 +76,8 @@ try {
         ':created_at' => $ahora,
     ]);
 
-    // Limpiar registros viejos (>7 días)
-    $conn->exec("DELETE FROM sistemas_ping_log WHERE ping_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
+    // Limpiar registros viejos (>1 día)
+    $conn->exec("DELETE FROM sistemas_ping_log WHERE ping_at < DATE_SUB(NOW(), INTERVAL 1 DAY)");
 
     echo json_encode([
         'status'      => 'success',

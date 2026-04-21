@@ -365,6 +365,11 @@ $menuGlobal = [
                 'url' => 'sistemas/gestion_permisos.php',
                 'cargos_permitidos' => [49, 15]
             ],
+            [
+                'nombre' => 'Monitor de Conexión',
+                'url' => 'sistemas/conexion_monitor.php',
+                'cargos_permitidos' => [49, 15]
+            ],
         ]
     ],
     [

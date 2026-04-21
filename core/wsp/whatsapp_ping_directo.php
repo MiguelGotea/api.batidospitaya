@@ -93,7 +93,12 @@ try {
         if ($respData['success'] ?? false) {
             echo json_encode(['success' => true, 'mensaje' => 'Ping enviado con éxito']);
         } else {
-            echo json_encode(['success' => false, 'error' => $respData['error'] ?? 'Error desconocido en el VPS']);
+            $errVps = $respData['error'] ?? 'Error desconocido en el VPS';
+            // Traducir errores técnicos de whatsapp-web.js a mensajes comprensibles
+            if (str_contains($errVps, 'getChat') || str_contains($errVps, 'undefined') || str_contains($errVps, 'not connected')) {
+                $errVps = 'WhatsApp no está conectado aún. Escanea el QR primero desde el badge de estado.';
+            }
+            echo json_encode(['success' => false, 'error' => $errVps]);
         }
     } else {
         $phpError = error_get_last();

@@ -39,12 +39,11 @@ $version      = param('version');
 $modulo       = param('modulo');
 $ip_publica   = $_SERVER['REMOTE_ADDR'] ?? '';
 
-// ── Validación mínima ─────────────────────────────────────────────────────────
+// ── Sin sucursal: respuesta de conectividad simple (para APIDisponible() de Access) ──
 if (empty($sucursal)) {
-    http_response_code(400);
     echo json_encode([
-        'status'    => 'error',
-        'message'   => 'Parámetro "sucursal" requerido',
+        'status'    => 'success',
+        'message'   => 'pong',
         'timestamp' => time()
     ]);
     exit;

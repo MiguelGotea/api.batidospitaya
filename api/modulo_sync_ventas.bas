@@ -110,43 +110,38 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
     Dim sRow    As String
     Dim bPrimero As Boolean
 
-    ' ── SQL idéntico al de ACCESS, filtrado por CodPedido (dividido para evitar límite VBA) ──────────────────
+    ' ── SQL con campos RAW únicamente (sin funciones personalizadas en el SELECT) ──────────
+    ' Las funciones de usuario (cfechasqlfecha, PrecioReal, OperarioCaja, etc.) causan
+    ' Error 5 cuando DAO intenta compilarlas desde contexto de módulo.
+    ' Solución: leer campos base y calcular todo en VBA dentro del loop.
     sSQL = "SELECT " & _
            "  NotaDePedido.Anulado, " & _
            "  NotaDePedido.MotivoAnulado, " & _
-           "  cfechasqlfecha([NotaDePedido]![Fecha]) AS Fecha, " & _
-           "  cfechasqlhora([NotaDePedido]![Hora]) AS Hora, " & _
+           "  NotaDePedido.Fecha, " & _
+           "  NotaDePedido.Hora, " & _
            "  NotaDePedido.CodPedido, " & _
            "  NotaDePedido.CodCliente, " & _
-           "  IIf([NotaDePedido]![POS]=-1,'A Cuentas','Efectivo') AS aPOS, " & _
-           "  [Delivery]![Nombre] AS Delivery_Nombre, " & _
+           "  NotaDePedido.POS, " & _
+           "  NotaDePedido.CodMotorizado, " & _
+           "  NotaDePedido.Impresiones, " & _
+           "  NotaDePedido.Propina, " & _
+           "  NotaDePedido.TotalGuardado, " & _
+           "  NotaDePedido.HoraCreado, " & _
+           "  NotaDePedido.HoraIngresoProducto, " & _
+           "  NotaDePedido.HoraImpreso, " & _
+           "  SubPedido.CodSubPedido, " & _
+           "  SubPedido.CodBatido, " & _
+           "  SubPedido.Cantidad, " & _
+           "  SubPedido.CodPromocion, " & _
+           "  SubPedido.Observaciones, " & _
+           "  SubPedido.Puntos, " & _
+           "  DBBatidos.Nombre AS DBBatidos_Nombre, " & _
+           "  DBBatidos.Medida, " & _
+           "  DBBatidos.Precio AS DBBatidos_Precio, "
+    sSQL = sSQL & _
            "  Grupos.Tipo, " & _
            "  Grupos.NombreGrupo, " & _
-           "  [DBBatidos]![Nombre] AS DBBatidos_Nombre, " & _
-           "  DBBatidos.Medida, " & _
-           "  SubPedido.Cantidad, " & _
-           "  [SubPedido]![CodPromocion] AS CodigoPromocion, " & _
-           "  [SubPedido]![Cantidad]*PrecioReal([SubPedido]![CodSubPedido]) AS Precio, " & _
-           "  codigolocal() AS [local], " & _
-           "  OperarioCaja([NotaDePedido]![Hora],[NotaDePedido]![Fecha]) AS Caja, " & _
-           "  statusnotaddepedido([NotaDePedido]![CodPedido]) AS Modalidad, " & _
-           "  IIf(IsNull([NotaDePedido]![CodMotorizado]),'',NombreOperario([NotaDePedido]![CodMotorizado])) AS Motorizado, " & _
-           "  SubPedido.Observaciones, " & _
-           "  IIf([SubPedido]![CodPromocion]=92,0,IIf([SubPedido]![CodPromocion]=104,0,[DBBatidos]![Precio])) AS Precio_Unitario_Sin_Descuento, " & _
-           "  NotaDePedido.Impresiones, " & _
-           "  cfechasqlhora([NotaDePedido]![HoraCreado]) AS HoraCreado, "
-    sSQL = sSQL & _
-           "  cfechasqlhora([NotaDePedido]![HoraIngresoProducto]) AS HoraIngresoProducto, " & _
-           "  cfechasqlhora([NotaDePedido]![HoraImpreso]) AS HoraImpreso, " & _
-           "  NotaDePedido.Propina, " & _
-           "  numerosemana([NotaDePedido]![Fecha]) AS semana, " & _
-           "  SubPedido.Puntos, " & _
-           "  [SubPedido]![CodBatido] AS CodProducto, " & _
-           "  [NotaDePedido]![TotalGuardado] AS MontoFactura, " & _
-           "  nombrelocalglobal(codigolocal()) AS Sucursal_Nombre, " & _
-           "  IIf(DCount('*','[StatusPedidosCentral]','[CodPedidoSucursal] = ' & [NotaDePedido]![CodPedido])>0,1,0) AS PedidoDeCentral, " & _
-           "  NotaDePedido.CodMotorizado "
-    sSQL = sSQL & _
+           "  Delivery.Nombre AS Delivery_Nombre " & _
            "FROM ((Delivery INNER JOIN ((SubPedido INNER JOIN DBBatidos ON SubPedido.CodBatido = DBBatidos.CodBatido) " & _
            "  INNER JOIN NotaDePedido ON SubPedido.CodPedido = NotaDePedido.CodPedido) " & _
            "  ON Delivery.CodDelivery = NotaDePedido.Delivery) " & _
@@ -154,8 +149,21 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
            "  INNER JOIN Grupos ON DBBatidos.CodGrupo = Grupos.CodGrupo " & _
            "WHERE NotaDePedido.CodPedido = " & lngCodPedido
 
+    Debug.Print "[SyncVentas] SQL=" & sSQL
+
+    ' ── Valores calculados UNA vez antes del loop (no dependen de la fila) ───────
+    Dim lngPedidoDeCentral As Long
+    Dim sSucursalNombre    As String
+
+    On Error Resume Next
+    lngPedidoDeCentral = IIf(DCount("*", "StatusPedidosCentral", "[CodPedidoSucursal] = " & lngCodPedido) > 0, 1, 0)
+    If Err.Number <> 0 Then lngPedidoDeCentral = 0
+    sSucursalNombre = nombrelocalglobal(codSuc)
+    If Err.Number <> 0 Then sSucursalNombre = ""
+    On Error GoTo ErrorHandler
+
     Set db = CurrentDb()
-    Set rs = db.OpenRecordset(sSQL, dbOpenSnapshot)
+    Set rs = db.OpenRecordset(sSQL, dbOpenForwardOnly, dbReadOnly)
 
     If rs.EOF And rs.BOF Then
         rs.Close
@@ -164,49 +172,115 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
         Exit Function
     End If
 
-    ' ── Construir JSON ─────────────────────────────────────
+    ' ── Construir JSON — funciones de usuario llamadas desde VBA (no desde SQL) ──
     sJSON = "["
     bPrimero = True
+
+    Dim vFecha    As Variant
+    Dim vHora     As Variant
+    Dim sPrecio   As String
+    Dim sPrecUnit As String
+    Dim sCaja     As String
+    Dim sModal    As String
+    Dim sMotor    As String
+    Dim sSemana   As String
 
     Do While Not rs.EOF
         If Not bPrimero Then sJSON = sJSON & ","
         bPrimero = False
 
+        ' ── Todo el bloque bajo Resume Next para aislar cualquier Null ──────────
+        On Error Resume Next
+
+        vFecha  = cfechasqlfecha(rs!Fecha)
+        If Err.Number <> 0 Then vFecha = rs!Fecha : Err.Clear
+
+        vHora   = cfechasqlhora(rs!Hora)
+        If Err.Number <> 0 Then vHora = rs!Hora : Err.Clear
+
+        sPrecio = CStr(CDbl(Nz(rs!Cantidad, 0)) * CDbl(PrecioReal(rs!CodSubPedido)))
+        If Err.Number <> 0 Then sPrecio = "0" : Err.Clear
+
+        sCaja   = CStr(OperarioCaja(rs!Hora, rs!Fecha))
+        If Err.Number <> 0 Then sCaja = "" : Err.Clear
+
+        sModal  = CStr(statusnotaddepedido(rs!CodPedido))
+        If Err.Number <> 0 Then sModal = "" : Err.Clear
+
+        If IsNull(rs!CodMotorizado) Then
+            sMotor = ""
+        Else
+            sMotor = CStr(NombreOperario(rs!CodMotorizado))
+            If Err.Number <> 0 Then sMotor = "" : Err.Clear
+        End If
+
+        sSemana = CStr(numerosemana(rs!Fecha))
+        If Err.Number <> 0 Then sSemana = "null" : Err.Clear
+
+        ' Precio_Unitario_Sin_Descuento: promo 92 y 104 = 0
+        Dim nProm As Long : nProm = Nz(rs!CodPromocion, 0)
+        If nProm = 92 Or nProm = 104 Then
+            sPrecUnit = "0"
+        Else
+            sPrecUnit = Replace(CStr(CDbl(Nz(rs!DBBatidos_Precio, 0))), ",", ".")
+            If Err.Number <> 0 Then sPrecUnit = "null" : Err.Clear
+        End If
+
+        ' HoraXxx — se precomputan aquí para evitar Error 94 al llamar cfechasqlhora(Null)
+        Dim sHoraCreado          As String
+        Dim sHoraIngresoProducto As String
+        Dim sHoraImpreso         As String
+
+        sHoraCreado = CStr(cfechasqlhora(rs!HoraCreado))
+        If Err.Number <> 0 Then sHoraCreado = "" : Err.Clear
+
+        sHoraIngresoProducto = CStr(cfechasqlhora(rs!HoraIngresoProducto))
+        If Err.Number <> 0 Then sHoraIngresoProducto = "" : Err.Clear
+
+        sHoraImpreso = CStr(cfechasqlhora(rs!HoraImpreso))
+        If Err.Number <> 0 Then sHoraImpreso = "" : Err.Clear
+
+        ' aPOS — Nz() para manejar POS=Null sin Error 94
+        Dim saPOS As String
+        saPOS = IIf(Nz(rs!POS, 0) = -1, "A Cuentas", "Efectivo")
+
         sRow = "{"
-        sRow = sRow & """Anulado"":"                         & JSONVal(rs!Anulado) & ","
-        sRow = sRow & """MotivoAnulado"":"                   & JSONStr(rs!MotivoAnulado) & ","
-        sRow = sRow & """Fecha"":"                           & JSONStr(rs!Fecha) & ","
-        sRow = sRow & """Hora"":"                            & JSONStr(rs!Hora) & ","
-        sRow = sRow & """CodPedido"":"                       & JSONVal(rs!CodPedido) & ","
-        sRow = sRow & """CodCliente"":"                      & JSONVal(rs!CodCliente) & ","
-        sRow = sRow & """aPOS"":"                            & JSONStr(rs!aPOS) & ","
-        sRow = sRow & """Delivery_Nombre"":"                 & JSONStr(rs!Delivery_Nombre) & ","
-        sRow = sRow & """Tipo"":"                            & JSONStr(rs!Tipo) & ","
-        sRow = sRow & """NombreGrupo"":"                     & JSONStr(rs!NombreGrupo) & ","
-        sRow = sRow & """DBBatidos_Nombre"":"                & JSONStr(rs!DBBatidos_Nombre) & ","
-        sRow = sRow & """Medida"":"                          & JSONStr(rs!Medida) & ","
-        sRow = sRow & """Cantidad"":"                        & JSONVal(rs!Cantidad) & ","
-        sRow = sRow & """CodigoPromocion"":"                 & JSONVal(rs!CodigoPromocion) & ","
-        sRow = sRow & """Precio"":"                          & JSONVal(rs!Precio) & ","
-        sRow = sRow & """local"":"                           & JSONStr(rs![local]) & ","
-        sRow = sRow & """Caja"":"                            & JSONStr(rs!Caja) & ","
-        sRow = sRow & """Modalidad"":"                       & JSONStr(rs!Modalidad) & ","
-        sRow = sRow & """Motorizado"":"                      & JSONStr(rs!Motorizado) & ","
-        sRow = sRow & """Observaciones"":"                   & JSONStr(rs!Observaciones) & ","
-        sRow = sRow & """Precio_Unitario_Sin_Descuento"":"   & JSONVal(rs!Precio_Unitario_Sin_Descuento) & ","
-        sRow = sRow & """Impresiones"":"                     & JSONVal(rs!Impresiones) & ","
-        sRow = sRow & """HoraCreado"":"                      & JSONStr(rs!HoraCreado) & ","
-        sRow = sRow & """HoraIngresoProducto"":"             & JSONStr(rs!HoraIngresoProducto) & ","
-        sRow = sRow & """HoraImpreso"":"                     & JSONStr(rs!HoraImpreso) & ","
-        sRow = sRow & """Propina"":"                         & JSONVal(rs!Propina) & ","
-        sRow = sRow & """Semana"":"                          & JSONVal(rs!semana) & ","
-        sRow = sRow & """Puntos"":"                          & JSONVal(rs!Puntos) & ","
-        sRow = sRow & """CodProducto"":"                     & JSONStr(rs!CodProducto) & ","
-        sRow = sRow & """MontoFactura"":"                    & JSONVal(rs!MontoFactura) & ","
-        sRow = sRow & """Sucursal_Nombre"":"                 & JSONStr(rs!Sucursal_Nombre) & ","
-        sRow = sRow & """PedidoDeCentral"":"                 & JSONVal(rs!PedidoDeCentral) & ","
-        sRow = sRow & """CodMotorizado"":"                   & JSONVal(rs!CodMotorizado)
+        sRow = sRow & """Anulado"":"                        & JSONVal(rs!Anulado) & ","
+        sRow = sRow & """MotivoAnulado"":"                  & JSONStr(rs!MotivoAnulado) & ","
+        sRow = sRow & """Fecha"":"                          & JSONStr(vFecha) & ","
+        sRow = sRow & """Hora"":"                           & JSONStr(vHora) & ","
+        sRow = sRow & """CodPedido"":"                      & JSONVal(rs!CodPedido) & ","
+        sRow = sRow & """CodCliente"":"                     & JSONVal(rs!CodCliente) & ","
+        sRow = sRow & """aPOS"":"                           & JSONStr(saPOS) & ","
+        sRow = sRow & """Delivery_Nombre"":"                & JSONStr(rs!Delivery_Nombre) & ","
+        sRow = sRow & """Tipo"":"                           & JSONStr(rs!Tipo) & ","
+        sRow = sRow & """NombreGrupo"":"                    & JSONStr(rs!NombreGrupo) & ","
+        sRow = sRow & """DBBatidos_Nombre"":"               & JSONStr(rs!DBBatidos_Nombre) & ","
+        sRow = sRow & """Medida"":"                         & JSONStr(rs!Medida) & ","
+        sRow = sRow & """Cantidad"":"                       & JSONVal(rs!Cantidad) & ","
+        sRow = sRow & """CodigoPromocion"":"                & JSONVal(rs!CodPromocion) & ","
+        sRow = sRow & """Precio"":"                         & sPrecio & ","
+        sRow = sRow & """local"":"                          & JSONStr(codSuc) & ","
+        sRow = sRow & """Caja"":"                           & JSONStr(sCaja) & ","
+        sRow = sRow & """Modalidad"":"                      & JSONStr(sModal) & ","
+        sRow = sRow & """Motorizado"":"                     & JSONStr(sMotor) & ","
+        sRow = sRow & """Observaciones"":"                  & JSONStr(rs!Observaciones) & ","
+        sRow = sRow & """Precio_Unitario_Sin_Descuento"":"  & sPrecUnit & ","
+        sRow = sRow & """Impresiones"":"                    & JSONVal(rs!Impresiones) & ","
+        sRow = sRow & """HoraCreado"":"                     & JSONStr(sHoraCreado) & ","
+        sRow = sRow & """HoraIngresoProducto"":"            & JSONStr(sHoraIngresoProducto) & ","
+        sRow = sRow & """HoraImpreso"":"                    & JSONStr(sHoraImpreso) & ","
+        sRow = sRow & """Propina"":"                        & JSONVal(rs!Propina) & ","
+        sRow = sRow & """Semana"":"                         & sSemana & ","
+        sRow = sRow & """Puntos"":"                         & JSONVal(rs!Puntos) & ","
+        sRow = sRow & """CodProducto"":"                    & JSONStr(rs!CodBatido) & ","
+        sRow = sRow & """MontoFactura"":"                   & JSONVal(rs!TotalGuardado) & ","
+        sRow = sRow & """Sucursal_Nombre"":"                & JSONStr(sSucursalNombre) & ","
+        sRow = sRow & """PedidoDeCentral"":"                & lngPedidoDeCentral & ","
+        sRow = sRow & """CodMotorizado"":"                  & JSONVal(rs!CodMotorizado)
         sRow = sRow & "}"
+
+        On Error GoTo ErrorHandler
 
         sJSON = sJSON & sRow
         rs.MoveNext
@@ -223,6 +297,9 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
 
 ErrorHandler:
     LogSyncError "ObtenerRegistrosPedidoJSON", "Error " & Err.Number & ": " & Err.Description
+    If Not rs Is Nothing Then rs.Close
+    Set rs = Nothing
+    Set db = Nothing
     ObtenerRegistrosPedidoJSON = ""
 End Function
 

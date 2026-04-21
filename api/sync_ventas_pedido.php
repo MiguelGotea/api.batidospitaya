@@ -96,20 +96,38 @@ if ($rowsInput === null && isset($_POST['rows'])) {
     $rowsInput = json_decode($_POST['rows'], true);
 }
 
-// 3) Validar parámetros obligatorios
-if (empty($sucursal) || !is_numeric($sucursal)) {
-    jsonError(400, 'Parámetro sucursal inválido o faltante.');
+// 3) Validar parámetros obligatorios — ESTRICTO para evitar borrados masivos
+
+// sucursal debe ser entero positivo >= 1
+if (empty($sucursal) || !is_numeric($sucursal) || (int)$sucursal < 1) {
+    jsonError(400, 'Parámetro sucursal inválido o faltante (debe ser entero >= 1).');
 }
-if (empty($codPedido) || !is_numeric($codPedido)) {
-    jsonError(400, 'Parámetro cod_pedido inválido o faltante.');
+// cod_pedido debe ser entero positivo >= 1
+if (empty($codPedido) || !is_numeric($codPedido) || (int)$codPedido < 1) {
+    jsonError(400, 'Parámetro cod_pedido inválido o faltante (debe ser entero >= 1).');
 }
-if (empty($rowsInput) || !is_array($rowsInput)) {
-    jsonError(400, 'Parámetro rows inválido, vacío o no es un array JSON.');
+// rows NUNCA puede estar vacío — sin datos no hay DELETE
+if (empty($rowsInput) || !is_array($rowsInput) || count($rowsInput) === 0) {
+    jsonError(400, 'Parámetro rows vacío. No se ejecuta DELETE sin filas a insertar.');
 }
 
 $sucursal  = (int)$sucursal;
 $codPedido = (int)$codPedido;
 $totalRows = count($rowsInput);
+
+// 3b) Verificación cruzada: la sucursal dentro de las filas debe coincidir
+// con el parámetro declarado. Protege contra mala construcción del payload.
+foreach ($rowsInput as $idxCheck => $rowCheck) {
+    $localEnFila = isset($rowCheck['local']) ? (int)$rowCheck['local'] : null;
+    if ($localEnFila !== null && $localEnFila !== $sucursal) {
+        logMsg("RECHAZO cross-check: sucursal param=$sucursal pero fila[$idxCheck][local]=$localEnFila");
+        jsonError(400,
+            "Inconsistencia de sucursal: el parámetro dice $sucursal " .
+            "pero la fila $idxCheck contiene local=$localEnFila. " .
+            "Operación cancelada por seguridad."
+        );
+    }
+}
 
 logMsg("INICIO sync - Sucursal: $sucursal | CodPedido: $codPedido | Filas recibidas: $totalRows");
 
@@ -121,13 +139,15 @@ $pdo = $conn;
 try {
     $pdo->beginTransaction();
 
-    // 5) DELETE de registros existentes para este pedido y sucursal
+    // 5) DELETE — SIEMPRE con CodPedido + local (ambos requeridos y ya validados arriba)
+    //    Esto garantiza que JAMÁS se borren datos de otras sucursales aunque el pedido
+    //    tenga el mismo número (los correlativos son por sucursal, no globales).
     $stmtDel = $pdo->prepare(
         "DELETE FROM `" . TABLE_NAME . "` WHERE `CodPedido` = :cod AND `local` = :suc"
     );
     $stmtDel->execute([':cod' => $codPedido, ':suc' => $sucursal]);
     $deletedRows = $stmtDel->rowCount();
-    logMsg("DELETE OK - Eliminadas $deletedRows filas existentes.");
+    logMsg("DELETE OK - CodPedido=$codPedido | local=$sucursal | Eliminadas: $deletedRows filas.");
 
     // 6) Validar y filtrar columnas de la primera fila
     $firstRow     = $rowsInput[0];

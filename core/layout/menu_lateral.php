@@ -103,7 +103,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 21]
             ],
             [
                 'nombre' => 'Reportes de Personal',

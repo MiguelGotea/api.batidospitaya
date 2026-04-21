@@ -61,7 +61,7 @@ try {
                  version_access, modulo_activo, ping_at, created_at)
             VALUES
                 (:sucursal, :pc_nombre, :pc_usuario, :ip_local, :ip_publica,
-                 :version, :modulo, :ahora, :ahora)";
+                 :version, :modulo, :ping_at, :created_at)";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([
@@ -72,7 +72,8 @@ try {
         ':ip_publica' => $ip_publica,
         ':version'    => $version,
         ':modulo'     => $modulo,
-        ':ahora'      => $ahora,
+        ':ping_at'    => $ahora,
+        ':created_at' => $ahora,
     ]);
 
     // Limpiar registros viejos (>7 días)

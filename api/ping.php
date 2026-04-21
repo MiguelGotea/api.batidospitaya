@@ -88,14 +88,13 @@ try {
     ]);
 
 } catch (Exception $e) {
-    // Responde pong igual para no bloquear Access, pero expone el error para diagnóstico
+    // Responde pong igual para no bloquear Access, pero registra el error en el log
     error_log("[ping.php] Error BD: " . $e->getMessage());
     echo json_encode([
-        'status'        => 'success',
-        'message'       => 'pong',
-        'timestamp'     => time(),
-        'db_error'      => true,
-        'db_error_msg'  => $e->getMessage()   // ← ver esto en el navegador
+        'status'    => 'success',
+        'message'   => 'pong',
+        'timestamp' => time(),
+        'db_error'  => true
     ]);
 }
 exit;

@@ -138,7 +138,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Plan Anual Feriados',
                 'url' => 'rh/plan_feriados_anual.php',
-                'cargos_permitidos' => []
+                'cargos_permitidos' => [13]
             ],
         ]
     ],

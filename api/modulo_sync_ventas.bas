@@ -30,12 +30,7 @@
 
 Option Explicit
 
-' ── CONFIGURACIÓN ───────────────────────────────────────────
-Private Const SYNC_URL        As String = "https://proxy.batidospitaya.com/api/sync_ventas_pedido.php"
-Private Const API_TOKEN       As String = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
-Private Const VERSION_MODULO  As String = "1.0"
-Private Const TIMEOUT_MS      As Long   = 15000   ' 15 segundos máximo de espera
-Private Const MODO_SILENCIOSO As Boolean = True    ' False = muestra errores al usuario
+' (Constantes definidas localmente dentro de cada función para evitar conflictos con otros módulos)
 
 ' ══════════════════════════════════════════════════════════
 '  FUNCIÓN PÚBLICA PRINCIPAL
@@ -46,6 +41,7 @@ Private Const MODO_SILENCIOSO As Boolean = True    ' False = muestra errores al 
 Public Function SyncVentasPedido(lngCodPedido As Long) As Boolean
     On Error GoTo ErrorHandler
 
+    Dim MODO_SILENCIOSO As Boolean : MODO_SILENCIOSO = True  ' False = muestra errores al usuario
     Dim codSuc  As String
     Dim sJson   As String
     Dim sResp   As String
@@ -114,7 +110,7 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
     Dim sRow    As String
     Dim bPrimero As Boolean
 
-    ' ── SQL idéntico al de ACCESS, filtrado por CodPedido ──────────────────
+    ' ── SQL idéntico al de ACCESS, filtrado por CodPedido (dividido para evitar límite VBA) ──────────────────
     sSQL = "SELECT " & _
            "  NotaDePedido.Anulado, " & _
            "  NotaDePedido.MotivoAnulado, " & _
@@ -138,7 +134,8 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
            "  SubPedido.Observaciones, " & _
            "  IIf([SubPedido]![CodPromocion]=92,0,IIf([SubPedido]![CodPromocion]=104,0,[DBBatidos]![Precio])) AS Precio_Unitario_Sin_Descuento, " & _
            "  NotaDePedido.Impresiones, " & _
-           "  cfechasqlhora([NotaDePedido]![HoraCreado]) AS HoraCreado, " & _
+           "  cfechasqlhora([NotaDePedido]![HoraCreado]) AS HoraCreado, "
+    sSQL = sSQL & _
            "  cfechasqlhora([NotaDePedido]![HoraIngresoProducto]) AS HoraIngresoProducto, " & _
            "  cfechasqlhora([NotaDePedido]![HoraImpreso]) AS HoraImpreso, " & _
            "  NotaDePedido.Propina, " & _
@@ -148,7 +145,8 @@ Private Function ObtenerRegistrosPedidoJSON(lngCodPedido As Long, codSuc As Stri
            "  [NotaDePedido]![TotalGuardado] AS MontoFactura, " & _
            "  nombrelocalglobal(codigolocal()) AS Sucursal_Nombre, " & _
            "  IIf(DCount('*','[StatusPedidosCentral]','[CodPedidoSucursal] = ' & [NotaDePedido]![CodPedido])>0,1,0) AS PedidoDeCentral, " & _
-           "  NotaDePedido.CodMotorizado " & _
+           "  NotaDePedido.CodMotorizado "
+    sSQL = sSQL & _
            "FROM ((Delivery INNER JOIN ((SubPedido INNER JOIN DBBatidos ON SubPedido.CodBatido = DBBatidos.CodBatido) " & _
            "  INNER JOIN NotaDePedido ON SubPedido.CodPedido = NotaDePedido.CodPedido) " & _
            "  ON Delivery.CodDelivery = NotaDePedido.Delivery) " & _
@@ -235,6 +233,10 @@ Private Function EnviarSyncAPI(lngCodPedido As Long, codSuc As String, _
                                 sRowsJson As String, ByRef sRespOut As String) As Boolean
     On Error GoTo ErrorHandler
 
+    Dim SYNC_URL       As String  : SYNC_URL       = "https://proxy.batidospitaya.com/api/sync_ventas_pedido.php"
+    Dim API_TOKEN      As String  : API_TOKEN      = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
+    Dim VERSION_MODULO As String  : VERSION_MODULO = "1.0"
+    Dim TIMEOUT_MS     As Long    : TIMEOUT_MS     = 15000  ' 15 segundos máximo de espera
     Dim http      As Object
     Dim sBody     As String
     Dim sPayload  As String

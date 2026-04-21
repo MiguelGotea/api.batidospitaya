@@ -95,7 +95,9 @@ End Function
 '  End Sub
 
 Public Sub IniciarPingAutomatico()
-    ' Configurar el timer del formulario principal
+    ' Solo activar si el Access está corriendo como sistema de tienda
+    If Not EsSistemaDeTienda() Then Exit Sub
+    
     Dim frm As Form
     On Error Resume Next
     Set frm = Forms(0)  ' Formulario activo principal
@@ -122,8 +124,42 @@ End Sub
 
 Public Sub PingTimerTick()
     ' Llamar esto desde el evento Form_Timer del form principal
-    EnviarPing
+    ' Valida de nuevo por si cambia el contexto en caliente
+    If EsSistemaDeTienda() Then EnviarPing
 End Sub
+
+' ════════════════════════════════════════════════════════
+'  Verificar que el Access está en modo Sistema de Tienda
+' ════════════════════════════════════════════════════════
+Private Function EsSistemaDeTienda() As Boolean
+    ' Condición 1: esModuloOpitayaRaiz() debe retornar 0
+    '   (0 = modo tienda | otro valor = test/global)
+    If esModuloOpitayaRaiz() <> 0 Then
+        EsSistemaDeTienda = False
+        Exit Function
+    End If
+    
+    ' Condición 2: debe existir la tabla vinculada DatosSistema
+    EsSistemaDeTienda = TieneTablaVinculada("DatosSistema")
+End Function
+
+Private Function TieneTablaVinculada(nombreTabla As String) As Boolean
+    ' Verifica que la tabla exista Y sea de tipo vinculada (Connect <> "")
+    On Error Resume Next
+    Dim tdf As Object
+    Set tdf = CurrentDb.TableDefs(nombreTabla)
+    
+    If Err.Number <> 0 Then
+        ' La tabla no existe
+        TieneTablaVinculada = False
+        Exit Function
+    End If
+    
+    ' Una tabla vinculada siempre tiene la propiedad Connect no vacía
+    TieneTablaVinculada = (Len(tdf.Connect) > 0)
+    Set tdf = Nothing
+    On Error GoTo 0
+End Function
 
 ' ══════════════════════════════════════════════════════════
 '  Helpers

@@ -53,12 +53,15 @@ if (empty($sucursal)) {
 try {
     require_once __DIR__ . '/../core/database/conexion.php';
 
+    // Hora Nicaragua (timezone fijado en conexion.php → America/Managua)
+    $ahora = date('Y-m-d H:i:s');
+
     $sql = "INSERT INTO sistemas_ping_log
                 (sucursal_codigo, pc_nombre, pc_usuario, ip_local, ip_publica,
                  version_access, modulo_activo, ping_at, created_at)
             VALUES
                 (:sucursal, :pc_nombre, :pc_usuario, :ip_local, :ip_publica,
-                 :version, :modulo, NOW(), NOW())";
+                 :version, :modulo, :ahora, :ahora)";
 
     $stmt = $conn->prepare($sql);
     $stmt->execute([
@@ -69,9 +72,10 @@ try {
         ':ip_publica' => $ip_publica,
         ':version'    => $version,
         ':modulo'     => $modulo,
+        ':ahora'      => $ahora,
     ]);
 
-    // Limpiar registros viejos (>7 días) para mantener tabla liviana
+    // Limpiar registros viejos (>7 días)
     $conn->exec("DELETE FROM sistemas_ping_log WHERE ping_at < DATE_SUB(NOW(), INTERVAL 7 DAY)");
 
     echo json_encode([
@@ -79,7 +83,7 @@ try {
         'message'     => 'pong',
         'sucursal'    => $sucursal,
         'timestamp'   => time(),
-        'server_time' => date('Y-m-d H:i:s')
+        'server_time' => $ahora
     ]);
 
 } catch (Exception $e) {

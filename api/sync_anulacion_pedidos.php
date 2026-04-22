@@ -3,14 +3,17 @@
  * api/sync_anulacion_pedidos.php
  * Endpoint para sincronizar solicitudes de anulación desde Access → MySQL.
  *
- * Recibe un array de registros de AnulacionPedidos con Status=0 (pendientes)
- * e inserta los que no existen o actualiza los que sí existen en el host.
- * Solo acepta registros con Status=0; los con Status=1 no se vuelven a subir.
+ * Recibe un array de registros de AnulacionPedidos.
+ * En modo normal (modo=normal): solo acepta Status=0 (pendientes).
+ * En modo masivo (modo=masivo): acepta cualquier Status para carga histórica.
+ *   - Si el registro YA existe en el host → lo ignora (no sobreescribe aprobaciones web).
+ *   - Si NO existe → lo inserta con el Status real que trae Access.
  *
  * Parámetros POST (JSON):
  *   token    : Token de autenticación (requerido)
  *   sucursal : Código del local (requerido)
- *   rows     : Array de registros AnulacionPedidos con Status=0
+ *   modo     : "normal" (default) | "masivo"
+ *   rows     : Array de registros AnulacionPedidos
  *
  * Cada fila:
  *   CodPedido, HoraSolicitada, HoraAnulada, Status, Modalidad,
@@ -90,8 +93,10 @@ if (empty($rowsInput) || !is_array($rowsInput)) {
 }
 
 $sucursal = (int)$sucursal;
+$modo     = trim($bodyJson['modo'] ?? 'normal'); // 'normal' | 'masivo'
+if (!in_array($modo, ['normal', 'masivo'])) $modo = 'normal';
 
-apLog("INICIO sync anulaciones - Sucursal: $sucursal | Filas recibidas: " . count($rowsInput));
+apLog("INICIO sync anulaciones - Sucursal: $sucursal | Modo: $modo | Filas recibidas: " . count($rowsInput));
 
 /** @var PDO $pdo */
 global $conn;
@@ -113,10 +118,10 @@ try {
             continue;
         }
 
-        // Solo se procesan Status=0 (pendientes)
-        if ($status !== 0) {
+        // En modo normal: solo se procesan Status=0 (pendientes)
+        // En modo masivo: se aceptan todos los Status del historial
+        if ($modo === 'normal' && $status !== 0) {
             $ignorados++;
-            apLog("Fila $idx: Ignorada - CodPedido=$codPedido Status=$status (no es pendiente).");
             continue;
         }
 
@@ -130,10 +135,15 @@ try {
         $existing = $stmtCheck->fetch();
 
         if ($existing) {
-            // Si ya existe con Status=1 (resuelto), no actualizar
-            if ((int)$existing['Status'] === 1) {
+            if ($modo === 'masivo') {
+                // En masivo: si ya existe no tocar nada (preserva aprobaciones web)
                 $ignorados++;
-                apLog("Fila $idx: Ignorada - CodPedido=$codPedido ya tiene Status=1 en host.");
+                continue;
+            }
+            // Modo normal: si ya tiene Status resuelto (>=1), no actualizar
+            if ((int)$existing['Status'] >= 1) {
+                $ignorados++;
+                apLog("Fila $idx: Ignorada - CodPedido=$codPedido ya tiene Status={$existing['Status']} en host.");
                 continue;
             }
             // Si existe con Status=0, actualizar datos (puede haber cambios en Motivo, etc.)
@@ -159,29 +169,32 @@ try {
             $actualizados++;
             apLog("Actualizado - CodPedido=$codPedido Sucursal=$sucursal");
         } else {
-            // Nuevo registro: insertar
+            $statusInsertar = ($modo === 'masivo') ? $status : 0;
+            $ejecutadoInsertar = ($modo === 'masivo' && $status >= 1) ? 1 : 0;
             $stmtIns = $pdo->prepare(
                 "INSERT INTO `" . AP_TABLE . "`
                  (CodPedido, HoraSolicitada, HoraAnulada, Status, Modalidad,
                   CodPedidoCambio, Motivo, CodMotivoAnulacion, Sucursal,
                   FechaUltimoSync, EjecutadoEnTienda)
                  VALUES
-                 (:cod, :hs, :ha, 0, :mod,
+                 (:cod, :hs, :ha, :st, :mod,
                   :cpc, :mot, :cma, :suc,
-                  NOW(), 0)"
+                  NOW(), :eje)"
             );
             $stmtIns->execute([
                 ':cod' => $codPedido,
-                ':hs'  => $row['HoraSolicitada']     ?? null,
-                ':ha'  => $row['HoraAnulada']        ?? null,
-                ':mod' => $row['Modalidad']           ?? null,
-                ':cpc' => $row['CodPedidoCambio']     ?? 0,
-                ':mot' => $row['Motivo']              ?? null,
-                ':cma' => $row['CodMotivoAnulacion']  ?? null,
+                ':hs'  => $row['HoraSolicitada']    ?? null,
+                ':ha'  => $row['HoraAnulada']       ?? null,
+                ':st'  => $statusInsertar,
+                ':mod' => $row['Modalidad']          ?? null,
+                ':cpc' => $row['CodPedidoCambio']    ?? 0,
+                ':mot' => $row['Motivo']             ?? null,
+                ':cma' => $row['CodMotivoAnulacion'] ?? null,
                 ':suc' => $sucursal,
+                ':eje' => $ejecutadoInsertar,
             ]);
             $insertados++;
-            apLog("Insertado - CodPedido=$codPedido Sucursal=$sucursal");
+            apLog("Insertado (modo=$modo) - CodPedido=$codPedido Sucursal=$sucursal Status=$statusInsertar");
         }
     }
 

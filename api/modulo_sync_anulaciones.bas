@@ -364,7 +364,7 @@ Public Function SyncMasivoHistorialAnulaciones() As Boolean
         If contador >= bloqueSize Then
             sRows = sRows & "]"
             Dim sPayload As String
-            sPayload = "{""sucursal"":""" & codSuc & """,""rows"":" & sRows & "}"
+            sPayload = "{""sucursal"":""" & codSuc & """,""modo":""masivo"",""rows"":" & sRows & "}"
             If HttpPost(sAnulUrlEnviar, sPayload, sResp) Then
                 totalOK = totalOK + contador
             End If
@@ -378,7 +378,7 @@ Public Function SyncMasivoHistorialAnulaciones() As Boolean
     If contador > 0 Then
         sRows = sRows & "]"
         Dim sPayloadFinal As String
-        sPayloadFinal = "{""sucursal"":""" & codSuc & """,""rows"":" & sRows & "}"
+        sPayloadFinal = "{""sucursal"":""" & codSuc & """,""modo"":""masivo"",""rows"":" & sRows & "}"
         If HttpPost(sAnulUrlEnviar, sPayloadFinal, sResp) Then
             totalOK = totalOK + contador
         End If

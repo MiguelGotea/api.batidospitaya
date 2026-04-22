@@ -7,9 +7,16 @@ define('API_TOKEN', 'a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e
 define('LOG_FILE', __DIR__ . '/logs/aplicar_cupon.log');
 
 // Headers
-header('CF-Connecting-IP: ' . $_SERVER['REMOTE_ADDR']);
-header('X-Forwarded-For: ' . $_SERVER['REMOTE_ADDR']);
-header('X-Real-IP: ' . $_SERVER['REMOTE_ADDR']);
+
+function obtenerIpReal() {
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ips[0]);
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    }
+    return $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+}
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST');
@@ -28,7 +35,8 @@ function logMessage($message)
     if (!file_exists(dirname(LOG_FILE))) {
         mkdir(dirname(LOG_FILE), 0777, true);
     }
-    file_put_contents(LOG_FILE, "[" . date('Y-m-d H:i:s') . "] $message\n", FILE_APPEND);
+    $ip = obtenerIpReal();
+    file_put_contents(LOG_FILE, "[" . date('Y-m-d H:i:s') . "] [IP: $ip] $message\n", FILE_APPEND);
 }
 
 function verifyToken()

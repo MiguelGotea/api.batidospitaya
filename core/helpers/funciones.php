@@ -664,17 +664,19 @@ function verificarIpSucursal($codSucursal)
 }
 
 /**
- * Obtiene la IP del cliente
+ * Obtiene la IP del cliente (considerando proxies)
  */
 function obtenerIpCliente()
 {
-    //if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-    //    return $_SERVER['HTTP_CLIENT_IP'];
-    //} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-    //    return $_SERVER['HTTP_X_FORWARDED_FOR'];
-    //} else {
-    return $_SERVER['REMOTE_ADDR'];
-//}
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        // X-Forwarded-For puede contener múltiples IPs, la primera es la del cliente
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ips[0]);
+    } else {
+        return $_SERVER['REMOTE_ADDR'] ?? '';
+    }
 }
 
 /**

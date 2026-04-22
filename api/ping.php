@@ -39,6 +39,14 @@ $version      = param('version');
 $modulo       = param('modulo');
 $ip_publica   = $_SERVER['REMOTE_ADDR'] ?? '';
 
+// Si viene detrás de un proxy (como el VPS que comunica con la API), obtener la IP real
+if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+    $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+    $ip_publica = trim($ips[0]);
+} elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+    $ip_publica = $_SERVER['HTTP_CLIENT_IP'];
+}
+
 // ── Sin sucursal: respuesta de conectividad simple (para APIDisponible() de Access) ──
 if (empty($sucursal)) {
     echo json_encode([

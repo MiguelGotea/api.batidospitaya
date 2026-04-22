@@ -35,6 +35,12 @@ if (!in_array($estado, $estadosValidos)) {
 
 try {
     $ipVPS = $_SERVER['REMOTE_ADDR'] ?? 'desconocida';
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $ipVPS = trim($ips[0]);
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ipVPS = $_SERVER['HTTP_CLIENT_IP'];
+    }
 
     // Si se conectó, limpiar el QR; si se desconectó, limpiar el número
     if ($estado === 'conectado')

@@ -37,6 +37,12 @@ function logMessage($message, $type = 'INFO')
 {
     $timestamp = date('Y-m-d H:i:s');
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+    if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        $ip = trim($ips[0]);
+    } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    }
     $logEntry = "[$timestamp] [$type] [IP: $ip] $message" . PHP_EOL;
 
     // Crear carpeta logs si no existe

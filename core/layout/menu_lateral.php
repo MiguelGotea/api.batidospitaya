@@ -521,6 +521,23 @@ $menuGlobal = [
         ]
     ],
     [
+        'nombre' => 'Inventario',
+        'icon' => 'fas fa-warehouse',
+        'cargos_permitidos' => [],
+        'items' => [
+            [
+                'nombre' => 'Inventario Semanal',
+                'url' => 'inventario/inventario_semanal.php',
+                'cargos_permitidos' => [27, 16, 49, 55]
+            ],
+            [
+                'nombre' => 'Configuración Porcentajes',
+                'url' => 'inventario/configuracion_porcentajes.php',
+                'cargos_permitidos' => [27, 16, 55]
+            ],
+        ]
+    ],
+    [
         'nombre' => 'POS',
         'icon' => 'fas fa-tag',
         'cargos_permitidos' => [],

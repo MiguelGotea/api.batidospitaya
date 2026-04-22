@@ -23,12 +23,8 @@
 
 Option Explicit
 
-' ── Constantes de configuración ──────────────────────────────────────────────
-Private Const SYNC_URL_ENVIAR   As String = "https://proxy.batidospitaya.com/api/sync_anulacion_pedidos.php"
-Private Const SYNC_URL_LEER     As String = "https://proxy.batidospitaya.com/api/read_anulacion_pedidos.php"
-Private Const SYNC_URL_CONFIRM  As String = "https://proxy.batidospitaya.com/api/confirm_anulacion_pedidos.php"
-Private Const API_TOKEN_ANULAN  As String = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
-Private Const HTTP_TIMEOUT      As Long   = 15000
+' ── (Configuración movida a variables locales en cada función para evitar
+'     colisiones de nombres con otros módulos del proyecto) ────────────────────
 
 ' ══════════════════════════════════════════════════════════
 ' 1. ENVIAR solicitudes pendientes al host
@@ -36,6 +32,9 @@ Private Const HTTP_TIMEOUT      As Long   = 15000
 ' ══════════════════════════════════════════════════════════
 Public Function SyncEnviarAnulacionesPendientes() As Boolean
     On Error GoTo ErrorHandler
+
+    Dim sAnulUrlEnviar As String
+    sAnulUrlEnviar = "https://proxy.batidospitaya.com/api/sync_anulacion_pedidos.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -73,7 +72,7 @@ Public Function SyncEnviarAnulacionesPendientes() As Boolean
     sPayload = "{""sucursal"":""" & codSuc & """,""rows"":" & sJson & "}"
 
     Dim bOk As Boolean
-    bOk = HttpPost(SYNC_URL_ENVIAR, sPayload, sResp)
+    bOk = HttpPost(sAnulUrlEnviar, sPayload, sResp)
     SyncEnviarAnulacionesPendientes = bOk
 
     If Not bOk Then
@@ -94,6 +93,9 @@ End Function
 ' ══════════════════════════════════════════════════════════
 Public Function SyncLeerRespuestasAnulacion() As Boolean
     On Error GoTo ErrorHandler
+
+    Dim sAnulUrlLeer As String
+    sAnulUrlLeer = "https://proxy.batidospitaya.com/api/read_anulacion_pedidos.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -140,7 +142,7 @@ Public Function SyncLeerRespuestasAnulacion() As Boolean
     Dim sResp    As String
     sPayload = "{""sucursal"":""" & codSuc & """,""cod_pedidos"":" & sCodigos & "}"
 
-    If Not HttpPost(SYNC_URL_LEER, sPayload, sResp) Then
+    If Not HttpPost(sAnulUrlLeer, sPayload, sResp) Then
         AnulacionLog "SyncLeer", "Fallo HTTP: " & sResp
         Exit Function
     End If
@@ -280,6 +282,9 @@ End Sub
 Private Sub ConfirmarEjecucionEnHost(lngCodPedido As Long, codSuc As String)
     On Error GoTo ErrorHandler
 
+    Dim sAnulUrlConfirm As String
+    sAnulUrlConfirm = "https://proxy.batidospitaya.com/api/confirm_anulacion_pedidos.php"
+
     Dim sPayload As String
     Dim sResp    As String
     Dim sHora    As String
@@ -293,7 +298,7 @@ Private Sub ConfirmarEjecucionEnHost(lngCodPedido As Long, codSuc As String)
                """cod_pedido"":" & lngCodPedido & "," & _
                """hora_anulada"":""" & sHora & """}"
 
-    If HttpPost(SYNC_URL_CONFIRM, sPayload, sResp) Then
+    If HttpPost(sAnulUrlConfirm, sPayload, sResp) Then
         AnulacionLog "ConfirmarHost", "OK - CodPedido=" & lngCodPedido & " | " & sResp
     Else
         AnulacionLog "ConfirmarHost", "Fallo - CodPedido=" & lngCodPedido & " | " & sResp
@@ -310,6 +315,9 @@ End Sub
 ' ══════════════════════════════════════════════════════════
 Public Function SyncMasivoHistorialAnulaciones() As Boolean
     On Error GoTo ErrorHandler
+
+    Dim sAnulUrlEnviar As String
+    sAnulUrlEnviar = "https://proxy.batidospitaya.com/api/sync_anulacion_pedidos.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -357,7 +365,7 @@ Public Function SyncMasivoHistorialAnulaciones() As Boolean
             sRows = sRows & "]"
             Dim sPayload As String
             sPayload = "{""sucursal"":""" & codSuc & """,""rows"":" & sRows & "}"
-            If HttpPost(SYNC_URL_ENVIAR, sPayload, sResp) Then
+            If HttpPost(sAnulUrlEnviar, sPayload, sResp) Then
                 totalOK = totalOK + contador
             End If
             sRows = "[" : bPrimero = True : contador = 0
@@ -371,7 +379,7 @@ Public Function SyncMasivoHistorialAnulaciones() As Boolean
         sRows = sRows & "]"
         Dim sPayloadFinal As String
         sPayloadFinal = "{""sucursal"":""" & codSuc & """,""rows"":" & sRows & "}"
-        If HttpPost(SYNC_URL_ENVIAR, sPayloadFinal, sResp) Then
+        If HttpPost(sAnulUrlEnviar, sPayloadFinal, sResp) Then
             totalOK = totalOK + contador
         End If
     End If
@@ -449,13 +457,16 @@ End Function
 Private Function HttpPost(sURL As String, sPayload As String, ByRef sRespOut As String) As Boolean
     On Error GoTo ErrorHandler
 
+    Dim sAnulToken  As String : sAnulToken  = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
+    Dim lAnulTimeout As Long  : lAnulTimeout = 15000
+
     Dim http As Object
     Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
     http.Open "POST", sURL, False
     http.setRequestHeader "Content-Type", "application/json; charset=utf-8"
-    http.setRequestHeader "Authorization", "Bearer " & API_TOKEN_ANULAN
+    http.setRequestHeader "Authorization", "Bearer " & sAnulToken
     http.setRequestHeader "User-Agent", "PitayaAccess/1.0"
-    http.setTimeouts 5000, 5000, HTTP_TIMEOUT, HTTP_TIMEOUT
+    http.setTimeouts 5000, 5000, lAnulTimeout, lAnulTimeout
     http.Send sPayload
 
     sRespOut = http.responseText

@@ -148,21 +148,31 @@ Private Function EsSistemaDeTienda() As Boolean
     EsSistemaDeTienda = (c1 And c2)
 End Function
 
-Private Function TieneTablaVinculada(nombreTabla As String) As Boolean
-    On Error Resume Next
-    Dim tdf As Object
-    Set tdf = CurrentDb.TableDefs(nombreTabla)
+Function TieneTablaVinculada(nombreTabla As String) As Boolean
+    On Error GoTo ErrorHandler
     
-    If Err.Number <> 0 Then
+    Dim db As DAO.Database
+    Dim tdf As DAO.TableDef
+    
+    Set db = CurrentDb
+    Set tdf = db.TableDefs(nombreTabla)
+    
+    ' Verifica si es tabla vinculada
+    ' Propiedad Connect no vacía y no es una tabla del sistema
+    If tdf.Connect <> "" And Left(nombreTabla, 4) <> "MSys" Then
+        TieneTablaVinculada = True
+    Else
         TieneTablaVinculada = False
-        Exit Function
     End If
     
-    ' Retorna True si existe, ya sea vinculada o local
-    ' (El usuario validará que en producción sea vinculada)
-    TieneTablaVinculada = True
+CleanExit:
     Set tdf = Nothing
-    On Error GoTo 0
+    Set db = Nothing
+    Exit Function
+    
+ErrorHandler:
+    TieneTablaVinculada = False
+    Resume CleanExit
 End Function
 
 ' ══════════════════════════════════════════════════════════

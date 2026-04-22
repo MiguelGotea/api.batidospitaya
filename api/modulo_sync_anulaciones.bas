@@ -21,7 +21,6 @@
 '   Alt+F11 → Archivo → Importar → modulo_sync_anulaciones.bas
 ' =============================================================
 
-Option Explicit
 
 ' ── (Configuración movida a variables locales en cada función para evitar
 '     colisiones de nombres con otros módulos del proyecto) ────────────────────

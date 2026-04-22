@@ -198,15 +198,15 @@ Private Sub ProcesarRespuestasHost(sJson As String, codSuc As String)
         Dim lngStatus    As Long
         Dim sMotivo      As String
 
-        lngCodPedido = CLng(ExtraerValorJSON(sObj, "CodPedido"))
-        lngStatus    = CLng(ExtraerValorJSON(sObj, "Status"))
-        sMotivo      = ExtraerValorJSON(sObj, "Motivo")
+        lngCodPedido = CLng(AnulExtraerJSON(sObj, "CodPedido"))
+        lngStatus    = CLng(AnulExtraerJSON(sObj, "Status"))
+        sMotivo      = AnulExtraerJSON(sObj, "Motivo")
 
         ' Si el host lo aprobó (Status=1) y aún no está ejecutado
         If lngStatus = 1 And lngCodPedido > 0 Then
             Dim lngEjecutado As Long
             On Error Resume Next
-            lngEjecutado = CLng(ExtraerValorJSON(sObj, "EjecutadoEnTienda"))
+            lngEjecutado = CLng(AnulExtraerJSON(sObj, "EjecutadoEnTienda"))
             If Err.Number <> 0 Then lngEjecutado = 0 : Err.Clear
             On Error GoTo ErrorHandler
 
@@ -484,7 +484,7 @@ End Function
 ' Extraer valor de un campo en un objeto JSON simple
 ' (parser mínimo para respuestas planas)
 ' ══════════════════════════════════════════════════════════
-Private Function ExtraerValorJSON(sJson As String, sKey As String) As String
+Private Function AnulExtraerJSON(sJson As String, sKey As String) As String
     Dim sSearch  As String
     Dim posStart As Long
     Dim posEnd   As Long
@@ -493,7 +493,7 @@ Private Function ExtraerValorJSON(sJson As String, sKey As String) As String
     sSearch = """" & sKey & """:"
     posStart = InStr(sJson, sSearch)
     If posStart = 0 Then
-        ExtraerValorJSON = ""
+        AnulExtraerJSON = ""
         Exit Function
     End If
 
@@ -526,7 +526,7 @@ Private Function ExtraerValorJSON(sJson As String, sKey As String) As String
         If sVal = "null" Then sVal = ""
     End If
 
-    ExtraerValorJSON = sVal
+    AnulExtraerJSON = sVal
 End Function
 
 ' ══════════════════════════════════════════════════════════

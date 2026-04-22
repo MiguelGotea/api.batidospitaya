@@ -530,6 +530,7 @@ $menuGlobal = [
                 'url' => 'productos/visor_recetas_light.php',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55]
             ],
+
         ]
     ],
     [

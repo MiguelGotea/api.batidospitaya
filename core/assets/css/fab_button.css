@@ -57,3 +57,109 @@
         transform: scale(0.9);
     }
 }
+
+/* =========================================================
+   CUSTOM EXPANDING FAB (Contenedor y Opciones)
+   ========================================================= */
+
+.fab-container {
+    position: fixed;
+    bottom: 35px;
+    right: 35px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 15px;
+    pointer-events: none;
+}
+
+.fab-container > * {
+    pointer-events: auto;
+}
+
+/* Sobrescritura para permitir el flujo flex dentro del contenedor */
+.fab-container .btn-floating-pitaya {
+    position: relative;
+    bottom: 0;
+    right: 0;
+    margin: 0;
+}
+
+.fab-options {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fab-container:hover .fab-options,
+.fab-container.active .fab-options {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.fab-option {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-decoration: none !important;
+    gap: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.fab-label {
+    background-color: #0E544C;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transform: translateX(10px);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.fab-option:hover .fab-label,
+.fab-container.active .fab-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.fab-icon-holder {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: white;
+    color: #51B8AC;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border: 2px solid #51B8AC;
+    transition: all 0.3s ease;
+}
+
+.fab-option:hover .fab-icon-holder,
+.fab-container.active .fab-icon-holder {
+    background-color: #51B8AC;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(81, 184, 172, 0.4);
+}
+
+/* Girar el icono del botón principal al hacer hover o estar activo */
+.fab-container:hover .btn-floating-pitaya i,
+.fab-container.active .btn-floating-pitaya i {
+    transform: rotate(135deg);
+}

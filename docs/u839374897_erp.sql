@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Apr 12, 2026 at 05:36 PM
+-- Generation Time: Apr 22, 2026 at 05:27 PM
 -- Server version: 11.8.6-MariaDB-log
 -- PHP Version: 7.2.34
 
@@ -105,6 +105,32 @@ CREATE TABLE `announcement_views` (
   `user_id` int(11) NOT NULL COMMENT 'CodOperario del usuario',
   `viewed_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `AnulacionPedidosHost`
+--
+
+CREATE TABLE `AnulacionPedidosHost` (
+  `CodAnulacionHost` int(10) UNSIGNED NOT NULL,
+  `CodPedido` int(10) UNSIGNED NOT NULL,
+  `Sucursal` tinyint(3) UNSIGNED NOT NULL,
+  `HoraSolicitada` datetime DEFAULT NULL,
+  `HoraAnulada` datetime DEFAULT NULL,
+  `Modalidad` tinyint(4) DEFAULT 1 COMMENT '1=anulado en tienda, 2=por web/telegram',
+  `CodPedidoCambio` int(10) UNSIGNED DEFAULT 0,
+  `Motivo` varchar(500) DEFAULT NULL,
+  `CodMotivoAnulacion` int(10) UNSIGNED DEFAULT NULL,
+  `Status` tinyint(4) NOT NULL DEFAULT 0 COMMENT '0=pendiente, 1=aprobado, 2=rechazado',
+  `ComentarioAprobacion` varchar(500) DEFAULT NULL,
+  `AprobadoPor` varchar(100) DEFAULT NULL,
+  `FechaAprobacion` datetime DEFAULT NULL,
+  `EjecutadoEnTienda` tinyint(1) NOT NULL DEFAULT 0,
+  `HoraEjecutadaTienda` datetime DEFAULT NULL,
+  `FechaUltimoSync` datetime DEFAULT NULL COMMENT 'Última vez que Access hizo sync',
+  `FechaCreacion` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Solicitudes de anulación centralizadas desde todas las sucursales';
 
 -- --------------------------------------------------------
 
@@ -872,7 +898,7 @@ CREATE TABLE `compra_local_pedidos_historico` (
   `id_producto_presentacion` int(11) NOT NULL COMMENT 'FK a producto_presentacion',
   `codigo_sucursal` varchar(10) NOT NULL COMMENT 'FK a sucursales',
   `fecha_entrega` date NOT NULL COMMENT 'Fecha específica de entrega del pedido',
-  `cantidad_pedido` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'Cantidad solicitada',
+  `cantidad_pedido` decimal(10,2) DEFAULT NULL COMMENT 'Cantidad solicitada',
   `usuario_registro` int(11) DEFAULT NULL COMMENT 'Usuario que registró el pedido',
   `fecha_hora_reportada` timestamp NULL DEFAULT NULL COMMENT 'Última modificación del pedido',
   `notas` text DEFAULT NULL COMMENT 'Notas adicionales sobre el pedido'
@@ -898,6 +924,43 @@ CREATE TABLE `compra_local_perfiles_despacho` (
   `semana_referencia` int(11) DEFAULT NULL COMMENT 'Número de semana (SemanasSistema) de inicio de ciclo',
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `configuracion_logistica_producto`
+--
+
+CREATE TABLE `configuracion_logistica_producto` (
+  `id` int(11) NOT NULL,
+  `cod_sucursal` varchar(10) NOT NULL,
+  `codigo_insumo` varchar(5) NOT NULL COMMENT 'Letra de la categoría de insumo para mapeo (A=Frescos, B=Congelados, C=Fresas, D=Desechables, E=Fijos, F=Secos y Preparación, G=Productos de Mostrador)',
+  `dias_ciclo` int(11) NOT NULL,
+  `dias_desfase` decimal(4,1) NOT NULL,
+  `dias_abastecimiento_despacho` int(11) NOT NULL,
+  `ajuste_demanda` decimal(4,2) DEFAULT NULL,
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
+  `creado_por` int(11) NOT NULL COMMENT 'FK a Operarios.CodOperario',
+  `fecha_actualizacion` datetime DEFAULT NULL,
+  `modificado_por` int(11) DEFAULT NULL COMMENT 'FK a Operarios.CodOperario'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `configuracion_logistica_sucursal`
+--
+
+CREATE TABLE `configuracion_logistica_sucursal` (
+  `id` int(11) NOT NULL,
+  `cod_sucursal` varchar(10) NOT NULL,
+  `dias_stock_minimo` int(11) NOT NULL,
+  `capacidad_congelados` int(11) NOT NULL,
+  `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
+  `creado_por` int(11) DEFAULT NULL COMMENT 'FK a Operarios.CodOperario',
+  `fecha_actualizacion` datetime DEFAULT NULL,
+  `modificado_por` int(11) DEFAULT NULL COMMENT 'FK a Operarios.CodOperario'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -1022,7 +1085,7 @@ CREATE TABLE `conversion_unidad_producto` (
   `id` int(11) NOT NULL,
   `id_unidad_producto_inicio` int(11) NOT NULL COMMENT 'FK - Unidad de origen',
   `id_unidad_producto_final` int(11) NOT NULL COMMENT 'FK - Unidad de destino',
-  `cantidad` decimal(10,4) NOT NULL COMMENT 'Factor de conversión (ej: 1 litro = 1000 ml)',
+  `cantidad` decimal(10,6) NOT NULL COMMENT 'Factor de conversión (ej: 1 litro = 1000 ml)',
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `usuario_creacion` int(11) NOT NULL COMMENT 'FK a Operarios',
   `fecha_modificacion` datetime DEFAULT NULL,
@@ -1304,7 +1367,8 @@ CREATE TABLE `extras` (
   `id` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `precio` decimal(10,2) NOT NULL,
-  `activo` tinyint(1) DEFAULT 1
+  `activo` tinyint(1) DEFAULT 1,
+  `fecha_hora_regsys` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -2152,6 +2216,21 @@ CREATE TABLE `intent_embeddings` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `inventario`
+--
+
+CREATE TABLE `inventario` (
+  `id` int(11) NOT NULL,
+  `cod_sucursal` varchar(11) NOT NULL,
+  `id_producto_presentacion` int(11) NOT NULL COMMENT 'FK a producto_presentacion.id',
+  `cantidad` int(11) NOT NULL DEFAULT 0,
+  `fecha_inventario` date NOT NULL DEFAULT current_timestamp(),
+  `fecha_hora_regsys` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `kpi_reclamos`
 --
 
@@ -2506,7 +2585,8 @@ CREATE TABLE `mtto_tickets` (
   `materiales_usados` text DEFAULT NULL COMMENT 'lista de materiales usados por el area de mantenimiento una vez que termina el trabajo',
   `fecha_finalizacion` timestamp NULL DEFAULT NULL COMMENT 'fecha que reporta el area de mantenimiento como fecha que se termino la ejecucion del trabajo',
   `finalizado_por` int(11) DEFAULT NULL COMMENT 'codigo de colaborador que ejecuto el trabajo',
-  `tiempo_estimado` int(11) DEFAULT 0 COMMENT 'tiempo que estima el area de mantenimiento que tomara la ejecucion del trabajo'
+  `tiempo_estimado` int(11) DEFAULT 0 COMMENT 'tiempo que estima el area de mantenimiento que tomara la ejecucion del trabajo',
+  `resolucion` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -2685,6 +2765,22 @@ CREATE TABLE `OperariosCategorias` (
   `FotoExamen` varchar(255) DEFAULT NULL COMMENT 'Ruta de la foto del examen de categoría',
   `codigo_contrato_asociado` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ops_config_estaciones`
+--
+
+CREATE TABLE `ops_config_estaciones` (
+  `id` int(11) NOT NULL,
+  `tipo_estacion` varchar(30) NOT NULL COMMENT 'Batido, Waffle, Bowl, General',
+  `parametro` varchar(60) NOT NULL COMMENT 'Nombre del parámetro',
+  `valor` decimal(10,2) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `actualizado_por` int(11) DEFAULT NULL COMMENT 'FK a Operarios',
+  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Parámetros operativos configurables para Pitaya OPS Lab';
 
 -- --------------------------------------------------------
 
@@ -3075,6 +3171,9 @@ CREATE TABLE `producto_presentacion` (
   `Nombre` varchar(255) NOT NULL COMMENT 'Nombre de la presentación',
   `id_producto_maestro` int(11) DEFAULT NULL COMMENT 'FK a producto_maestro',
   `id_unidad_producto` int(11) DEFAULT NULL COMMENT 'FK a unidad_producto',
+  `categoria_insumo` varchar(11) DEFAULT NULL COMMENT 'Letra de la categoría de insumo para mapeo (A=Frescos, B=Congelados, C=Fresas, D=Desechables, E=Fijos, F=Secos y Preparación, G=Productos de Mostrador)',
+  `presentacion_basica_inventario` tinyint(1) DEFAULT 0,
+  `presentacion_despacho` tinyint(1) DEFAULT 0,
   `es_vendible` enum('SI','NO') NOT NULL DEFAULT 'NO' COMMENT '¿Se puede vender?',
   `es_comprable` enum('SI','NO') NOT NULL DEFAULT 'NO' COMMENT '¿Se puede comprar?',
   `es_fabricable` enum('SI','NO') NOT NULL DEFAULT 'NO' COMMENT '¿Se fabrica?',
@@ -3086,7 +3185,8 @@ CREATE TABLE `producto_presentacion` (
   `fecha_modificacion` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   `usuario_modificacion` int(11) DEFAULT NULL COMMENT 'FK a Operarios',
   `cantidad` decimal(10,2) DEFAULT 0.00,
-  `compra_tienda` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 indica que el producto puede ser seleccionado para facturas de compra de tienda'
+  `compra_tienda` tinyint(1) NOT NULL DEFAULT 0 COMMENT '1 indica que el producto puede ser seleccionado para facturas de compra de tienda',
+  `presentacion` varchar(255) DEFAULT NULL COMMENT 'Forma comercial en que se vende o adquiere el producto (ej: Unidad, Paquete x 12, Caja x 24, Pote 1.36kg, Bolsa 500g). Describe el empaque y/o cantidad por bulto.'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Gestión de presentaciones de productos';
 
 -- --------------------------------------------------------
@@ -3112,6 +3212,31 @@ CREATE TABLE `promociones` (
   `uso_interno` tinyint(1) DEFAULT 0 COMMENT '1 si es para uso interno (no visible a clientes)',
   `fecha_inicio` date DEFAULT NULL,
   `fecha_fin` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `promociones_access_csv`
+--
+
+CREATE TABLE `promociones_access_csv` (
+  `CodPromocion` int(11) NOT NULL,
+  `Nombre` varchar(255) DEFAULT NULL,
+  `RatioDescuento` double DEFAULT NULL,
+  `DescuentoFijo` decimal(10,2) DEFAULT NULL,
+  `Condiciones` text DEFAULT NULL,
+  `Vigencia` varchar(255) DEFAULT NULL,
+  `Cliente` varchar(255) DEFAULT NULL,
+  `Activo` tinyint(1) DEFAULT 0,
+  `Local` int(11) DEFAULT NULL,
+  `diaespecifico` int(11) DEFAULT NULL,
+  `usointerno` tinyint(1) DEFAULT 0,
+  `dia` varchar(255) DEFAULT NULL,
+  `hora` varchar(255) DEFAULT NULL,
+  `aplicaen` text DEFAULT NULL,
+  `mododeaplicacion` text DEFAULT NULL,
+  `tipocliente` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -3652,6 +3777,25 @@ CREATE TABLE `servicios_delivery` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `sistemas_ping_log`
+--
+
+CREATE TABLE `sistemas_ping_log` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `sucursal_codigo` varchar(20) NOT NULL COMMENT 'Código de la sucursal (enviado por Access)',
+  `pc_nombre` varchar(100) NOT NULL DEFAULT '' COMMENT 'Nombre del equipo (COMPUTERNAME)',
+  `pc_usuario` varchar(100) NOT NULL DEFAULT '' COMMENT 'Usuario de Windows activo',
+  `ip_local` varchar(45) NOT NULL DEFAULT '' COMMENT 'IP local del equipo',
+  `ip_publica` varchar(45) NOT NULL DEFAULT '' COMMENT 'IP pública detectada por el servidor',
+  `version_access` varchar(50) NOT NULL DEFAULT '' COMMENT 'Versión del sistema Access (si aplica)',
+  `modulo_activo` varchar(100) NOT NULL DEFAULT '' COMMENT 'Módulo de Access en uso al momento del ping',
+  `ping_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'Timestamp del último ping recibido',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Registro de pings de conectividad enviados por sistemas Access en sucursales';
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `solicitudes_cotizacion`
 --
 
@@ -3961,7 +4105,6 @@ CREATE TABLE `subgrupo_presentacion_producto` (
   `nombre` varchar(100) NOT NULL,
   `descripcion` varchar(255) DEFAULT NULL,
   `id_grupo_presentacion_producto` int(11) NOT NULL COMMENT 'FK a grupo_presentacion_producto',
-  `categoria_insumo` varchar(11) DEFAULT NULL COMMENT 'Letra de la categoría de insumo para mapeo',
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `usuario_creacion` int(11) NOT NULL COMMENT 'FK a Operarios',
   `fecha_modificacion` datetime DEFAULT NULL ON UPDATE current_timestamp(),
@@ -4000,6 +4143,7 @@ CREATE TABLE `sucursales` (
   `telefono` varchar(20) DEFAULT NULL,
   `whatsapp` varchar(20) DEFAULT NULL,
   `Fecha_Apertura` date DEFAULT NULL COMMENT 'yyyy-mm-dd',
+  `Fecha_Cierre` date DEFAULT NULL COMMENT 'yyyy-mm-dd',
   `departamento` text DEFAULT NULL,
   `cod_departamento` int(11) NOT NULL,
   `email` varchar(255) DEFAULT NULL COMMENT 'Correo de sucursal',
@@ -4106,7 +4250,9 @@ CREATE TABLE `tipos_falta` (
 CREATE TABLE `tipo_cambio` (
   `id` int(11) NOT NULL,
   `fecha` date NOT NULL DEFAULT curdate(),
-  `tasa` decimal(10,1) NOT NULL
+  `tasa` decimal(10,1) NOT NULL,
+  `registrado_por` int(11) DEFAULT NULL COMMENT 'FK CodOperario.Operarios',
+  `fecha_hora_regsys` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4156,6 +4302,31 @@ CREATE TABLE `tipo_receta_producto` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tmptablaconsultadesdeaccess`
+--
+
+CREATE TABLE `tmptablaconsultadesdeaccess` (
+  `CodPromocion` int(11) DEFAULT NULL,
+  `Nombre` varchar(255) DEFAULT NULL,
+  `RatioDescuento` double DEFAULT NULL,
+  `DescuentoFijo` double DEFAULT NULL,
+  `Condiciones` mediumtext DEFAULT NULL,
+  `Vigencia` varchar(255) DEFAULT NULL,
+  `Cliente` varchar(255) DEFAULT NULL,
+  `Activo` bit(1) DEFAULT NULL,
+  `Local` int(11) DEFAULT NULL,
+  `diaespecifico` int(11) DEFAULT NULL,
+  `usointerno` bit(1) DEFAULT NULL,
+  `dia` varchar(255) DEFAULT NULL,
+  `hora` varchar(255) DEFAULT NULL,
+  `aplicaen` mediumtext DEFAULT NULL,
+  `mododeaplicacion` mediumtext DEFAULT NULL,
+  `tipocliente` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tools_erp`
 --
 
@@ -4186,6 +4357,8 @@ CREATE TABLE `tools_erp` (
 CREATE TABLE `unidad_producto` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) NOT NULL COMMENT 'Nombre de la unidad (ej: Gramos, Litros, Onzas)',
+  `abreviado` varchar(50) DEFAULT NULL,
+  `nombres_opcionales` text DEFAULT NULL,
   `observaciones` varchar(255) DEFAULT NULL COMMENT 'Notas adicionales sobre la unidad',
   `fecha_creacion` datetime NOT NULL DEFAULT current_timestamp(),
   `usuario_creacion` int(11) NOT NULL COMMENT 'FK a Operarios - Usuario que creó',
@@ -4779,7 +4952,8 @@ CREATE TABLE `wsp_destinatarios_` (
   `sucursal` varchar(100) DEFAULT NULL,
   `enviado` tinyint(1) DEFAULT 0,
   `error` varchar(500) DEFAULT NULL,
-  `fecha_envio` datetime DEFAULT NULL
+  `fecha_envio` datetime DEFAULT NULL,
+  `hora_envio_programada` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -4902,6 +5076,16 @@ ALTER TABLE `announcement_views`
   ADD UNIQUE KEY `unique_announcement_user` (`announcement_id`,`user_id`),
   ADD KEY `announcement_id` (`announcement_id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `AnulacionPedidosHost`
+--
+ALTER TABLE `AnulacionPedidosHost`
+  ADD PRIMARY KEY (`CodAnulacionHost`),
+  ADD UNIQUE KEY `uq_pedido_sucursal` (`CodPedido`,`Sucursal`),
+  ADD KEY `idx_status` (`Status`),
+  ADD KEY `idx_sucursal` (`Sucursal`),
+  ADD KEY `idx_codpedido` (`CodPedido`);
 
 --
 -- Indexes for table `ArchivosAdjuntos`
@@ -5197,6 +5381,20 @@ ALTER TABLE `compra_local_pedidos_historico`
 --
 ALTER TABLE `compra_local_perfiles_despacho`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `configuracion_logistica_producto`
+--
+ALTER TABLE `configuracion_logistica_producto`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_logistica_producto_sucursal_insumo` (`cod_sucursal`,`codigo_insumo`);
+
+--
+-- Indexes for table `configuracion_logistica_sucursal`
+--
+ALTER TABLE `configuracion_logistica_sucursal`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_logistica_sucursal_cod` (`cod_sucursal`);
 
 --
 -- Indexes for table `ContactosEmergencia`
@@ -5662,6 +5860,15 @@ ALTER TABLE `intent_embeddings`
   ADD KEY `idx_term` (`term`);
 
 --
+-- Indexes for table `inventario`
+--
+ALTER TABLE `inventario`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_inventario_producto_presentacion` (`id_producto_presentacion`),
+  ADD KEY `idx_inventario_sucursal` (`cod_sucursal`),
+  ADD KEY `idx_inv_sucursal_producto` (`cod_sucursal`,`id_producto_presentacion`);
+
+--
 -- Indexes for table `kpi_reclamos`
 --
 ALTER TABLE `kpi_reclamos`
@@ -5894,6 +6101,13 @@ ALTER TABLE `OperariosCategorias`
   ADD KEY `IDX_OperarioCategoria_Fechas` (`FechaInicio`,`FechaFin`);
 
 --
+-- Indexes for table `ops_config_estaciones`
+--
+ALTER TABLE `ops_config_estaciones`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_ops_param` (`tipo_estacion`,`parametro`);
+
+--
 -- Indexes for table `PagoAdelantos`
 --
 ALTER TABLE `PagoAdelantos`
@@ -6067,6 +6281,12 @@ ALTER TABLE `promociones`
   ADD KEY `grupo_id` (`grupo_id`);
 
 --
+-- Indexes for table `promociones_access_csv`
+--
+ALTER TABLE `promociones_access_csv`
+  ADD PRIMARY KEY (`CodPromocion`);
+
+--
 -- Indexes for table `promociones_aplicacion`
 --
 ALTER TABLE `promociones_aplicacion`
@@ -6172,6 +6392,7 @@ ALTER TABLE `qr_offline_bank`
 ALTER TABLE `receta_producto_global`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uk_receta_presentacion` (`id_presentacion_producto`),
+  ADD UNIQUE KEY `idx_id_presentacion_unique` (`id_presentacion_producto`),
   ADD KEY `idx_receta_tipo` (`id_tipo_receta`),
   ADD KEY `idx_receta_sku` (`SKU`);
 
@@ -6298,6 +6519,14 @@ ALTER TABLE `servicios_delivery`
   ADD KEY `sucursal_id` (`sucursal_id`);
 
 --
+-- Indexes for table `sistemas_ping_log`
+--
+ALTER TABLE `sistemas_ping_log`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_sucursal_ping` (`sucursal_codigo`,`ping_at` DESC),
+  ADD KEY `idx_ping_at` (`ping_at` DESC);
+
+--
 -- Indexes for table `solicitudes_cotizacion`
 --
 ALTER TABLE `solicitudes_cotizacion`
@@ -6395,6 +6624,13 @@ ALTER TABLE `subgrupo_presentacion_producto`
   ADD KEY `idx_subgrupo_nombre` (`nombre`),
   ADD KEY `fk_subgrupo_usuario_creacion` (`usuario_creacion`),
   ADD KEY `fk_subgrupo_usuario_modificacion` (`usuario_modificacion`);
+
+--
+-- Indexes for table `SubReceta`
+--
+ALTER TABLE `SubReceta`
+  ADD KEY `idx_subreceta_codbatido` (`CodBatido`),
+  ADD KEY `idx_subreceta_ingrediente` (`CodIngrediente`);
 
 --
 -- Indexes for table `sucursales`
@@ -6565,7 +6801,9 @@ ALTER TABLE `VentasGlobalesAccessCSV`
   ADD KEY `idx_puntos` (`Puntos`),
   ADD KEY `idx_montofactura` (`MontoFactura`),
   ADD KEY `idx_pedidodecentral` (`PedidoDeCentral`),
-  ADD KEY `idx_codmotorizado` (`CodMotorizado`);
+  ADD KEY `idx_codmotorizado` (`CodMotorizado`),
+  ADD KEY `idx_consumo_semana_prod` (`Semana`,`CodProducto`,`Anulado`),
+  ADD KEY `idx_consumo_local_semana` (`local`,`Semana`,`Anulado`);
 
 --
 -- Indexes for table `ventas_detalle`
@@ -6631,7 +6869,8 @@ ALTER TABLE `wsp_campanas_`
 --
 ALTER TABLE `wsp_destinatarios_`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `idx_campana_pendientes` (`campana_id`,`enviado`);
+  ADD KEY `idx_campana_pendientes` (`campana_id`,`enviado`),
+  ADD KEY `idx_dest_hora_prog` (`campana_id`,`enviado`,`hora_envio_programada`);
 
 --
 -- Indexes for table `wsp_logs_`
@@ -6695,6 +6934,12 @@ ALTER TABLE `announcements`
 --
 ALTER TABLE `announcement_views`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `AnulacionPedidosHost`
+--
+ALTER TABLE `AnulacionPedidosHost`
+  MODIFY `CodAnulacionHost` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `ArchivosAdjuntos`
@@ -6910,6 +7155,18 @@ ALTER TABLE `compra_local_pedidos_historico`
 -- AUTO_INCREMENT for table `compra_local_perfiles_despacho`
 --
 ALTER TABLE `compra_local_perfiles_despacho`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `configuracion_logistica_producto`
+--
+ALTER TABLE `configuracion_logistica_producto`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `configuracion_logistica_sucursal`
+--
+ALTER TABLE `configuracion_logistica_sucursal`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -7225,6 +7482,12 @@ ALTER TABLE `intent_embeddings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `inventario`
+--
+ALTER TABLE `inventario`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `kpi_reclamos`
 --
 ALTER TABLE `kpi_reclamos`
@@ -7390,6 +7653,12 @@ ALTER TABLE `Operarios`
 -- AUTO_INCREMENT for table `OperariosCategorias`
 --
 ALTER TABLE `OperariosCategorias`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `ops_config_estaciones`
+--
+ALTER TABLE `ops_config_estaciones`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -7691,6 +7960,12 @@ ALTER TABLE `SemanasSistema`
 --
 ALTER TABLE `servicios_delivery`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `sistemas_ping_log`
+--
+ALTER TABLE `sistemas_ping_log`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `solicitudes_cotizacion`
@@ -8177,15 +8452,6 @@ ALTER TABLE `categoria_producto_maestro`
   ADD CONSTRAINT `fk_categoria_usuario_modificacion` FOREIGN KEY (`usuario_modificacion`) REFERENCES `Operarios` (`CodOperario`);
 
 --
--- Constraints for table `componentes_receta_producto`
---
-ALTER TABLE `componentes_receta_producto`
-  ADD CONSTRAINT `fk_componente_producto` FOREIGN KEY (`id_presentacion_producto`) REFERENCES `producto_presentacion` (`id`),
-  ADD CONSTRAINT `fk_componente_receta` FOREIGN KEY (`id_receta_producto_global`) REFERENCES `receta_producto_global` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `fk_componente_usuario_creacion` FOREIGN KEY (`usuario_creacion`) REFERENCES `Operarios` (`CodOperario`),
-  ADD CONSTRAINT `fk_componente_usuario_modificacion` FOREIGN KEY (`usuario_modificacion`) REFERENCES `Operarios` (`CodOperario`);
-
---
 -- Constraints for table `compra_local_configuracion_despacho`
 --
 ALTER TABLE `compra_local_configuracion_despacho`
@@ -8202,6 +8468,18 @@ ALTER TABLE `compra_local_pedidos_historico`
   ADD CONSTRAINT `compra_local_pedidos_historico_ibfk_1` FOREIGN KEY (`id_producto_presentacion`) REFERENCES `producto_presentacion` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `compra_local_pedidos_historico_ibfk_2` FOREIGN KEY (`codigo_sucursal`) REFERENCES `sucursales` (`codigo`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `compra_local_pedidos_historico_ibfk_3` FOREIGN KEY (`usuario_registro`) REFERENCES `Operarios` (`CodOperario`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `configuracion_logistica_producto`
+--
+ALTER TABLE `configuracion_logistica_producto`
+  ADD CONSTRAINT `fk_hi_sucursal` FOREIGN KEY (`cod_sucursal`) REFERENCES `sucursales` (`codigo`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `configuracion_logistica_sucursal`
+--
+ALTER TABLE `configuracion_logistica_sucursal`
+  ADD CONSTRAINT `fk_config_sucursal` FOREIGN KEY (`cod_sucursal`) REFERENCES `sucursales` (`codigo`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `ContactosEmergencia`
@@ -8445,6 +8723,13 @@ ALTER TABLE `IndicadoresSemanalesResultados`
   ADD CONSTRAINT `IndicadoresSemanalesResultados_ibfk_1` FOREIGN KEY (`id_indicador`) REFERENCES `IndicadoresSemanales` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `IndicadoresSemanalesResultados_ibfk_2` FOREIGN KEY (`usuario_registra`) REFERENCES `Operarios` (`CodOperario`) ON DELETE SET NULL,
   ADD CONSTRAINT `IndicadoresSemanalesResultados_ibfk_3` FOREIGN KEY (`usuario_modifica`) REFERENCES `Operarios` (`CodOperario`) ON DELETE SET NULL;
+
+--
+-- Constraints for table `inventario`
+--
+ALTER TABLE `inventario`
+  ADD CONSTRAINT `fk_inventario_producto_presentacion` FOREIGN KEY (`id_producto_presentacion`) REFERENCES `producto_presentacion` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_inventario_sucursal` FOREIGN KEY (`cod_sucursal`) REFERENCES `sucursales` (`codigo`) ON UPDATE CASCADE;
 
 --
 -- Constraints for table `kpi_reclamos`

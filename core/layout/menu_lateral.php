@@ -357,18 +357,23 @@ $menuGlobal = [
     ],
     [
         'nombre' => 'Sistemas',
-        'icon' => 'fas fa-laptop-code',
+        'icon'   => 'fas fa-laptop-code',
         'cargos_permitidos' => [],
         'items' => [
             [
                 'nombre' => 'Permisos',
-                'url' => 'sistemas/gestion_permisos.php',
+                'url'    => 'sistemas/gestion_permisos.php',
                 'cargos_permitidos' => [49, 15]
             ],
             [
                 'nombre' => 'Monitor de Conexión',
-                'url' => 'sistemas/conexion_monitor.php',
+                'url'    => 'sistemas/conexion_monitor.php',
                 'cargos_permitidos' => [49, 15]
+            ],
+            [
+                'nombre' => 'Aprobación de Anulaciones',
+                'url'    => 'sistemas/gestion_anulaciones.php',
+                'cargos_permitidos' => [49, 15, 16, 11]
             ],
         ]
     ],

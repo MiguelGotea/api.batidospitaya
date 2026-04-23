@@ -5,6 +5,10 @@
  * Retorna array de alertas con sus destinatarios por WhatsApp.
  * Solo alerta una vez por evento único (sucursal + pc + ultimo_ping).
  *
+ * IMPORTANTE: Este archivo NO registra la alerta en alertas_wsp_estado.
+ * El bot llama a marcar_enviado.php SOLO después de confirmar entrega exitosa.
+ * Esto garantiza que alertas con fallo de envío sean reintentadas el próximo minuto.
+ *
  * Llamado por: api/alertas/check_all.php
  */
 
@@ -103,12 +107,12 @@ try {
         return ['alertas' => []];
     }
 
-    // ── 3. Construir alertas y registrar en alertas_wsp_estado ───────────
-    $alertas    = [];
-    $stmtInsert = $conn->prepare("
-        INSERT IGNORE INTO alertas_wsp_estado (tipo_alerta, key_unica, datos_json)
-        VALUES ('conexion_pc', :key, :datos)
-    ");
+    // ── 3. Construir alertas (SIN registrar — el bot confirma entrega) ───────────
+    //
+    //  El bot llama a marcar_enviado.php solo si sendMessage() es exitoso.
+    //  Si el envío falla, la alerta NO queda en alertas_wsp_estado y
+    //  será reintentada en el próximo ciclo (1 minuto).
+    $alertas = [];
 
     foreach ($pcsOffline as $pc) {
         $segundos      = (int)$pc['segundos'];
@@ -125,22 +129,17 @@ try {
                    "🕐 Último ping: {$ultimoPing}\n" .
                    "🔗 https://erp.batidospitaya.com/modulos/sistemas/conexion_monitor.php";
 
-        // Registrar en BD para no volver a alertar este evento
-        $stmtInsert->execute([
-            ':key'   => $pc['key_unica'],
-            ':datos' => json_encode([
-                'sucursal'   => $sucursal,
-                'pc_nombre'  => $pcNombre,
-                'ping_at'    => $pc['ping_at'],
-                'segundos'   => $segundos,
-            ], JSON_UNESCAPED_UNICODE),
-        ]);
-
         $alertas[] = [
             'tipo'          => 'conexion_pc',
             'key_unica'     => $pc['key_unica'],
             'mensaje'       => $mensaje,
             'destinatarios' => $destinatarios,
+            'datos_json'    => [
+                'sucursal'   => $sucursal,
+                'pc_nombre'  => $pcNombre,
+                'ping_at'    => $pc['ping_at'],
+                'segundos'   => $segundos,
+            ],
         ];
     }
 

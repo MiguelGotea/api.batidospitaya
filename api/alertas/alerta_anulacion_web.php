@@ -9,7 +9,10 @@
  *     (si aún no se subió el pedido, Fecha es NULL → no alerta hasta que suba)
  *   - No existe en alertas_wsp_estado con ese CodAnulacionHost
  *
- * Una sola alerta por CodAnulacionHost, nunca se resetea.
+ * IMPORTANTE: Este archivo NO registra la alerta en alertas_wsp_estado.
+ * El bot llama a marcar_enviado.php SOLO después de confirmar entrega exitosa.
+ * Esto garantiza que alertas con fallo de envío sean reintentadas el próximo minuto.
+ *
  * Llamado por: api/alertas/check_all.php
  */
 
@@ -99,12 +102,12 @@ try {
         return ['alertas' => []];
     }
 
-    // ── 3. Construir alertas y registrar en alertas_wsp_estado ───────────
-    $alertas    = [];
-    $stmtInsert = $conn->prepare("
-        INSERT IGNORE INTO alertas_wsp_estado (tipo_alerta, key_unica, datos_json)
-        VALUES ('anulacion_web', :key, :datos)
-    ");
+    // ── 3. Construir alertas (SIN registrar — el bot confirma entrega) ────
+    //
+    //  El bot llama a marcar_enviado.php solo si sendMessage() es exitoso.
+    //  Si el envío falla, la alerta NO queda en alertas_wsp_estado y
+    //  será reintentada en el próximo ciclo (1 minuto).
+    $alertas = [];
 
     foreach ($anulaciones as $a) {
         $codAnulacion = $a['CodAnulacionHost'];
@@ -119,23 +122,18 @@ try {
                    "📋 Motivo: {$motivo}\n" .
                    "🔗 https://erp.batidospitaya.com/modulos/sistemas/gestion_anulaciones.php";
 
-        // Registrar → nunca vuelve a alertar este CodAnulacionHost
-        $stmtInsert->execute([
-            ':key'   => (string)$codAnulacion,
-            ':datos' => json_encode([
-                'CodAnulacionHost' => $codAnulacion,
-                'CodPedido'        => $a['CodPedido'],
-                'Sucursal'         => $a['Sucursal'],
-                'nombre_sucursal'  => $sucursal,
-                'hora_solicitud'   => $hora,
-            ], JSON_UNESCAPED_UNICODE),
-        ]);
-
         $alertas[] = [
             'tipo'          => 'anulacion_web',
             'key_unica'     => (string)$codAnulacion,
             'mensaje'       => $mensaje,
             'destinatarios' => $destinatarios,
+            'datos_json'    => [
+                'CodAnulacionHost' => $codAnulacion,
+                'CodPedido'        => $a['CodPedido'],
+                'Sucursal'         => $a['Sucursal'],
+                'nombre_sucursal'  => $sucursal,
+                'hora_solicitud'   => $hora,
+            ],
         ];
     }
 

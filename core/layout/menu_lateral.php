@@ -515,12 +515,12 @@ $menuGlobal = [
             ],
             [
                 'nombre' => 'Recetas',
-                'url' => 'sistemas/accessantiguo_visor_recetas.php',
+                'url' => 'productos/accessantiguo_visor_recetas.php',
                 'cargos_permitidos' => [55, 49]
             ],
             [
                 'nombre' => 'Diccionario Access ERP',
-                'url' => 'sistemas/accessantiguo_diccionario_productos.php',
+                'url' => 'productos/accessantiguo_diccionario_productos.php',
                 'cargos_permitidos' => [55, 49]
             ],
         ]

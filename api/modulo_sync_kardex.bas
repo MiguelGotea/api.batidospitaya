@@ -94,18 +94,31 @@ Public Function SyncKardexSubPreIngresos30Dias() As Boolean
         sSQL, "limpiar_30dias", "SPI", c)
 End Function
 
-' ── Master cierre: llama las 6 tablas ────────────────────
-Public Function SyncKardexCierre30Dias() As Boolean
+' ── Master cierre TIENDA (sucursales) ───────────────────
+' Tablas: InventarioCotizacion, AjustesInventario, Compras, MermaCotizacion
+' Llamar en el procedimiento de cierre de caja de cada tienda.
+Public Function SyncKardexTiendaCierre30Dias() As Boolean
     Dim bOk As Boolean : bOk = True
-    KdxLog "Cierre", "Iniciando sync 30 dias - " & Now()
+    KdxLog "CierreTienda", "Iniciando sync 30 dias tienda - " & Now()
     If Not SyncKardexInventarioCotizacion30Dias() Then bOk = False
     If Not SyncKardexAjustesInventario30Dias()    Then bOk = False
     If Not SyncKardexCompras30Dias()              Then bOk = False
     If Not SyncKardexMermaCotizacion30Dias()      Then bOk = False
-    If Not SyncKardexPreIngresos30Dias()          Then bOk = False
-    If Not SyncKardexSubPreIngresos30Dias()       Then bOk = False
-    KdxLog "Cierre", IIf(bOk, "OK", "Con errores") & " - " & Now()
-    SyncKardexCierre30Dias = bOk
+    KdxLog "CierreTienda", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    SyncKardexTiendaCierre30Dias = bOk
+End Function
+
+' ── Master cierre CENTRAL (codigoLocal()=0) ─────────────
+' Tablas: Compras, PreIngresoPitaya, SubPreIngresosPitaya
+' Llamar en el procedimiento de cierre del sistema central.
+Public Function SyncKardexCentralCierre30Dias() As Boolean
+    Dim bOk As Boolean : bOk = True
+    KdxLog "Cierre Central", "Iniciando sync 30 dias central - " & Now()
+    If Not SyncKardexCompras30Dias()         Then bOk = False
+    If Not SyncKardexPreIngresos30Dias()     Then bOk = False
+    If Not SyncKardexSubPreIngresos30Dias()  Then bOk = False
+    KdxLog "CierreCentral", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    SyncKardexCentralCierre30Dias = bOk
 End Function
 
 ' ══════════════════════════════════════════════════════════
@@ -160,20 +173,35 @@ Public Function SyncKardexSubPreIngresosMasivo() As Boolean
         "limpiar_total", "SPI", c)
 End Function
 
-' ── Master masivo: llama las 6 tablas ────────────────────
-Public Function SyncKardexMasivoCompleto() As Boolean
+' ── Master masivo TIENDA (sucursales) ───────────────────
+' Tablas: InventarioCotizacion, AjustesInventario, Compras, MermaCotizacion
+' Activar desde botón panel admin en cada sistema de tienda.
+Public Function SyncKardexTiendaMasivoCompleto() As Boolean
     Dim bOk As Boolean : bOk = True
-    KdxLog "Masivo", "Iniciando masivo completo - " & Now()
+    KdxLog "MasivoTienda", "Iniciando masivo tienda - " & Now()
     If Not SyncKardexInventarioCotizacionMasivo() Then bOk = False
     If Not SyncKardexAjustesInventarioMasivo()    Then bOk = False
     If Not SyncKardexComprasMasivo()              Then bOk = False
     If Not SyncKardexMermaCotizacionMasivo()      Then bOk = False
-    If Not SyncKardexPreIngresosMasivo()          Then bOk = False
-    If Not SyncKardexSubPreIngresosMasivo()       Then bOk = False
-    KdxLog "Masivo", IIf(bOk, "OK", "Con errores") & " - " & Now()
-    MsgBox "Sync Masivo Kardex " & IIf(bOk, "completado OK.", "completado con errores (ver log)."), _
-           IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo"
-    SyncKardexMasivoCompleto = bOk
+    KdxLog "MasivoTienda", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    MsgBox "Masivo Tienda " & IIf(bOk, "OK.", "con errores (ver log)."), _
+           IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo Tienda"
+    SyncKardexTiendaMasivoCompleto = bOk
+End Function
+
+' ── Master masivo CENTRAL (codigoLocal()=0) ──────────────
+' Tablas: Compras, PreIngresoPitaya, SubPreIngresosPitaya
+' Activar desde botón panel admin en el sistema central.
+Public Function SyncKardexCentralMasivoCompleto() As Boolean
+    Dim bOk As Boolean : bOk = True
+    KdxLog "MasivoCentral", "Iniciando masivo central - " & Now()
+    If Not SyncKardexComprasMasivo()          Then bOk = False
+    If Not SyncKardexPreIngresosMasivo()      Then bOk = False
+    If Not SyncKardexSubPreIngresosMasivo()   Then bOk = False
+    KdxLog "MasivoCentral", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    MsgBox "Masivo Central " & IIf(bOk, "OK.", "con errores (ver log)."), _
+           IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo Central"
+    SyncKardexCentralMasivoCompleto = bOk
 End Function
 
 ' ══════════════════════════════════════════════════════════

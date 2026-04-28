@@ -78,6 +78,9 @@ Public Function SyncEnviarAnulacionesPendientes() As Boolean
         AnulacionLog "SyncEnviar", "Fallo HTTP: " & sResp
     Else
         AnulacionLog "SyncEnviar", "OK - " & sResp
+        ' Disparar validación IA para las solicitudes recién subidas
+        ' (respaldo al fire-and-forget del servidor)
+        SyncIAValidarAnulaciones codSuc
     End If
 
     Exit Function
@@ -85,6 +88,46 @@ ErrorHandler:
     AnulacionLog "SyncEnviar", "Error " & Err.Number & ": " & Err.Description
     SyncEnviarAnulacionesPendientes = False
 End Function
+
+' ══════════════════════════════════════════════════════════
+' 1b. DISPARAR validación IA para solicitudes pendientes
+'     → Llamado automáticamente tras SyncEnviarAnulacionesPendientes
+'     → También se puede llamar directamente para re-procesar
+' ══════════════════════════════════════════════════════════
+Public Sub SyncIAValidarAnulaciones(codSuc As String)
+    On Error GoTo ErrorHandlerIA
+
+    Dim sIAUrl As String
+    sIAUrl = "https://erp.batidospitaya.com/modulos/sistemas/ajax/anulaciones_ia_auto_batch.php"
+
+    Dim sIAToken  As String
+    sIAToken = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
+
+    Dim sPayloadIA As String
+    sPayloadIA = "{""sucursal"":""" & codSuc & """}"
+
+    ' Usamos un objeto HTTP de corta vida — no esperamos respuesta larga
+    Dim http As Object
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    http.Open "POST", sIAUrl, False
+    http.setRequestHeader "Content-Type", "application/json; charset=utf-8"
+    http.setRequestHeader "Authorization", "Bearer " & sIAToken
+    http.setRequestHeader "User-Agent", "PitayaAccess/1.0"
+    ' Timeout corto — la IA puede tardar; Access solo dispara y sigue
+    http.setTimeouts 3000, 3000, 60000, 60000
+
+    On Error Resume Next
+    http.Send sPayloadIA
+    Dim sRespIA As String
+    sRespIA = http.responseText
+    Set http = Nothing
+    On Error GoTo ErrorHandlerIA
+
+    AnulacionLog "SyncIA", "IA batch disparada Sucursal=" & codSuc & " | Resp: " & Left(sRespIA, 120)
+    Exit Sub
+ErrorHandlerIA:
+    AnulacionLog "SyncIA", "Error (no bloqueante) " & Err.Number & ": " & Err.Description
+End Sub
 
 ' ══════════════════════════════════════════════════════════
 ' 2. LEER respuestas del host y ejecutar anulaciones locales

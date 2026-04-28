@@ -213,6 +213,37 @@ try {
     apLog("FIN OK - Insertados: $insertados | Actualizados: $actualizados | Ignorados: $ignorados | Errores: " . count($errores));
     echo json_encode($respuesta);
 
+    // ── Disparar validación IA de forma asíncrona (fire & forget) ──
+    // Solo si se insertaron nuevas solicitudes en modo normal.
+    // Access recibe respuesta inmediata; la IA procesa en paralelo.
+    if ($insertados > 0 && $modo === 'normal') {
+        $iaBatchUrl = 'https://erp.batidospitaya.com/modulos/sistemas/ajax/anulaciones_ia_auto_batch.php';
+        $iaPayload  = json_encode(['sucursal' => $sucursal]);
+        $iaToken    = AP_TOKEN;
+
+        try {
+            $ch = curl_init($iaBatchUrl);
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST           => true,
+                CURLOPT_POSTFIELDS     => $iaPayload,
+                CURLOPT_HTTPHEADER     => [
+                    'Content-Type: application/json',
+                    "Authorization: Bearer $iaToken",
+                ],
+                // Timeout muy corto: no esperamos respuesta (fire & forget)
+                CURLOPT_TIMEOUT_MS     => 400,
+                CURLOPT_SSL_VERIFYPEER => false,
+            ]);
+            curl_exec($ch);
+            curl_close($ch);
+            apLog("IA batch disparada para Sucursal=$sucursal ($insertados nuevas solicitudes).");
+        } catch (Throwable $eIA) {
+            apLog("Aviso: no se pudo disparar IA batch: " . $eIA->getMessage());
+        }
+    }
+
+
 } catch (PDOException $e) {
     apLog("ERROR PDO: " . $e->getMessage());
     apError(500, 'Error de base de datos: ' . $e->getMessage());

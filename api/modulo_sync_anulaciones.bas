@@ -107,18 +107,12 @@ Public Function SyncLeerRespuestasAnulacion() As Boolean
     Dim rs  As DAO.Recordset
     Set db = CurrentDb()
 
-    ' Obtener CodPedidos con Status=0 local
+    ' Obtener CodPedidos con Status=0 local (para consultar su estado en el host)
     Set rs = db.OpenRecordset( _
         "SELECT CodPedido FROM AnulacionPedidos WHERE Status = 0", _
         dbOpenForwardOnly, dbReadOnly)
 
-    If rs.EOF And rs.BOF Then
-        rs.Close : Set rs = Nothing : Set db = Nothing
-        SyncLeerRespuestasAnulacion = True
-        Exit Function
-    End If
-
-    ' Construir array de CodPedidos
+    ' Construir array de CodPedidos (puede quedar vacío [])
     Dim sCodigos As String
     sCodigos = "["
     Dim bPrimero As Boolean : bPrimero = True
@@ -131,15 +125,18 @@ Public Function SyncLeerRespuestasAnulacion() As Boolean
     sCodigos = sCodigos & "]"
     rs.Close : Set rs = Nothing : Set db = Nothing
 
-    If sCodigos = "[]" Then
-        SyncLeerRespuestasAnulacion = True
-        Exit Function
-    End If
-
-    ' Consultar host
+    ' NOTA: Siempre llamamos al host aunque no haya pendientes locales.
+    ' El servidor también devuelve anulaciones aprobadas remotamente
+    ' (desde el ERP Web) que no existen en este Access con Status=0.
     Dim sPayload As String
     Dim sResp    As String
-    sPayload = "{""sucursal"":""" & codSuc & """,""cod_pedidos"":" & sCodigos & "}"
+
+    If sCodigos = "[]" Then
+        ' Sin pendientes locales: solo enviar sucursal para recibir remotas
+        sPayload = "{""sucursal"":""" & codSuc & """}"
+    Else
+        sPayload = "{""sucursal"":""" & codSuc & """,""cod_pedidos"":" & sCodigos & "}"
+    End If
 
     If Not HttpPost(sAnulUrlLeer, sPayload, sResp) Then
         AnulacionLog "SyncLeer", "Fallo HTTP: " & sResp

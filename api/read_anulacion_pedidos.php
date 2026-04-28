@@ -10,7 +10,7 @@
  * Parámetros POST (JSON):
  *   token       : Token de autenticación
  *   sucursal    : Código del local
- *   cod_pedidos : Array de CodPedido con Status=0 en Access
+ *   cod_pedidos : Array de CodPedido con Status=0 en Access (Opcional)
  *
  * Respuesta JSON:
  *   {
@@ -91,18 +91,10 @@ if ($codPedidos === null && isset($_POST['cod_pedidos'])) {
 if (empty($sucursal) || !is_numeric($sucursal) || (int)$sucursal < 1) {
     raError(400, 'Parámetro sucursal inválido o faltante.');
 }
-if (empty($codPedidos) || !is_array($codPedidos)) {
-    raError(400, 'Parámetro cod_pedidos vacío o inválido.');
-}
 
-$sucursal   = (int)$sucursal;
-// Sanitizar: solo enteros positivos
-$codPedidos = array_filter(array_map('intval', $codPedidos), fn($v) => $v > 0);
+$sucursal = (int)$sucursal;
+$codPedidos = (!empty($codPedidos) && is_array($codPedidos)) ? array_filter(array_map('intval', $codPedidos), fn($v) => $v > 0) : [];
 $codPedidos = array_values(array_unique($codPedidos));
-
-if (empty($codPedidos)) {
-    raError(400, 'No hay CodPedidos válidos en la lista.');
-}
 
 raLog("CONSULTA - Sucursal=$sucursal | CodPedidos: " . implode(',', $codPedidos));
 
@@ -111,28 +103,40 @@ global $conn;
 $pdo = $conn;
 
 try {
-    $placeholders = implode(',', array_fill(0, count($codPedidos), '?'));
+    $results = [];
+    $params = [$sucursal];
 
-    $stmt = $pdo->prepare(
+    if (!empty($codPedidos)) {
+        $placeholders = implode(',', array_fill(0, count($codPedidos), '?'));
+        $stmt = $pdo->prepare(
+            "SELECT CodPedido, Status, Motivo, HoraAnulada, Modalidad,
+                    ComentarioAprobacion, EjecutadoEnTienda
+             FROM `" . RA_TABLE . "`
+             WHERE Sucursal = ? AND CodPedido IN ($placeholders)
+             ORDER BY CodPedido ASC"
+        );
+        $stmt->execute(array_merge([$sucursal], $codPedidos));
+        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $stmtPending = $pdo->prepare(
         "SELECT CodPedido, Status, Motivo, HoraAnulada, Modalidad,
                 ComentarioAprobacion, EjecutadoEnTienda
          FROM `" . RA_TABLE . "`
-         WHERE CodPedido IN ($placeholders)
-           AND Sucursal = ?
-         ORDER BY CodPedido ASC"
+         WHERE Sucursal = ? AND Status = 1 AND EjecutadoEnTienda = 0"
     );
+    $stmtPending->execute([$sucursal]);
+    $pendingApprovals = $stmtPending->fetchAll(PDO::FETCH_ASSOC);
 
-    $params = array_merge($codPedidos, [$sucursal]);
-    $stmt->execute($params);
-    $registros = $stmt->fetchAll();
+    $finalRegistros = array_values(array_column(array_merge($results, $pendingApprovals), null, 'CodPedido'));
 
-    raLog("Respuesta - " . count($registros) . " registros encontrados.");
+    raLog("Respuesta - " . count($finalRegistros) . " registros encontrados.");
 
     echo json_encode([
         'success'    => true,
-        'registros'  => $registros,
+        'registros'  => $finalRegistros,
         'consultados'=> count($codPedidos),
-        'encontrados'=> count($registros),
+        'encontrados'=> count($finalRegistros),
     ]);
 
 } catch (PDOException $e) {

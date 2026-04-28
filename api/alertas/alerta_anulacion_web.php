@@ -116,11 +116,7 @@ try {
         $hora         = $a['hora_solicitud'] ?: '—';
 
         $mensaje = "⚠️ *Alerta: Anulación Web Pendiente*\n" .
-                   "📦 Pedido #" . $a['CodPedido'] . "\n" .
-                   "📍 Sucursal: {$sucursal}\n" .
-                   "🕐 Solicitado: {$hora}\n" .
-                   "📋 Motivo: {$motivo}\n" .
-                   "🔗 https://erp.batidospitaya.com/modulos/sistemas/gestion_anulaciones.php";
+                   "📦 Pedido #" . $a['CodPedido'] . " ({$sucursal}) : {$motivo}";
 
         $alertas[] = [
             'tipo'          => 'anulacion_web',

@@ -105,12 +105,7 @@ try {
         $lineaCambio = $tieneCambio ? "\n🔄 Pedido Cambio #" . $a['CodPedidoCambio'] : '';
 
         $mensaje = "✅ *IA Auto-Aprobó una Anulación*\n" .
-                   "📦 Pedido #{$a['CodPedido']}{$lineaCambio}\n" .
-                   "📍 Sucursal: {$sucursal}\n" .
-                   "🕐 Aprobado: {$hora}\n" .
-                   "📋 Motivo: {$motivo}\n" .
-                   ($iaComentario ? "🤖 IA: {$iaComentario}\n" : '') .
-                   "🔗 https://erp.batidospitaya.com/modulos/sistemas/gestion_anulaciones.php";
+                   "📦 Pedido #{$a['CodPedido']} ({$sucursal}) : {$iaComentario}";
 
         $alertas[] = [
             'tipo'          => 'ia_aprobacion',

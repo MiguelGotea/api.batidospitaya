@@ -52,6 +52,16 @@ try {
     error_log('[check_all] alerta_anulacion_web falló: ' . $e->getMessage());
 }
 
+// ── Alerta 3: IA auto-aprobó una anulación ───────────────────────────────
+try {
+    $resultado = require __DIR__ . '/alerta_ia_aprobacion.php';
+    if (!empty($resultado['alertas'])) {
+        $todasLasAlertas = array_merge($todasLasAlertas, $resultado['alertas']);
+    }
+} catch (Throwable $e) {
+    error_log('[check_all] alerta_ia_aprobacion falló: ' . $e->getMessage());
+}
+
 // ── Futuras alertas: agregar require aquí ─────────────────────────────────
 // try {
 //     $resultado = require __DIR__ . '/alerta_nombre_nueva.php';

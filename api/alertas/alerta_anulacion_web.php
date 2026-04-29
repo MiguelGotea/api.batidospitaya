@@ -71,7 +71,7 @@ try {
             ON v.CodPedido = a.CodPedido
             AND v.local = CAST(a.Sucursal AS CHAR)
         WHERE a.Modalidad = 2
-          AND (a.Status = 0 OR (a.Status = 1 AND a.AprobadoPor = 'IA Automática'))
+          AND a.Status = 0
           AND NOT EXISTS (
               SELECT 1 FROM alertas_wsp_estado
               WHERE tipo_alerta = 'anulacion_web'

@@ -116,18 +116,11 @@ try {
 
     foreach ($pcsOffline as $pc) {
         $segundos      = (int)$pc['segundos'];
-        $tiempoTexto   = formatearTiempoSinConexion($segundos);
-        $ultimoPing    = date('h:i A', strtotime($pc['ping_at']));
         $sucursal      = $pc['nombre_sucursal'] ?: $pc['sucursal_codigo'];
         $pcNombre      = $pc['pc_nombre'] ?: '(sin nombre)';
-        $ipLinea       = $pc['ip_local'] ? "\n🌐 IP: " . $pc['ip_local'] : '';
 
         $mensaje = "🔴 *Alerta: PC Sin Conexión*\n" .
-                   "📍 Sucursal: {$sucursal}\n" .
-                   "💻 PC: {$pcNombre}" . $ipLinea . "\n" .
-                   "⏱ Sin conexión hace: *{$tiempoTexto}*\n" .
-                   "🕐 Último ping: {$ultimoPing}\n" .
-                   "🔗 https://erp.batidospitaya.com/modulos/sistemas/conexion_monitor.php";
+                   "📍 Sucursal: {$sucursal} ({$pcNombre})";
 
         $alertas[] = [
             'tipo'          => 'conexion_pc',

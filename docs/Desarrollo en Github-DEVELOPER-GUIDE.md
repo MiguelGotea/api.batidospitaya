@@ -19,7 +19,7 @@ Antes de empezar asegúrate de tener:
 ### Paso 1: Clonar el repositorio
 
 ```bash
-git clone https://github.com/USUARIO/NOMBRE-REPO.git
+git clone https://github.com/MiguelGotea/NOMBRE-REPO.git
 cd NOMBRE-REPO
 ```
 

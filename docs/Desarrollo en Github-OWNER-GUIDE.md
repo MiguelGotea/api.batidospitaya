@@ -19,8 +19,11 @@ Settings → Branches → Add branch protection rule
 | Require a pull request before merging | ✅ ON |
 | Required approvals | `1` |
 | Dismiss stale reviews when new commits are pushed | ✅ ON |
-| Do not require for administrators | ✅ ON ← crítico para ti |
-| Restrict who can push to matching branches | ✅ ON → solo tu usuario |
+| **Do not allow bypassing the above settings** | ❌ **OFF** (Desmarcado) ← Crítico para que tú puedas hacer push directo |
+| Restrict who can push to matching branches | ✅ ON (Si está disponible) |
+
+> [!NOTE]
+> Dejar **"Do not allow bypassing..."** desmarcado es lo que permite que seas "administrador" y puedas subir cambios sin pasar por Pull Request. Si lo marcas, incluso tú quedarás bloqueado.
 
 Guarda con **"Create"**.
 

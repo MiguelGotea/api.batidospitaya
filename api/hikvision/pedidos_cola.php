@@ -30,13 +30,16 @@ try {
 
     $conn->beginTransaction();
 
-    // Seleccionar los siguientes N items pendientes con bloqueo
+    // Seleccionar los siguientes N items pendientes CON FILTRO DE FECHA HOY
+    // El worker SOLO procesa pedidos del día actual.
+    // Items de días anteriores quedan intactos para revisión manual.
     $stmt = $conn->prepare("
         SELECT id, cod_pedido, local_codigo, fecha,
                hora_inicio, hora_fin, canal_track, puerto_rtsp,
                dvr_ip_local, dvr_usuario, dvr_clave, vps_ip, tipo
         FROM hikvision_cola_analisis
         WHERE estado = 'pendiente'
+          AND fecha  = CURDATE()
         ORDER BY prioridad ASC, created_at ASC
         LIMIT :lim
         FOR UPDATE

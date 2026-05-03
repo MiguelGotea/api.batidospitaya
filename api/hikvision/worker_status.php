@@ -1,82 +1,72 @@
 <?php
 /**
- * worker_status.php — Estado y control del worker HikvisionIA (vía BD)
+ * worker_status.php — Estado y control del worker HikvisionIA
  * 
- * GET  /api/hikvision/worker_status.php
- *   → Devuelve si el worker está habilitado y estadísticas de cola del día
+ * El flag de habilitación se guarda en un archivo JSON local:
+ *   /api/hikvision/worker.flag.json
+ * No requiere tabla adicional en la BD.
  *
- * POST /api/hikvision/worker_status.php
- *   Body JSON: { "action": "start" } | { "action": "stop" }
- *   → Activa o desactiva el flag en BD. El worker chequea este flag
- *     en cada iteración vía pedidos_cola.php.
- *
- * Nota: El API está en Hostinger (mismo host que ERP), no en el VPS.
- * Control del worker se hace exclusivamente a través de la BD.
+ * GET  → Devuelve si el worker está habilitado y estadísticas de cola del día
+ * POST → { "action": "start" | "stop", "updated_by": "Nombre" }
+ *         Escribe el flag en el archivo y retorna el estado actualizado
  */
 
 require_once __DIR__ . '/auth.php';
 
 verificarTokenHIK();
 
-$method = $_SERVER['REQUEST_METHOD'];
+// ── Ruta del archivo de flag ─────────────────────────────────
+define('WORKER_FLAG_FILE', __DIR__ . '/worker.flag.json');
 
-try {
-    // ── Asegurar que existe la tabla de configuración ────────
-    $conn->exec("
-        CREATE TABLE IF NOT EXISTS hikvision_worker_config (
-            id               INT          NOT NULL DEFAULT 1,
-            worker_habilitado TINYINT(1)  NOT NULL DEFAULT 0,
-            updated_at       TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            updated_by       VARCHAR(100)         DEFAULT NULL,
-            PRIMARY KEY (id)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
-    ");
+// ── Helpers de flag ──────────────────────────────────────────
 
-    // ── Asegurar que existe la fila de config ────────────────
-    $conn->exec("
-        INSERT IGNORE INTO hikvision_worker_config (id, worker_habilitado)
-        VALUES (1, 0)
-    ");
+function leerFlag(): array {
+    if (!file_exists(WORKER_FLAG_FILE)) {
+        return ['worker_habilitado' => false, 'updated_at' => null, 'updated_by' => null];
+    }
+    $data = json_decode(file_get_contents(WORKER_FLAG_FILE), true);
+    return is_array($data) ? $data : ['worker_habilitado' => false, 'updated_at' => null, 'updated_by' => null];
+}
 
-    // ── POST: cambiar estado ─────────────────────────────────
-    if ($method === 'POST') {
-        $data   = json_decode(file_get_contents('php://input'), true);
-        $action = isset($data['action']) ? trim($data['action']) : null;
-        $by     = isset($data['updated_by']) ? trim($data['updated_by']) : 'ERP';
+function escribirFlag(bool $habilitado, string $by = 'sistema'): void {
+    $data = [
+        'worker_habilitado' => $habilitado,
+        'updated_at'        => date('Y-m-d H:i:s'),
+        'updated_by'        => $by,
+    ];
+    file_put_contents(WORKER_FLAG_FILE, json_encode($data), LOCK_EX);
+}
 
-        if (!in_array($action, ['start', 'stop'])) {
-            hikErr('Acción inválida. Use: start | stop');
-        }
+// ── POST: cambiar estado ─────────────────────────────────────
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $data   = json_decode(file_get_contents('php://input'), true);
+    $action = isset($data['action']) ? trim($data['action']) : null;
+    $by     = isset($data['updated_by']) ? trim($data['updated_by']) : 'ERP';
 
-        $nuevoEstado = ($action === 'start') ? 1 : 0;
-
-        $conn->prepare("
-            UPDATE hikvision_worker_config
-            SET worker_habilitado = :estado,
-                updated_by        = :by
-            WHERE id = 1
-        ")->execute([':estado' => $nuevoEstado, ':by' => $by]);
-
-        hikOk([
-            'action'           => $action,
-            'worker_habilitado' => $nuevoEstado,
-            'mensaje'          => $action === 'start'
-                ? 'Worker habilitado. Procesará items de la cola automáticamente.'
-                : 'Worker detenido. No tomará nuevos items de la cola.',
-        ]);
+    if (!in_array($action, ['start', 'stop'])) {
+        hikErr('Acción inválida. Use: start | stop');
     }
 
-    // ── GET: consultar estado ────────────────────────────────
-    $cfg = $conn->query("
-        SELECT worker_habilitado, updated_at, updated_by
-        FROM hikvision_worker_config
-        WHERE id = 1
-        LIMIT 1
-    ")->fetch();
+    $nuevoEstado = ($action === 'start');
+    escribirFlag($nuevoEstado, $by);
 
-    $hoy = date('Y-m-d');
+    hikOk([
+        'action'            => $action,
+        'worker_habilitado' => $nuevoEstado,
+        'updated_by'        => $by,
+        'updated_at'        => date('Y-m-d H:i:s'),
+        'mensaje'           => $nuevoEstado
+            ? 'Worker habilitado. Procesará items de la cola automáticamente.'
+            : 'Worker detenido. No tomará nuevos items de la cola.',
+    ]);
+}
 
-    // Estadísticas de cola del día actual
+// ── GET: consultar estado ────────────────────────────────────
+try {
+    $flag = leerFlag();
+    $hoy  = date('Y-m-d');
+
+    // Estadísticas de cola del día actual (desde BD)
     $stats = $conn->prepare("
         SELECT
             SUM(estado = 'pendiente')   AS pendientes,
@@ -90,8 +80,8 @@ try {
     $stats->execute([':hoy' => $hoy]);
     $cola = $stats->fetch();
 
-    // Inferir si el worker está procesando activamente:
-    // Si hay algún item en 'procesando' actualizado en los últimos 3 minutos
+    // ¿Está el worker realmente activo en este momento?
+    // Si hay algún item en 'procesando' actualizado en los últimos 3 min
     $activo = $conn->prepare("
         SELECT COUNT(*) AS cnt
         FROM hikvision_cola_analisis
@@ -99,13 +89,13 @@ try {
           AND updated_at >= DATE_SUB(NOW(), INTERVAL 3 MINUTE)
     ");
     $activo->execute();
-    $workerActivo = (int)$activo->fetch()['cnt'] > 0;
+    $workerProcesando = (int)$activo->fetch()['cnt'] > 0;
 
     hikOk([
-        'worker_habilitado'  => (bool)$cfg['worker_habilitado'],
-        'worker_procesando'  => $workerActivo,
-        'config_updated_at'  => $cfg['updated_at'],
-        'config_updated_by'  => $cfg['updated_by'],
+        'worker_habilitado'  => (bool)$flag['worker_habilitado'],
+        'worker_procesando'  => $workerProcesando,
+        'config_updated_at'  => $flag['updated_at'],
+        'config_updated_by'  => $flag['updated_by'],
         'fecha_hoy'          => $hoy,
         'cola_hoy'           => [
             'pendientes'  => (int)($cola['pendientes']  ?? 0),

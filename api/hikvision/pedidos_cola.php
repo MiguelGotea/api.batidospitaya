@@ -16,20 +16,17 @@ verificarTokenHIK();
 $limit = min((int)($_GET['limit'] ?? 1), 10); // Máximo 10 por llamada
 
 try {
-    // ── Verificar flag de habilitación del worker ────────────
-    // Si el worker está deshabilitado (stop desde ERP), retornar
-    // cola vacía para que el worker duerma sin procesar nada.
-    $cfgStmt = $conn->query("
-        SELECT worker_habilitado
-        FROM hikvision_worker_config
-        WHERE id = 1
-        LIMIT 1
-    ");
-    $cfg = $cfgStmt ? $cfgStmt->fetch() : null;
-
-    if ($cfg && !$cfg['worker_habilitado']) {
-        hikOk(['items' => [], 'total' => 0, 'worker_habilitado' => false]);
+    // ── Verificar flag de habilitación del worker (archivo JSON) ─
+    // Si el worker está deshabilitado vía ERP (stop), retornar cola vacía
+    // para que el worker duerma sin procesar nada. Sin tabla adicional.
+    $flagFile = __DIR__ . '/worker.flag.json';
+    if (file_exists($flagFile)) {
+        $flag = json_decode(file_get_contents($flagFile), true);
+        if (isset($flag['worker_habilitado']) && !$flag['worker_habilitado']) {
+            hikOk(['items' => [], 'total' => 0, 'worker_habilitado' => false]);
+        }
     }
+    // Si el archivo no existe, el worker procede normalmente (comportamiento por defecto)
 
     $conn->beginTransaction();
 

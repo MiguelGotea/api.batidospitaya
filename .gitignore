@@ -21,3 +21,6 @@ uploads/
 
 # Scripts de Deploy
 # .scripts/ (Versionado en GitHub pero excluido del host)
+
+# Runtime flags (generados en producción, no versionados)
+api/hikvision/worker.flag.json

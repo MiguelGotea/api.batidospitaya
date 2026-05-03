@@ -47,7 +47,7 @@ try {
     hikOk([
         'key_id'  => $row['id'],
         'api_key' => $row['api_key'],
-        'modelo'  => 'gemini-2.0-flash',
+        'modelo'  => 'gemini-1.5-flash',   // Soporta video via Files API
     ]);
 
 } catch (Exception $e) {

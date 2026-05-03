@@ -16,6 +16,21 @@ verificarTokenHIK();
 $limit = min((int)($_GET['limit'] ?? 1), 10); // Máximo 10 por llamada
 
 try {
+    // ── Verificar flag de habilitación del worker ────────────
+    // Si el worker está deshabilitado (stop desde ERP), retornar
+    // cola vacía para que el worker duerma sin procesar nada.
+    $cfgStmt = $conn->query("
+        SELECT worker_habilitado
+        FROM hikvision_worker_config
+        WHERE id = 1
+        LIMIT 1
+    ");
+    $cfg = $cfgStmt ? $cfgStmt->fetch() : null;
+
+    if ($cfg && !$cfg['worker_habilitado']) {
+        hikOk(['items' => [], 'total' => 0, 'worker_habilitado' => false]);
+    }
+
     $conn->beginTransaction();
 
     // Seleccionar los siguientes N items pendientes con bloqueo

@@ -1,25 +1,24 @@
-﻿<?php
+<?php
 /**
  * registrar_resultado.php — Guarda el análisis IA y marca el item como completado.
  *
  * POST /api/hikvision/registrar_resultado.php
  * Header: X-WSP-Token
  *
- * Body JSON (Protocolo 5 Grupos Pitaya + contexto membresía):
+ * Body JSON (Protocolo 4 Grupos Pitaya — pasos 9-10 fuera de cámara de caja):
  * {
- *   "id_cola"          : 5,
- *   "grupo_bienvenida" : 8,       -- Paso 1
- *   "grupo_asesoria"   : 6,       -- Pasos 2-4 (null si no aplicó)
- *   "grupo_membresia"  : 3,       -- Paso 5
- *   "grupo_cobro"      : 7,       -- Pasos 6-8
- *   "
- *   "cal_promedio"       : 6.6,     -- Calculado en Python, verificado aquí
+ *   "id_cola"            : 5,
+ *   "grupo_bienvenida"   : 8,       -- Paso 1
+ *   "grupo_asesoria"     : 6,       -- Pasos 2-4 (null si no aplicó)
+ *   "grupo_membresia"    : 3,       -- Paso 5 (null=ya_tenia, 10=vendida auto)
+ *   "grupo_cobro"        : 7,       -- Pasos 6-8
+ *   "cal_promedio"       : 6.0,     -- Calculado en Python, verificado aquí
  *   "detalle_json"       : "{...}", -- JSON string con breakdown por paso
- *   "membresia_contexto" : "sin_membresia", -- sin_membresia|vendida|ya_tenia
+ *   "membresia_contexto" : "sin_membresia",
  *   "resumen"            : "texto",
  *   "tiene_audio"        : 1,
- *   "duracion_segundos": 92,
- *   "modelo_ia"        : "gemini-2.5-flash"
+ *   "duracion_segundos"  : 92,
+ *   "modelo_ia"          : "gemini-2.5-flash"
  * }
  */
 
@@ -33,8 +32,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 $id_cola = isset($data['id_cola']) ? intval($data['id_cola']) : null;
 if (!$id_cola) hikErr('Falta parámetro requerido: id_cola');
 
-// ── Grupos de calificación (1-10 o null) ─────────────────────
-$grupos = ['grupo_bienvenida', 'grupo_asesoria', 'grupo_membresia', 'grupo_cobro', '
+// ── Grupos de calificación (1-10 o null) — 4 grupos ──────────
+$grupos = ['grupo_bienvenida', 'grupo_asesoria', 'grupo_membresia', 'grupo_cobro'];
 $vals_grupo = [];
 foreach ($grupos as $g) {
     $val = isset($data[$g]) && $data[$g] !== null ? intval($data[$g]) : null;
@@ -92,37 +91,36 @@ try {
             (id_cola, cod_pedido, local_codigo, sucursal_nombre,
              fecha, hora_inicio, hora_fin,
              grupo_bienvenida, grupo_asesoria, grupo_membresia,
-             grupo_cobro,
+             grupo_cobro, cal_promedio,
              detalle_json, resumen,
              tiene_audio, duracion_segundos, modelo_ia, membresia_contexto)
         VALUES
             (:id_cola, :cp, :lc, :sn,
              :fecha, :hi, :hf,
              :gbienvenida, :gasesoria, :gmembresia,
-             :gcobro, :gentrega, :promedio,
+             :gcobro, :promedio,
              :detalle, :resumen,
              :audio, :dur, :modelo, :membresia_ctx)
     ");
     $ins->execute([
-        ':id_cola'      => $id_cola,
-        ':cp'           => $item['cod_pedido'],
-        ':lc'           => $item['local_codigo'],
-        ':sn'           => $item['sucursal_nombre'] ?? null,
-        ':fecha'        => $item['fecha'],
-        ':hi'           => $item['hora_inicio'],
-        ':hf'           => $item['hora_fin'],
-        ':gbienvenida'  => $vals_grupo['grupo_bienvenida'],
-        ':gasesoria'    => $vals_grupo['grupo_asesoria'],
-        ':gmembresia'   => $vals_grupo['grupo_membresia'],
-        ':gcobro'       => $vals_grupo['grupo_cobro'],
-        ':gentrega'     => $vals_grupo['
-        ':promedio'     => $cal_promedio,
-        ':detalle'        => $detalle_json,
-        ':resumen'        => $resumen,
-        ':audio'          => $tiene_audio,
-        ':dur'            => $duracion_seg,
-        ':modelo'         => $modelo_ia,
-        ':membresia_ctx'  => $membresia_contexto,
+        ':id_cola'       => $id_cola,
+        ':cp'            => $item['cod_pedido'],
+        ':lc'            => $item['local_codigo'],
+        ':sn'            => $item['sucursal_nombre'] ?? null,
+        ':fecha'         => $item['fecha'],
+        ':hi'            => $item['hora_inicio'],
+        ':hf'            => $item['hora_fin'],
+        ':gbienvenida'   => $vals_grupo['grupo_bienvenida'],
+        ':gasesoria'     => $vals_grupo['grupo_asesoria'],
+        ':gmembresia'    => $vals_grupo['grupo_membresia'],
+        ':gcobro'        => $vals_grupo['grupo_cobro'],
+        ':promedio'      => $cal_promedio,
+        ':detalle'       => $detalle_json,
+        ':resumen'       => $resumen,
+        ':audio'         => $tiene_audio,
+        ':dur'           => $duracion_seg,
+        ':modelo'        => $modelo_ia,
+        ':membresia_ctx' => $membresia_contexto,
     ]);
 
     $id_resultado = $conn->lastInsertId();
@@ -146,4 +144,3 @@ try {
 } catch (Exception $e) {
     hikErr('Error interno: ' . $e->getMessage(), 500);
 }
-

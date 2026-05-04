@@ -27,7 +27,7 @@ $menuGlobal = [
                 'cargos_permitidos' => []
             ],
             [ //exclusivo para atencion cliente y auxilir 
-                'nombre' => 'Avisos Sucursales',
+                'nombre' => 'Avisos Tiendas',
                 'url' => 'marketing/auditorias_original/index_avisos_publico.php',
                 'cargos_permitidos' => [49, 13, 22, 26, 28, 42, 36, 53]
             ],
@@ -131,7 +131,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54]
             ],
             [
-                'nombre' => 'Gestion Sucursales',
+                'nombre' => 'Gestión de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
                 'cargos_permitidos' => [49, 16, 36]
             ],

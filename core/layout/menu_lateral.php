@@ -380,6 +380,11 @@ $menuGlobal = [
                 'url' => 'sistemas/gestion_anulaciones.php',
                 'cargos_permitidos' => [49]
             ],
+            [
+                'nombre' => 'Configuración de Tiendas',
+                'url' => 'sistemas/configuracion_sucursales.php',
+                'cargos_permitidos' => [49]
+            ],
         ]
     ],
     [

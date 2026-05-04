@@ -3585,7 +3585,7 @@ function obtenerMensajeEstadoContrato($codOperario)
 }
 
 /**
- * Verifica si el usuario que tiene asignado actulemnte un cargo , agarra el orimero que encuentra asi que aplica a administrativos mas que operarios/colaboradores
+ * Verifica si el usuario que tiene asignado actulemnte un cargo , agarra el orimero que encuentra asi que aplica a administrativos mas que operarios o colaboradores
  */
 function obtenerOperariosPorCargoVigente($codNivelCargo)
 {

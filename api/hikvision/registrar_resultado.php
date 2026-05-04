@@ -1,18 +1,24 @@
 <?php
 /**
- * registrar_resultado.php — Guarda el análisis IA y marca el item como completado
+ * registrar_resultado.php — Guarda el análisis IA y marca el item como completado.
+ *
  * POST /api/hikvision/registrar_resultado.php
  * Header: X-WSP-Token
- * Body JSON: {
- *   "id_cola": 5,
- *   "cal_amabilidad": 8,
- *   "cal_saludo": 9,
- *   "cal_despedida": 7,
- *   "cal_membresia": 5,
- *   "resumen": "texto del análisis...",
- *   "tiene_audio": 1,
- *   "duracion_segundos": 185,
- *   "modelo_ia": "gemini-2.0-flash"
+ *
+ * Body JSON (Protocolo 5 Grupos Pitaya):
+ * {
+ *   "id_cola"          : 5,
+ *   "grupo_bienvenida" : 8,       -- Paso 1
+ *   "grupo_asesoria"   : 6,       -- Pasos 2-4 (null si no aplicó)
+ *   "grupo_membresia"  : 3,       -- Paso 5
+ *   "grupo_cobro"      : 7,       -- Pasos 6-8
+ *   "grupo_entrega"    : 9,       -- Pasos 9-10
+ *   "cal_promedio"     : 6.6,     -- Calculado en Python, verificado aquí
+ *   "detalle_json"     : "{...}", -- JSON string con breakdown por paso
+ *   "resumen"          : "texto",
+ *   "tiene_audio"      : 1,
+ *   "duracion_segundos": 92,
+ *   "modelo_ia"        : "gemini-2.5-flash"
  * }
  */
 
@@ -22,29 +28,44 @@ verificarTokenHIK();
 
 $data = json_decode(file_get_contents('php://input'), true);
 
-$id_cola          = isset($data['id_cola'])          ? intval($data['id_cola'])          : null;
-$cal_amabilidad   = isset($data['cal_amabilidad'])   ? intval($data['cal_amabilidad'])   : null;
-$cal_saludo       = isset($data['cal_saludo'])       ? intval($data['cal_saludo'])       : null;
-$cal_despedida    = isset($data['cal_despedida'])    ? intval($data['cal_despedida'])    : null;
-$cal_membresia    = isset($data['cal_membresia'])    ? intval($data['cal_membresia'])    : null;
-$resumen          = $data['resumen']                 ?? null;
-$tiene_audio      = isset($data['tiene_audio'])      ? intval($data['tiene_audio'])      : 0;
-$duracion_seg     = isset($data['duracion_segundos'])? intval($data['duracion_segundos']): null;
-$modelo_ia        = $data['modelo_ia']               ?? 'gemini-2.0-flash';
+// ── Parámetros requeridos ─────────────────────────────────────
+$id_cola = isset($data['id_cola']) ? intval($data['id_cola']) : null;
+if (!$id_cola) hikErr('Falta parámetro requerido: id_cola');
 
-if (!$id_cola) {
-    hikErr('Falta parámetro requerido: id_cola');
+// ── Grupos de calificación (1-10 o null) ─────────────────────
+$grupos = ['grupo_bienvenida', 'grupo_asesoria', 'grupo_membresia', 'grupo_cobro', 'grupo_entrega'];
+$vals_grupo = [];
+foreach ($grupos as $g) {
+    $val = isset($data[$g]) && $data[$g] !== null ? intval($data[$g]) : null;
+    if ($val !== null && ($val < 1 || $val > 10)) {
+        hikErr("$g debe estar entre 1 y 10");
+    }
+    $vals_grupo[$g] = $val;
 }
 
-// Validar rangos de calificación
-foreach (['cal_amabilidad','cal_saludo','cal_despedida','cal_membresia'] as $campo) {
-    if ($$campo !== null && ($$campo < 1 || $$campo > 10)) {
-        hikErr("$campo debe estar entre 1 y 10");
+// ── Promedio: recalcular en PHP para verificar integridad ─────
+$no_null = array_filter($vals_grupo, fn($v) => $v !== null);
+$cal_promedio = count($no_null) > 0
+    ? round(array_sum($no_null) / count($no_null), 2)
+    : null;
+
+// ── Resto de campos ───────────────────────────────────────────
+$detalle_json  = $data['detalle_json']  ?? null;
+$resumen       = $data['resumen']       ?? null;
+$tiene_audio   = isset($data['tiene_audio'])       ? intval($data['tiene_audio'])       : 0;
+$duracion_seg  = isset($data['duracion_segundos']) ? intval($data['duracion_segundos']) : null;
+$modelo_ia     = $data['modelo_ia']    ?? 'gemini-2.5-flash';
+
+// Validar que detalle_json sea JSON válido si viene
+if ($detalle_json !== null) {
+    json_decode($detalle_json);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        hikErr('detalle_json no es un JSON válido');
     }
 }
 
 try {
-    // ── Obtener datos del item de cola ───────────────────────
+    // ── Obtener datos del item de cola ────────────────────────
     $stmt = $conn->prepare("
         SELECT c.*, s.nombre AS sucursal_nombre
         FROM hikvision_cola_analisis c
@@ -55,54 +76,49 @@ try {
     $stmt->execute([':id' => $id_cola]);
     $item = $stmt->fetch();
 
-    if (!$item) {
-        hikErr("Item $id_cola no encontrado en la cola", 404);
-    }
+    if (!$item) hikErr("Item $id_cola no encontrado en la cola", 404);
 
-    // ── Calcular promedio ────────────────────────────────────
-    $calificaciones = array_filter(
-        [$cal_amabilidad, $cal_saludo, $cal_despedida, $cal_membresia],
-        fn($v) => $v !== null
-    );
-    $promedio = count($calificaciones) > 0
-        ? round(array_sum($calificaciones) / count($calificaciones), 2)
-        : null;
-
-    // ── Insertar resultado ───────────────────────────────────
+    // ── Insertar resultado ────────────────────────────────────
     $ins = $conn->prepare("
         INSERT INTO hikvision_analisis_ia_atencion
             (id_cola, cod_pedido, local_codigo, sucursal_nombre,
              fecha, hora_inicio, hora_fin,
-             cal_amabilidad, cal_saludo, cal_despedida, cal_membresia,
-             promedio, resumen, tiene_audio, duracion_segundos, modelo_ia)
+             grupo_bienvenida, grupo_asesoria, grupo_membresia,
+             grupo_cobro, grupo_entrega, cal_promedio,
+             detalle_json, resumen,
+             tiene_audio, duracion_segundos, modelo_ia)
         VALUES
             (:id_cola, :cp, :lc, :sn,
              :fecha, :hi, :hf,
-             :cam, :cs, :cd, :cme,
-             :prom, :res, :audio, :dur, :modelo)
+             :gbienvenida, :gasesoria, :gmembresia,
+             :gcobro, :gentrega, :promedio,
+             :detalle, :resumen,
+             :audio, :dur, :modelo)
     ");
     $ins->execute([
-        ':id_cola'  => $id_cola,
-        ':cp'       => $item['cod_pedido'],
-        ':lc'       => $item['local_codigo'],
-        ':sn'       => $item['sucursal_nombre'] ?? null,
-        ':fecha'    => $item['fecha'],
-        ':hi'       => $item['hora_inicio'],
-        ':hf'       => $item['hora_fin'],
-        ':cam'      => $cal_amabilidad,
-        ':cs'       => $cal_saludo,
-        ':cd'       => $cal_despedida,
-        ':cme'      => $cal_membresia,
-        ':prom'     => $promedio,
-        ':res'      => $resumen,
-        ':audio'    => $tiene_audio,
-        ':dur'      => $duracion_seg,
-        ':modelo'   => $modelo_ia,
+        ':id_cola'      => $id_cola,
+        ':cp'           => $item['cod_pedido'],
+        ':lc'           => $item['local_codigo'],
+        ':sn'           => $item['sucursal_nombre'] ?? null,
+        ':fecha'        => $item['fecha'],
+        ':hi'           => $item['hora_inicio'],
+        ':hf'           => $item['hora_fin'],
+        ':gbienvenida'  => $vals_grupo['grupo_bienvenida'],
+        ':gasesoria'    => $vals_grupo['grupo_asesoria'],
+        ':gmembresia'   => $vals_grupo['grupo_membresia'],
+        ':gcobro'       => $vals_grupo['grupo_cobro'],
+        ':gentrega'     => $vals_grupo['grupo_entrega'],
+        ':promedio'     => $cal_promedio,
+        ':detalle'      => $detalle_json,
+        ':resumen'      => $resumen,
+        ':audio'        => $tiene_audio,
+        ':dur'          => $duracion_seg,
+        ':modelo'       => $modelo_ia,
     ]);
 
     $id_resultado = $conn->lastInsertId();
 
-    // ── Marcar item de cola como completado ──────────────────
+    // ── Marcar cola como completado ───────────────────────────
     $conn->prepare("
         UPDATE hikvision_cola_analisis
         SET estado = 'completado', updated_at = NOW()
@@ -110,10 +126,11 @@ try {
     ")->execute([':id' => $id_cola]);
 
     hikOk([
-        'id_resultado' => (int) $id_resultado,
-        'id_cola'      => $id_cola,
-        'promedio'     => $promedio,
-        'cod_pedido'   => $item['cod_pedido'],
+        'id_resultado'     => (int) $id_resultado,
+        'id_cola'          => $id_cola,
+        'cal_promedio'     => $cal_promedio,
+        'cod_pedido'       => $item['cod_pedido'],
+        'grupos'           => $vals_grupo,
     ]);
 
 } catch (Exception $e) {

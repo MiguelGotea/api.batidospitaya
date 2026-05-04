@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * registrar_resultado.php — Guarda el análisis IA y marca el item como completado.
  *
@@ -12,7 +12,7 @@
  *   "grupo_asesoria"   : 6,       -- Pasos 2-4 (null si no aplicó)
  *   "grupo_membresia"  : 3,       -- Paso 5
  *   "grupo_cobro"      : 7,       -- Pasos 6-8
- *   "grupo_entrega"    : 9,       -- Pasos 9-10
+ *   "
  *   "cal_promedio"       : 6.6,     -- Calculado en Python, verificado aquí
  *   "detalle_json"       : "{...}", -- JSON string con breakdown por paso
  *   "membresia_contexto" : "sin_membresia", -- sin_membresia|vendida|ya_tenia
@@ -34,7 +34,7 @@ $id_cola = isset($data['id_cola']) ? intval($data['id_cola']) : null;
 if (!$id_cola) hikErr('Falta parámetro requerido: id_cola');
 
 // ── Grupos de calificación (1-10 o null) ─────────────────────
-$grupos = ['grupo_bienvenida', 'grupo_asesoria', 'grupo_membresia', 'grupo_cobro', 'grupo_entrega'];
+$grupos = ['grupo_bienvenida', 'grupo_asesoria', 'grupo_membresia', 'grupo_cobro', '
 $vals_grupo = [];
 foreach ($grupos as $g) {
     $val = isset($data[$g]) && $data[$g] !== null ? intval($data[$g]) : null;
@@ -92,7 +92,7 @@ try {
             (id_cola, cod_pedido, local_codigo, sucursal_nombre,
              fecha, hora_inicio, hora_fin,
              grupo_bienvenida, grupo_asesoria, grupo_membresia,
-             grupo_cobro, grupo_entrega, cal_promedio,
+             grupo_cobro,
              detalle_json, resumen,
              tiene_audio, duracion_segundos, modelo_ia, membresia_contexto)
         VALUES
@@ -115,7 +115,7 @@ try {
         ':gasesoria'    => $vals_grupo['grupo_asesoria'],
         ':gmembresia'   => $vals_grupo['grupo_membresia'],
         ':gcobro'       => $vals_grupo['grupo_cobro'],
-        ':gentrega'     => $vals_grupo['grupo_entrega'],
+        ':gentrega'     => $vals_grupo['
         ':promedio'     => $cal_promedio,
         ':detalle'        => $detalle_json,
         ':resumen'        => $resumen,
@@ -146,3 +146,4 @@ try {
 } catch (Exception $e) {
     hikErr('Error interno: ' . $e->getMessage(), 500);
 }
+

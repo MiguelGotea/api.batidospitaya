@@ -354,9 +354,13 @@ function obtenerOperariosSucursal($codSucursal, $fechaInicio, $fechaFin)
         FROM Operarios o
         INNER JOIN AsignacionNivelesCargos anc ON o.CodOperario = anc.CodOperario
         LEFT JOIN (
-            SELECT cod_operario, MAX(fecha_liquidacion) as fecha_liquidacion
+            SELECT c1.cod_operario, c1.fecha_liquidacion
+            FROM Contratos c1
+            INNER JOIN (
+                SELECT cod_operario, MAX(CodContrato) as max_contrato
                 FROM Contratos 
-            GROUP BY cod_operario
+                GROUP BY cod_operario
+            ) c2 ON c1.cod_operario = c2.cod_operario AND c1.CodContrato = c2.max_contrato
         ) c ON o.CodOperario = c.cod_operario
         WHERE anc.Sucursal = ?
         -- Validamos que la asignación esté activa durante el rango de la semana
@@ -2420,9 +2424,13 @@ function obtenerTodosOperariosConHorario($codSucursal, $idSemana)
         INNER JOIN HorariosSemanales hs ON o.CodOperario = hs.cod_operario
         INNER JOIN SemanasSistema ss ON hs.id_semana_sistema = ss.id
         LEFT JOIN (
-            SELECT cod_operario, MAX(fecha_liquidacion) as fecha_liquidacion
-            FROM Contratos
-            GROUP BY cod_operario
+            SELECT c1.cod_operario, c1.fecha_liquidacion
+            FROM Contratos c1
+            INNER JOIN (
+                SELECT cod_operario, MAX(CodContrato) as max_contrato
+                FROM Contratos 
+                GROUP BY cod_operario
+            ) c2 ON c1.cod_operario = c2.cod_operario AND c1.CodContrato = c2.max_contrato
         ) c ON o.CodOperario = c.cod_operario
         WHERE hs.cod_sucursal = ?
         AND hs.id_semana_sistema = ?

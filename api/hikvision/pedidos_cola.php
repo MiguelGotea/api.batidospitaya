@@ -17,29 +17,36 @@ $limit = min((int)($_GET['limit'] ?? 1), 10); // Máximo 10 por llamada
 
 try {
     // ── Verificar flag de habilitación del worker (archivo JSON) ─
-    // Si el worker está deshabilitado vía ERP (stop), retornar cola vacía
-    // para que el worker duerma sin procesar nada. Sin tabla adicional.
+    // Regla:
+    //   · flag = true  → procesar manuales + automáticos de hoy
+    //   · flag = false → procesar SOLO manuales (botón Analizar del ERP siempre funciona)
+    //   · sin archivo  → comportamiento por defecto = activo (procesar todo)
+    $workerHabilitado = true;
     $flagFile = __DIR__ . '/worker.flag.json';
     if (file_exists($flagFile)) {
         $flag = json_decode(file_get_contents($flagFile), true);
-        if (isset($flag['worker_habilitado']) && !$flag['worker_habilitado']) {
-            hikOk(['items' => [], 'total' => 0, 'worker_habilitado' => false]);
-        }
+        $workerHabilitado = (bool)($flag['worker_habilitado'] ?? true);
     }
-    // Si el archivo no existe, el worker procede normalmente (comportamiento por defecto)
+    // La restricción de tipo/fecha se aplica en el WHERE de abajo
 
     $conn->beginTransaction();
 
-    // Seleccionar los siguientes N items pendientes CON FILTRO DE FECHA HOY
-    // El worker SOLO procesa pedidos del día actual.
-    // Items de días anteriores quedan intactos para revisión manual.
+    // Seleccionar los siguientes N items pendientes.
+    // REGLA DE FECHA Y FLAG:
+    //   · tipo = 'manual'     → siempre procesar (botón Analizar del ERP)
+    //   · tipo = 'automatico' → solo cuando worker habilitado Y fecha = hoy
+    $soloManual = $workerHabilitado ? '' : "AND tipo = 'manual'";
     $stmt = $conn->prepare("
         SELECT id, cod_pedido, local_codigo, fecha,
                hora_inicio, hora_fin, canal_track, puerto_rtsp,
                dvr_ip_local, dvr_usuario, dvr_clave, vps_ip, tipo
         FROM hikvision_cola_analisis
         WHERE estado = 'pendiente'
-          AND fecha  = CURDATE()
+          AND (
+              tipo = 'manual'
+              OR (tipo != 'manual' AND fecha = CURDATE())
+          )
+          $soloManual
         ORDER BY prioridad ASC, created_at ASC
         LIMIT :lim
         FOR UPDATE

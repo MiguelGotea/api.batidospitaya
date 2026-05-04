@@ -1,7 +1,7 @@
 <?php
 // /public_html/core/auth/auth.php
 
-// Extender sesión a 6 horas (21600 segundos)
+// Extender sesión a 6 horas (21600 segundos equivalente)
 ini_set('session.gc_maxlifetime', 21600);
 session_set_cookie_params(21600);
 session_start();

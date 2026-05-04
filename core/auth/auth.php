@@ -1,8 +1,9 @@
 <?php
 // /public_html/core/auth/auth.php
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
 
+// Extender sesión a 6 horas (21600 segundos)
+ini_set('session.gc_maxlifetime', 21600);
+session_set_cookie_params(21600);
 session_start();
 
 // ✅ USAR RUTAS ABSOLUTAS basadas en DOCUMENT_ROOT

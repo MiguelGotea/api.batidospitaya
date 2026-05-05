@@ -182,7 +182,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Panel de Control',
                 'url' => 'reclutamiento/postulacion_panel_control.php',
-                'cargos_permitidos' => [13]
+                'cargos_permitidos' => [13, 39]
             ],
             [
                 'nombre' => 'Plazas Activas',

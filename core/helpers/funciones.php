@@ -127,6 +127,40 @@ function formatoFechaEspanol($fecha = null)
 }
 
 /**
+ * Formatea fecha en español con hora (Migrada desde auditorías)
+ */
+function formatFechaEspanol($fecha = 'now')
+{
+    $meses = [
+        1 => 'ene', 2 => 'feb', 3 => 'mar', 4 => 'abr',
+        5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'ago',
+        9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dic'
+    ];
+
+    try {
+        $date = new DateTime($fecha, new DateTimeZone('America/Managua'));
+        $nMes = (int)$date->format('n');
+        return $date->format('d') . '-' . ($meses[$nMes] ?? '') . '-' . $date->format('y') . ' ' . $date->format('h:i a');
+    } catch (Exception $e) {
+        return $fecha;
+    }
+}
+
+/**
+ * Formatea fecha para reportes (Migrada desde auditorías)
+ */
+function formatFechaReporte($fecha)
+{
+    if (empty($fecha) || $fecha === '0000-00-00') return '';
+    try {
+        $date = new DateTime($fecha);
+        return $date->format('d/m/Y');
+    } catch (Exception $e) {
+        return $fecha;
+    }
+}
+
+/**
  * Verifica si un usuario tiene un cargo específico
  */
 function tieneCargo($cargoRequerido)

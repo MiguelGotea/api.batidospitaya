@@ -6,6 +6,12 @@ $username = "u839374897_erp";
 $password = "ERpPitHay2025$";
 $dbname = "u839374897_erp";
 
+// Constantes para compatibilidad con archivos legacy (mysqli)
+if (!defined('DB_HOST')) define('DB_HOST', $servername);
+if (!defined('DB_NAME')) define('DB_NAME', $dbname);
+if (!defined('DB_USER')) define('DB_USER', $username);
+if (!defined('DB_PASS')) define('DB_PASS', $password);
+
 // verifica si se puede conectar  al abse de datos local, caso contrairo manda error
 try {
     $conn = new PDO(

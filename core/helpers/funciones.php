@@ -13,7 +13,7 @@ function formatoFecha($fecha)
 
     try {
         $fechaObj = new DateTime($fecha);
-        $mes = $meses[(int)$fechaObj->format('m') - 1];
+        $mes = $meses[(int) $fechaObj->format('m') - 1];
         return $fechaObj->format('d') . '-' . $mes . '-' . $fechaObj->format('y');
     } catch (Exception $e) {
         // Si hay error al parsear la fecha, devolver string vacío
@@ -212,7 +212,7 @@ function verificarAccesoCargo($cargosRequeridos)
     }
 
     global $conn;
-    $cargosRequeridos = (array)$cargosRequeridos;
+    $cargosRequeridos = (array) $cargosRequeridos;
     $placeholders = implode(',', array_fill(0, count($cargosRequeridos), '?'));
 
     $stmt = $conn->prepare("
@@ -259,8 +259,8 @@ function verificarAccesoSucursalCargo($cargosRequeridos, $sucursalesRequeridas)
     }
 
     global $conn;
-    $cargosRequeridos = (array)$cargosRequeridos;
-    $sucursalesRequeridas = (array)$sucursalesRequeridas;
+    $cargosRequeridos = (array) $cargosRequeridos;
+    $sucursalesRequeridas = (array) $sucursalesRequeridas;
 
     // Preparamos los placeholders para los IN clauses
     $cargosPlaceholders = implode(',', array_fill(0, count($cargosRequeridos), '?'));
@@ -528,7 +528,7 @@ function formatoFechaCorta($fecha)
         }
 
         $fechaObj = new DateTime($fecha);
-        $mes = $meses[(int)$fechaObj->format('m') - 1];
+        $mes = $meses[(int) $fechaObj->format('m') - 1];
         return $fechaObj->format('d') . '-' . $mes . '-' . $fechaObj->format('y');
     } catch (Exception $e) {
         // Si hay error al parsear la fecha, devolver string vacío
@@ -1147,7 +1147,7 @@ function obtenerCargosUsuario($codOperario)
 function determinarQuincenaPorDiaMes($fecha)
 {
     try {
-        $dia = (int)date('d', strtotime($fecha));
+        $dia = (int) date('d', strtotime($fecha));
         return ($dia <= 15) ? 'primera' : 'segunda';
     } catch (Exception $e) {
         error_log("Error al determinar quincena: " . $e->getMessage());
@@ -1176,7 +1176,7 @@ function determinarQuincenaPorDiaMesEnRango($fecha, $fechaDesde, $fechaHasta)
         }
 
         // Si está dentro del rango, determinar quincena por día del mes
-        $dia = (int)date('d', strtotime($fecha));
+        $dia = (int) date('d', strtotime($fecha));
         return ($dia <= 15) ? 'primera' : 'segunda';
     } catch (Exception $e) {
         error_log("Error al determinar quincena: " . $e->getMessage());
@@ -1846,7 +1846,7 @@ function obtenerFaltasPendientesRevisión($codSucursal = null, $fechaDesde = nul
 function calcularPeriodoRevisionFaltas()
 {
     $hoy = new DateTime();
-    $dia = (int)$hoy->format('d');
+    $dia = (int) $hoy->format('d');
 
     if ($dia <= 2) {
         // Mes anterior
@@ -1872,7 +1872,7 @@ function calcularPeriodoRevisionFaltas()
 function calcularDiasRestantesRevisionFaltas()
 {
     $hoy = new DateTime();
-    $dia = (int)$hoy->format('d');
+    $dia = (int) $hoy->format('d');
 
     if ($dia <= 2) {
         // Si estamos en días 1-2, la fecha límite es el día 2
@@ -1955,7 +1955,8 @@ function obtenerSucursalesPermitidasMantenimiento($codOperario)
     $cargo = $usuario['CodNivelesCargos'] ?? null;
 
     // Si es admin o tiene permiso de ver todas las sucursales
-    if ((isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'admin') ||
+    if (
+        (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'admin') ||
         ($cargo && tienePermiso('historial_solicitudes_mantenimiento', 'vista_todas_sucursales', $cargo))
     ) {
         $stmt = $conn->prepare("SELECT codigo, nombre FROM sucursales WHERE activa = 1 ORDER BY nombre");
@@ -2128,7 +2129,7 @@ function aplicaViaticoMasaya($fecha)
 function aplicaViaticoDepartamento($codDepartamento, $fecha)
 {
     // Convertir a string para comparación segura
-    $codDepartamento = (string)$codDepartamento;
+    $codDepartamento = (string) $codDepartamento;
 
     switch ($codDepartamento) {
         case '1': // Managua - todos los días
@@ -2597,9 +2598,9 @@ function obtenerContratoActivo($codOperario)
 function obtenerRangoQuincenaActual()
 {
     $hoy = new DateTime();
-    $dia = (int)$hoy->format('d');
-    $mes = (int)$hoy->format('m');
-    $anio = (int)$hoy->format('Y');
+    $dia = (int) $hoy->format('d');
+    $mes = (int) $hoy->format('m');
+    $anio = (int) $hoy->format('Y');
 
     if ($dia <= 15) {
         // Primera quincena (1-15)
@@ -3594,7 +3595,7 @@ function obtenerOperariosPorCargoVigente($codNivelCargo)
     }
 
     global $conn;
-    $codNivelCargo = (int)$codNivelCargo; // Aseguramos que sea un número entero
+    $codNivelCargo = (int) $codNivelCargo; // Aseguramos que sea un número entero
 
     $stmt = $conn->prepare("
         SELECT CodOperario
@@ -3615,4 +3616,53 @@ function obtenerOperariosPorCargoVigente($codNivelCargo)
     }
 
     return $operarios;
+}
+
+
+/**
+ * FUNCIONES TRAIDAS DE FUNCIONES.PHP DE AUDITORIAS
+ */
+
+/**
+ * Función para traducir meses al español en formatos tipo dd-Mmm-yy
+ * (Migrada de modulos/supervision/auditorias_original/funciones.php)
+ */
+function traducirMes($fechaFormateada)
+{
+    $mesesIngles = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dec'];
+    $mesesEspanol = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+
+    return str_replace($mesesIngles, $mesesEspanol, $fechaFormateada);
+}
+
+/**
+ * Obtiene la sucursal asignada al usuario actual
+ * (Migrada de modulos/supervision/auditorias_original/funciones.php)
+ */
+function obtenerSucursalUsuarioActual()
+{
+    if (!isset($_SESSION['usuario_id'])) {
+        return null;
+    }
+
+    // Si es admin, puede ver todos los avisos
+    if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'admin') {
+        return null;
+    }
+
+    global $conn;
+
+    // Obtener la sucursal activa más reciente del usuario
+    $stmt = $conn->prepare("
+        SELECT Sucursal 
+        FROM AsignacionNivelesCargos 
+        WHERE CodOperario = ? 
+        AND (Fin IS NULL OR Fin >= CURDATE())
+        ORDER BY Fecha DESC
+        LIMIT 1
+    ");
+    $stmt->execute([$_SESSION['usuario_id']]);
+    $result = $stmt->fetch();
+
+    return $result ? $result['Sucursal'] : null;
 }

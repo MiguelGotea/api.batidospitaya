@@ -2649,6 +2649,26 @@ function obtenerUltimoCodigoContrato($codOperario)
 }
 
 /**
+ * Obtiene la fecha de inicio del último contrato de un operario
+ */
+function obtenerUltimaFechaInicioContrato($codOperario)
+{
+    global $conn;
+
+    $stmt = $conn->prepare("
+        SELECT inicio_contrato 
+        FROM Contratos 
+        WHERE cod_operario = ? 
+        ORDER BY inicio_contrato DESC, CodContrato DESC 
+        LIMIT 1
+    ");
+    $stmt->execute([$codOperario]);
+    $result = $stmt->fetch();
+
+    return $result['inicio_contrato'] ?? null;
+}
+
+/**
  * Obtiene el contrato activo de un operario (si existe)
  */
 function obtenerContratoActivo($codOperario)

@@ -85,6 +85,48 @@ function formatoMesAnio($fecha)
 }
 
 /**
+ * Formatea una fecha al formato español ej: 15-oct-2025
+ * Reemplaza a strftime() obsoleto
+ */
+function formatoFechaEspanol($fecha = null)
+{
+    if (empty($fecha)) {
+        $fecha = time();
+    }
+
+    if (is_string($fecha)) {
+        $fecha = strtotime($fecha);
+    }
+
+    $meses = [
+        'Jan' => 'ene',
+        'Feb' => 'feb',
+        'Mar' => 'mar',
+        'Apr' => 'abr',
+        'May' => 'may',
+        'Jun' => 'jun',
+        'Jul' => 'jul',
+        'Aug' => 'ago',
+        'Sep' => 'sep',
+        'Oct' => 'oct',
+        'Nov' => 'nov',
+        'Dec' => 'dic'
+    ];
+
+    $fechaIngles = date('d-M-Y', $fecha);
+    $partes = explode('-', $fechaIngles);
+
+    if (count($partes) === 3) {
+        $dia = $partes[0];
+        $mes = $meses[$partes[1]] ?? $partes[1];
+        $anio = $partes[2];
+        return "$dia-$mes-$anio";
+    }
+
+    return date('d-m-Y', $fecha);
+}
+
+/**
  * Verifica si un usuario tiene un cargo específico
  */
 function tieneCargo($cargoRequerido)

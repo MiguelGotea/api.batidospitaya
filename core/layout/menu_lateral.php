@@ -484,7 +484,7 @@ $menuGlobal = [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
                 'tool_name' => 'desempeno_tienda',
-                'cargos_permitidos' => [11, 21, 42, 33, 27]
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43]
             ],
             [
                 'nombre' => 'Liderazgo',

@@ -696,7 +696,7 @@ function tieneAcceso($cargoOperario, $item)
     // 1. Intentar obtener permiso desde la Base de Datos (Prioridad Máxima)
     if ($toolName && function_exists('obtenerEstadoPermiso')) {
         $estadoBD = obtenerEstadoPermiso($toolName, 'vista', $cargoOperario);
-        
+
         if ($estadoBD === 'allow') {
             return true;
         } elseif ($estadoBD === 'deny') {

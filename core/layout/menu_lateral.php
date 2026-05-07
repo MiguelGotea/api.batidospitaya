@@ -1400,6 +1400,7 @@ function renderMenuLateral($cargoOperario)
         })();
     </script>
 
+
     <?php
     return ob_get_clean();
 }

@@ -19,16 +19,23 @@
  * @return bool True si tiene permiso, False si no tiene permiso
  */
 function tienePermiso($nombreHerramienta, $nombreAccion, $codNivelCargo) {
+    $estado = obtenerEstadoPermiso($nombreHerramienta, $nombreAccion, $codNivelCargo);
+    return $estado === 'allow';
+}
+
+/**
+ * Obtiene el estado explícito de un permiso en la base de datos
+ * 
+ * @return string|null 'allow', 'deny' o null si no hay registro
+ */
+function obtenerEstadoPermiso($nombreHerramienta, $nombreAccion, $codNivelCargo) {
     global $conn;
     
-    // Validar parámetros
     if (empty($nombreHerramienta) || empty($nombreAccion) || empty($codNivelCargo)) {
-        error_log("tienePermiso: Parámetros inválidos - Herramienta: $nombreHerramienta, Acción: $nombreAccion, Cargo: $codNivelCargo");
-        return false;
+        return null;
     }
     
     try {
-        // Consulta que une las 4 tablas para verificar el permiso
         $sql = "
             SELECT p.permiso
             FROM tools_erp t
@@ -48,18 +55,11 @@ function tienePermiso($nombreHerramienta, $nombreAccion, $codNivelCargo) {
         ]);
         
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-        
-        // Si no existe registro, no tiene permiso
-        if (!$resultado) {
-            return false;
-        }
-        
-        // Si existe registro, verificar si es 'allow' o 'deny'
-        return $resultado['permiso'] === 'allow';
+        return $resultado ? $resultado['permiso'] : null;
         
     } catch (PDOException $e) {
-        error_log("Error en tienePermiso: " . $e->getMessage());
-        return false;
+        error_log("Error en obtenerEstadoPermiso: " . $e->getMessage());
+        return null;
     }
 }
 

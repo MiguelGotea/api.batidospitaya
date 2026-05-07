@@ -684,28 +684,34 @@ function detectarModuloActual()
 
 /**
  * Función para verificar si un cargo tiene acceso a un elemento
- * Combina permisos estáticos (cargos_permitidos) con dinámicos (tools_erp)
- * Si está permitido en CUALQUIERA de los dos sistemas, se muestra.
+ * Prioridad:
+ * 1. Base de Datos (tools_erp): Si existe un registro explícito (allow/deny), manda la BD.
+ * 2. Código (cargos_permitidos): Si NO hay registro en BD, se usa la lista del código.
  */
 function tieneAcceso($cargoOperario, $item)
 {
     $cargosPermitidos = $item['cargos_permitidos'] ?? [];
     $toolName = $item['tool_name'] ?? null;
 
-    // 1. Verificar por lista estática de cargos (Código)
-    if (!empty($cargosPermitidos) && in_array($cargoOperario, $cargosPermitidos)) {
-        return true;
-    }
-
-    // 2. Verificar por nombre de herramienta (Base de Datos)
-    if ($toolName && function_exists('tienePermiso')) {
-        if (tienePermiso($toolName, 'vista', $cargoOperario)) {
+    // 1. Intentar obtener permiso desde la Base de Datos (Prioridad Máxima)
+    if ($toolName && function_exists('obtenerEstadoPermiso')) {
+        $estadoBD = obtenerEstadoPermiso($toolName, 'vista', $cargoOperario);
+        
+        if ($estadoBD === 'allow') {
             return true;
+        } elseif ($estadoBD === 'deny') {
+            return false;
         }
+        // Si es null (no hay registro), continuamos al siguiente sistema
     }
 
-    // 3. Caso especial: Si no hay restricciones en el código ni herramienta definida (ej: Inicio, Logout)
-    if (empty($cargosPermitidos) && !$toolName) {
+    // 2. Fallback: Verificar por lista estática de cargos (Código)
+    if (!empty($cargosPermitidos)) {
+        return in_array($cargoOperario, $cargosPermitidos);
+    }
+
+    // 3. Caso especial: Si no hay restricciones definidas (ej: Inicio, Logout)
+    if (!$toolName && empty($cargosPermitidos)) {
         return true;
     }
 

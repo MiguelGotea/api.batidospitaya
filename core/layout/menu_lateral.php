@@ -685,23 +685,31 @@ function detectarModuloActual()
 /**
  * Función para verificar si un cargo tiene acceso a un elemento
  * Combina permisos estáticos (cargos_permitidos) con dinámicos (tools_erp)
+ * Si está permitido en CUALQUIERA de los dos sistemas, se muestra.
  */
 function tieneAcceso($cargoOperario, $item)
 {
     $cargosPermitidos = $item['cargos_permitidos'] ?? [];
     $toolName = $item['tool_name'] ?? null;
 
-    // 1. Verificar por nombre de herramienta (Sistema Centralizado de Permisos)
-    // Si tiene un nombre de herramienta, el sistema centralizado manda
-    if ($toolName && function_exists('tienePermiso')) {
-        return tienePermiso($toolName, 'vista', $cargoOperario);
-    }
-
-    // 2. Fallback: Verificar por lista estática de cargos
-    if (empty($cargosPermitidos)) {
+    // 1. Verificar por lista estática de cargos (Código)
+    if (!empty($cargosPermitidos) && in_array($cargoOperario, $cargosPermitidos)) {
         return true;
     }
-    return in_array($cargoOperario, $cargosPermitidos);
+
+    // 2. Verificar por nombre de herramienta (Base de Datos)
+    if ($toolName && function_exists('tienePermiso')) {
+        if (tienePermiso($toolName, 'vista', $cargoOperario)) {
+            return true;
+        }
+    }
+
+    // 3. Caso especial: Si no hay restricciones en el código ni herramienta definida (ej: Inicio, Logout)
+    if (empty($cargosPermitidos) && !$toolName) {
+        return true;
+    }
+
+    return false;
 }
 
 /**

@@ -7,6 +7,14 @@
  * Uso: renderMenuLateral($cargoOperario, 'index.php');
  */
 
+// Requerir sistema de permisos si no está cargado
+if (!function_exists('tienePermiso')) {
+    $rutaPermisos = __DIR__ . '/../permissions/permissions.php';
+    if (file_exists($rutaPermisos)) {
+        require_once $rutaPermisos;
+    }
+}
+
 // Configuración global del menú basado en permisos por cargo
 $menuGlobal = [
     [
@@ -24,16 +32,19 @@ $menuGlobal = [
             [
                 'nombre' => 'Avisos Internos',
                 'url' => 'supervision/auditorias_original/index_avisos_publico.php',
+                'tool_name' => 'avisos_internos',
                 'cargos_permitidos' => []
             ],
             [ //exclusivo para atencion cliente y auxilir 
                 'nombre' => 'Avisos Tiendas',
                 'url' => 'marketing/auditorias_original/index_avisos_publico.php',
+                'tool_name' => 'avisos_tiendas',
                 'cargos_permitidos' => [49, 13, 22, 26, 28, 42, 36, 53]
             ],
             [
                 'nombre' => 'Auditorías',
                 'url' => 'supervision/auditorias_original/index_auditorias_publico.php',
+                'tool_name' => 'auditorias',
                 'cargos_permitidos' => []
             ],
 
@@ -78,12 +89,14 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54]
+                'tool_name' => 'tardanzas_manual',
+                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54]
+                'tool_name' => 'faltas_manual',
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33]
             ],
             [
                 'nombre' => 'Viaticos',
@@ -98,17 +111,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21]
+                'tool_name' => 'horas_extras_manual',
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33]
             ],
             [
                 'nombre' => 'Confirmar Horarios',
                 'url' => 'supervision/programar_horarios_operaciones.php',
+                'tool_name' => 'confirmar_horarios',
                 'cargos_permitidos' => [16, 21, 36, 11]
             ],
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 21]
+                'tool_name' => 'gestion_feriados',
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42]
             ],
             [
                 'nombre' => 'Reportes de Personal',
@@ -123,7 +139,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 42]
+                'tool_name' => 'horarios_programados',
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33]
             ],
             [
                 'nombre' => 'Marcaciones',
@@ -209,7 +226,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Auditorías de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
-                'cargos_permitidos' => [49, 11, 21, 16]
+                'tool_name' => 'auditorias_efectivo',
+                'cargos_permitidos' => [49, 11, 21, 16, 42]
             ],
             [
                 'nombre' => 'Deducciones',
@@ -237,17 +255,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Nuevo Reclamo',
                 'url' => 'supervision/auditorias_original/nuevoreclamo.php',
+                'tool_name' => 'nuevo_reclamo',
                 'cargos_permitidos' => [49, 16, 21, 28, 50]
             ],
             [
                 'nombre' => 'Procesar Reclamos',
                 'url' => 'supervision/auditorias_original/reclamospend.php',
-                'cargos_permitidos' => [49, 16, 11]
+                'tool_name' => 'investigacion_reclamos',
+                'cargos_permitidos' => [49, 16, 11, 21, 42, 50]
             ],
             [
                 'nombre' => 'Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
-                'cargos_permitidos' => [49, 16, 21, 28, 50]
+                'tool_name' => 'resenas_google',
+                'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42]
             ],
             [
                 'nombre' => 'Historial Reseñas Google',
@@ -308,6 +329,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
+                'tool_name' => 'historial_solicitudes_mantenimiento',
                 'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21]
             ],
             [
@@ -378,7 +400,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Aprobación de Anulaciones',
                 'url' => 'sistemas/gestion_anulaciones.php',
-                'cargos_permitidos' => [49]
+                'tool_name' => 'aprobacion_pedidos_access_host',
+                'cargos_permitidos' => [49, 11, 21]
             ],
             [
                 'nombre' => 'Configuración de Tiendas',
@@ -405,7 +428,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55]
+                'tool_name' => 'compra_local_consolidado_pedidos',
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42]
             ],
         ]
     ],
@@ -459,17 +483,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => []
+                'tool_name' => 'desempeno_tienda',
+                'cargos_permitidos' => [11, 21, 42, 33]
             ],
             [
                 'nombre' => 'Liderazgo',
                 'url' => 'gerencia/indicadores_resultado.php',
-                'cargos_permitidos' => [49, 11, 12, 13, 42, 16, 53]
+                'tool_name' => 'kpi_gestion_resultados',
+                'cargos_permitidos' => [49, 12, 16, 53] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
             ],
             [
                 'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21]
+                'tool_name' => 'kpi_reportes_ventas',
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33]
             ],
             [
                 'nombre' => 'Edición de Indicadores',
@@ -484,17 +511,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Consumo de Insumos',
                 'url' => 'productos/dashboard_consumo.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49] // equipo liderazgo
+                'tool_name' => 'dashboard_consumo_insumos',
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
             ],
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49] // equipo liderazgo
+                'tool_name' => 'dashboard_rfm',
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21]
             ],
             [
                 'nombre' => 'Balance Inventario Access',
                 'url' => 'productos/balance_inventario_access_host.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21]
+                'tool_name' => 'balance_inventario_access_host',
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
             ],
         ]
     ],
@@ -560,7 +590,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55]
+                'tool_name' => 'recetario_access_traducido',
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21]
             ],
 
         ]
@@ -653,9 +684,20 @@ function detectarModuloActual()
 
 /**
  * Función para verificar si un cargo tiene acceso a un elemento
+ * Combina permisos estáticos (cargos_permitidos) con dinámicos (tools_erp)
  */
-function tieneAcceso($cargoOperario, $cargosPermitidos)
+function tieneAcceso($cargoOperario, $item)
 {
+    $cargosPermitidos = $item['cargos_permitidos'] ?? [];
+    $toolName = $item['tool_name'] ?? null;
+
+    // 1. Verificar por nombre de herramienta (Sistema Centralizado de Permisos)
+    // Si tiene un nombre de herramienta, el sistema centralizado manda
+    if ($toolName && function_exists('tienePermiso')) {
+        return tienePermiso($toolName, 'vista', $cargoOperario);
+    }
+
+    // 2. Fallback: Verificar por lista estática de cargos
     if (empty($cargosPermitidos)) {
         return true;
     }
@@ -676,7 +718,7 @@ function filtrarMenuPorPermisos($menu, $cargoOperario)
         // Si el grupo tiene items, su visibilidad depende de éstos
         if (!empty($grupo['items'])) {
             foreach ($grupo['items'] as $item) {
-                if (tieneAcceso($cargoOperario, $item['cargos_permitidos'])) {
+                if (tieneAcceso($cargoOperario, $item)) {
                     $itemsFiltrados[] = $item;
                 }
             }
@@ -686,8 +728,8 @@ function filtrarMenuPorPermisos($menu, $cargoOperario)
                 $esVisible = true;
             }
         } else {
-            // El grupo no tiene items (enlace directo), usar sus propios cargos
-            if (tieneAcceso($cargoOperario, $grupo['cargos_permitidos'])) {
+            // El grupo no tiene items (enlace directo), usar sus propios datos
+            if (tieneAcceso($cargoOperario, $grupo)) {
                 $esVisible = true;
             }
         }
@@ -728,7 +770,7 @@ function renderMenuLateral($cargoOperario)
     $moduloActual = detectarModuloActual();
 
     ob_start();
-    ?>
+?>
 
     <!-- Font Awesome Universal -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -1212,13 +1254,13 @@ function renderMenuLateral($cargoOperario)
 
     <!-- JavaScript del menú -->
     <script>
-        (function () {
+        (function() {
             'use strict';
 
             let activeGroupIndex = null;
 
             // Función para toggle de grupo (acordeón)
-            window.toggleMenuGroup = function (index) {
+            window.toggleMenuGroup = function(index) {
                 const grupo = document.getElementById('grupo-' + index);
                 const allGroups = document.querySelectorAll('.menu-group');
                 const titulo = grupo.querySelector('.menu-group-title');
@@ -1239,7 +1281,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para abrir sidebar en móvil
-            window.toggleSidebarMobile = function () {
+            window.toggleSidebarMobile = function() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1256,7 +1298,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para cerrar sidebar en móvil
-            window.closeSidebarMobile = function () {
+            window.closeSidebarMobile = function() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1278,7 +1320,7 @@ function renderMenuLateral($cargoOperario)
 
             // Cerrar menú en móvil al hacer clic en un enlace
             document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function () {
+                item.addEventListener('click', function() {
                     if (window.innerWidth <= 768) {
                         closeSidebarMobile();
                     }
@@ -1286,7 +1328,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Marcar grupo activo si hay una página activa
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const activeItem = document.querySelector('.menu-item.active');
                 if (activeItem) {
                     const parentGroup = activeItem.closest('.menu-group');
@@ -1317,8 +1359,8 @@ function renderMenuLateral($cargoOperario)
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
 
-            const observer = new MutationObserver(function (mutations) {
-                mutations.forEach(function (mutation) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
                     if (mutation.attributeName === 'class') {
                         if (sidebar.classList.contains('show')) {
                             document.body.style.overflow = 'hidden';
@@ -1334,7 +1376,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Soporte para teclado (accesibilidad)
-            document.addEventListener('keydown', function (e) {
+            document.addEventListener('keydown', function(e) {
                 // ESC para cerrar menú en móvil
                 if (e.key === 'Escape' && window.innerWidth <= 768) {
                     closeSidebarMobile();
@@ -1344,6 +1386,6 @@ function renderMenuLateral($cargoOperario)
         })();
     </script>
 
-    <?php
+<?php
     return ob_get_clean();
 }

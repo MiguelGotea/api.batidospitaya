@@ -483,7 +483,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => []
+                'tool_name' => 'desempeno_tienda',
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43]
             ],
             [
                 'nombre' => 'Liderazgo',
@@ -687,12 +688,34 @@ function detectarModuloActual()
  * 1. Base de Datos (tools_erp): Si existe un registro explícito (allow/deny), manda la BD.
  * 2. Código (cargos_permitidos): Si NO hay registro en BD, se usa la lista del código.
  */
-function tieneAcceso($cargoOperario, $cargosPermitidos)
+function tieneAcceso($cargoOperario, $item)
 {
-    if (empty($cargosPermitidos)) {
+    $cargosPermitidos = $item['cargos_permitidos'] ?? [];
+    $toolName = $item['tool_name'] ?? null;
+
+    // 1. Intentar obtener permiso desde la Base de Datos (Prioridad Máxima)
+    if ($toolName && function_exists('obtenerEstadoPermiso')) {
+        $estadoBD = obtenerEstadoPermiso($toolName, 'vista', $cargoOperario);
+
+        if ($estadoBD === 'allow') {
+            return true;
+        } elseif ($estadoBD === 'deny') {
+            return false;
+        }
+        // Si es null (no hay registro), continuamos al siguiente sistema
+    }
+
+    // 2. Fallback: Verificar por lista estática de cargos (Código)
+    if (!empty($cargosPermitidos)) {
+        return in_array($cargoOperario, $cargosPermitidos);
+    }
+
+    // 3. Caso especial: Si no hay restricciones definidas (ej: Inicio, Logout)
+    if (!$toolName && empty($cargosPermitidos)) {
         return true;
     }
-    return in_array($cargoOperario, $cargosPermitidos);
+
+    return false;
 }
 
 /**

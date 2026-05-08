@@ -916,6 +916,7 @@ function renderMenuLateral($cargoOperario)
             max-height: 600px;
         }
 
+
         .menu-item {
             padding: 12px 20px 12px 70px;
             color: #666;

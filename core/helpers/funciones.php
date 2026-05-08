@@ -1695,36 +1695,37 @@ function obtenerSalarioReferencia($codOperario)
 {
     global $conn;
 
-    // Primero intentar obtener el último adendum activo
-    $stmtAdendum = $conn->prepare("
+    // 1. Primero intentar obtener el último registro de salario en AsignacionNivelesCargos
+    $stmtAsignacion = $conn->prepare("
         SELECT Salario 
-        FROM OperariosCategorias 
+        FROM AsignacionNivelesCargos 
         WHERE CodOperario = ? 
-        AND es_activo = 1
-        AND Salario IS NOT NULL
-        ORDER BY FechaInicio DESC 
+        AND Salario IS NOT NULL 
+        AND Salario > 0
+        ORDER BY Fecha DESC, CodAsignacionNivelesCargos DESC 
         LIMIT 1
     ");
-    $stmtAdendum->execute([$codOperario]);
-    $adendum = $stmtAdendum->fetch();
+    $stmtAsignacion->execute([$codOperario]);
+    $asignacion = $stmtAsignacion->fetch();
 
-    if ($adendum && $adendum['Salario'] > 0) {
-        return $adendum['Salario'];
+    if ($asignacion && $asignacion['Salario'] > 0) {
+        return $asignacion['Salario'];
     }
 
-    // Si no hay adendum, obtener el salario inicial del contrato
+    // 2. Si no hay asignación previa con salario, buscar el del contrato activo o último contrato
     $stmtContrato = $conn->prepare("
         SELECT salario_inicial 
         FROM Contratos 
         WHERE cod_operario = ? 
-        AND (fin_contrato IS NULL OR fin_contrato >= CURDATE())
-        ORDER BY inicio_contrato DESC 
+        AND (fin_contrato IS NULL OR fin_contrato >= CURDATE() OR Finalizado = 0)
+        ORDER BY inicio_contrato DESC, CodContrato DESC 
         LIMIT 1
     ");
     $stmtContrato->execute([$codOperario]);
     $contrato = $stmtContrato->fetch();
 
-    return $contrato['salario_inicial'] ?? 0;
+    // 3. Retornar el salario del contrato o NULL si no existe nada
+    return $contrato['salario_inicial'] ?? null;
 }
 
 /**

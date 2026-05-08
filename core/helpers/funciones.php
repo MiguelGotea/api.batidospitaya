@@ -1700,8 +1700,6 @@ function obtenerSalarioReferencia($codOperario)
         SELECT Salario 
         FROM AsignacionNivelesCargos 
         WHERE CodOperario = ? 
-        AND Salario IS NOT NULL 
-        AND Salario > 0
         ORDER BY Fecha DESC, CodAsignacionNivelesCargos DESC 
         LIMIT 1
     ");
@@ -1755,7 +1753,15 @@ function obtenerCategoriaCompleta($idCategoria)
 {
     global $conn;
 
-    $stmt = $conn->prepare("SELECT * FROM CategoriasOperarios WHERE idCategoria = ?");
+    // Migrado a NivelesCargos
+    $stmt = $conn->prepare("
+        SELECT 
+            CodNivelesCargos as idCategoria, 
+            Nombre as NombreCategoria, 
+            Peso 
+        FROM NivelesCargos 
+        WHERE CodNivelesCargos = ?
+    ");
     $stmt->execute([$idCategoria]);
     return $stmt->fetch();
 }

@@ -429,7 +429,7 @@ $menuGlobal = [
                 'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
                 'tool_name' => 'compra_local_consolidado_pedidos',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42]
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21]
             ],
         ]
     ],

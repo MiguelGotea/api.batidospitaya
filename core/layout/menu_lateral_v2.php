@@ -6,7 +6,8 @@
  * Uso: renderMenuLateral($cargoOperario);
  */
 
-function detectarRutaBase() {
+function detectarRutaBase()
+{
     $scriptActual = $_SERVER['SCRIPT_FILENAME'];
     $documentRoot = $_SERVER['DOCUMENT_ROOT'];
 
@@ -27,7 +28,8 @@ function detectarRutaBase() {
     return './';
 }
 
-function generarUrlModulo($rutaDestino) {
+function generarUrlModulo($rutaDestino)
+{
     $rutaBase = detectarRutaBase();
 
     if ($rutaDestino === 'index.php') {
@@ -41,7 +43,8 @@ function generarUrlModulo($rutaDestino) {
     return $rutaBase . $rutaDestino;
 }
 
-function detectarModuloActual() {
+function detectarModuloActual()
+{
     $scriptActual = $_SERVER['SCRIPT_FILENAME'];
     $documentRoot = $_SERVER['DOCUMENT_ROOT'];
 
@@ -57,7 +60,8 @@ function detectarModuloActual() {
     return 'raiz';
 }
 
-function renderMenuLateral($cargoOperario) {
+function renderMenuLateral($cargoOperario)
+{
     global $conn;
 
     if (!$cargoOperario) {
@@ -107,7 +111,7 @@ function renderMenuLateral($cargoOperario) {
 
         foreach ($herramientas as $herramienta) {
             $nombreGrupo = $herramienta['grupo'];
-            
+
             if (!isset($gruposAgrupados[$nombreGrupo])) {
                 $gruposAgrupados[$nombreGrupo] = [
                     'nombre' => $nombreGrupo,
@@ -115,13 +119,13 @@ function renderMenuLateral($cargoOperario) {
                     'items' => []
                 ];
             }
-            
+
             $gruposAgrupados[$nombreGrupo]['items'][] = [
                 'nombre' => $herramienta['nombre'],
                 'url' => $herramienta['url_real'],
                 'icon' => $herramienta['icono']
             ];
-            
+
             // Usar el icono del primer elemento del grupo como icono del grupo si existe
             if (count($gruposAgrupados[$nombreGrupo]['items']) === 1 && !empty($herramienta['icono'])) {
                 $gruposAgrupados[$nombreGrupo]['icon'] = $herramienta['icono'];

@@ -7,6 +7,14 @@
  * Uso: renderMenuLateral($cargoOperario, 'index.php');
  */
 
+// Requerir sistema de permisos si no está cargado
+if (!function_exists('tienePermiso')) {
+    $rutaPermisos = __DIR__ . '/../permissions/permissions.php';
+    if (file_exists($rutaPermisos)) {
+        require_once $rutaPermisos;
+    }
+}
+
 // Configuración global del menú basado en permisos por cargo
 $menuGlobal = [
     [
@@ -24,16 +32,19 @@ $menuGlobal = [
             [
                 'nombre' => 'Avisos Internos',
                 'url' => 'supervision/auditorias_original/index_avisos_publico.php',
+                'tool_name' => 'avisos_internos',
                 'cargos_permitidos' => []
             ],
             [ //exclusivo para atencion cliente y auxilir 
                 'nombre' => 'Avisos Tiendas',
                 'url' => 'marketing/auditorias_original/index_avisos_publico.php',
+                'tool_name' => 'avisos_tiendas',
                 'cargos_permitidos' => [49, 13, 22, 26, 28, 42, 36, 53]
             ],
             [
                 'nombre' => 'Auditorías',
                 'url' => 'supervision/auditorias_original/index_auditorias_publico.php',
+                'tool_name' => 'auditorias',
                 'cargos_permitidos' => []
             ],
 
@@ -78,11 +89,13 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
+                'tool_name' => 'tardanzas_manual',
                 'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
+                'tool_name' => 'faltas_manual',
                 'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33]
             ],
             [
@@ -98,16 +111,19 @@ $menuGlobal = [
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
+                'tool_name' => 'horas_extras_manual',
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33]
             ],
             [
                 'nombre' => 'Confirmar Horarios',
                 'url' => 'supervision/programar_horarios_operaciones.php',
+                'tool_name' => 'confirmar_horarios',
                 'cargos_permitidos' => [16, 21, 36, 11]
             ],
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
+                'tool_name' => 'gestion_feriados',
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42]
             ],
             [
@@ -123,6 +139,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
+                'tool_name' => 'horarios_programados',
                 'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33]
             ],
             [
@@ -209,6 +226,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Auditorías de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
+                'tool_name' => 'auditorias_efectivo',
                 'cargos_permitidos' => [49, 11, 21, 16, 42]
             ],
             [
@@ -237,16 +255,19 @@ $menuGlobal = [
             [
                 'nombre' => 'Nuevo Reclamo',
                 'url' => 'supervision/auditorias_original/nuevoreclamo.php',
+                'tool_name' => 'nuevo_reclamo',
                 'cargos_permitidos' => [49, 16, 21, 28, 50]
             ],
             [
                 'nombre' => 'Procesar Reclamos',
                 'url' => 'supervision/auditorias_original/reclamospend.php',
+                'tool_name' => 'investigacion_reclamos',
                 'cargos_permitidos' => [49, 16, 11, 21, 42, 50]
             ],
             [
                 'nombre' => 'Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
+                'tool_name' => 'resenas_google',
                 'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42]
             ],
             [
@@ -308,6 +329,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
+                'tool_name' => 'historial_solicitudes_mantenimiento',
                 'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21]
             ],
             [
@@ -378,6 +400,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Aprobación de Anulaciones',
                 'url' => 'sistemas/gestion_anulaciones.php',
+                'tool_name' => 'aprobacion_pedidos_access_host',
                 'cargos_permitidos' => [49, 11, 21]
             ],
             [
@@ -405,6 +428,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
+                'tool_name' => 'compra_local_consolidado_pedidos',
                 'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21]
             ],
         ]
@@ -459,16 +483,19 @@ $menuGlobal = [
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
+                'tool_name' => 'desempeno_tienda',
                 'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43]
             ],
             [
                 'nombre' => 'Liderazgo',
                 'url' => 'gerencia/indicadores_resultado.php',
+                'tool_name' => 'kpi_gestion_resultados',
                 'cargos_permitidos' => [49, 12, 16, 53] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
             ],
             [
                 'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
+                'tool_name' => 'kpi_reportes_ventas',
                 'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 27]
             ],
             [
@@ -484,16 +511,19 @@ $menuGlobal = [
             [
                 'nombre' => 'Consumo de Insumos',
                 'url' => 'productos/dashboard_consumo.php',
+                'tool_name' => 'dashboard_consumo_insumos',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
             ],
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
+                'tool_name' => 'dashboard_rfm',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21]
             ],
             [
                 'nombre' => 'Balance Inventario Access',
                 'url' => 'productos/balance_inventario_access_host.php',
+                'tool_name' => 'balance_inventario_access_host',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
             ],
         ]
@@ -560,6 +590,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
+                'tool_name' => 'recetario_access_traducido',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21]
             ],
 
@@ -650,15 +681,41 @@ function detectarModuloActual()
     return 'raiz';
 }
 
+
 /**
  * Función para verificar si un cargo tiene acceso a un elemento
+ * Prioridad:
+ * 1. Base de Datos (tools_erp): Si existe un registro explícito (allow/deny), manda la BD.
+ * 2. Código (cargos_permitidos): Si NO hay registro en BD, se usa la lista del código.
  */
-function tieneAcceso($cargoOperario, $cargosPermitidos)
+function tieneAcceso($cargoOperario, $item)
 {
-    if (empty($cargosPermitidos)) {
+    $cargosPermitidos = $item['cargos_permitidos'] ?? [];
+    $toolName = $item['tool_name'] ?? null;
+
+    // 1. Intentar obtener permiso desde la Base de Datos (Prioridad Máxima)
+    if ($toolName && function_exists('obtenerEstadoPermiso')) {
+        $estadoBD = obtenerEstadoPermiso($toolName, 'vista', $cargoOperario);
+
+        if ($estadoBD === 'allow') {
+            return true;
+        } elseif ($estadoBD === 'deny') {
+            return false;
+        }
+        // Si es null (no hay registro), continuamos al siguiente sistema
+    }
+
+    // 2. Fallback: Verificar por lista estática de cargos (Código)
+    if (!empty($cargosPermitidos)) {
+        return in_array($cargoOperario, $cargosPermitidos);
+    }
+
+    // 3. Caso especial: Si no hay restricciones definidas (ej: Inicio, Logout)
+    if (!$toolName && empty($cargosPermitidos)) {
         return true;
     }
-    return in_array($cargoOperario, $cargosPermitidos);
+
+    return false;
 }
 
 /**
@@ -675,7 +732,7 @@ function filtrarMenuPorPermisos($menu, $cargoOperario)
         // Si el grupo tiene items, su visibilidad depende de éstos
         if (!empty($grupo['items'])) {
             foreach ($grupo['items'] as $item) {
-                if (tieneAcceso($cargoOperario, $item['cargos_permitidos'])) {
+                if (tieneAcceso($cargoOperario, $item)) {
                     $itemsFiltrados[] = $item;
                 }
             }
@@ -685,8 +742,8 @@ function filtrarMenuPorPermisos($menu, $cargoOperario)
                 $esVisible = true;
             }
         } else {
-            // El grupo no tiene items (enlace directo), usar sus propios cargos
-            if (tieneAcceso($cargoOperario, $grupo['cargos_permitidos'])) {
+            // El grupo no tiene items (enlace directo), usar sus propios datos
+            if (tieneAcceso($cargoOperario, $grupo)) {
                 $esVisible = true;
             }
         }
@@ -1342,6 +1399,7 @@ function renderMenuLateral($cargoOperario)
 
         })();
     </script>
+
 
     <?php
     return ob_get_clean();

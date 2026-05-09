@@ -1462,7 +1462,7 @@ function renderMenuLateral($cargoOperario) {
 <?php
 /**
  * Header Universal para Módulos ERP
- * Incluir este archivo en cada página: require_once '../../includes/header_universal.php';
+ * Incluir este archivo en cada página: require_once '../../core/layout/header_universal.php';
  * Uso: echo renderHeader($usuario, $esAdmin, 'Título de la Página');
  */
 

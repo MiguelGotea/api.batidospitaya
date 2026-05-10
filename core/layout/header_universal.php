@@ -2,17 +2,16 @@
 /**
  * Header Universal para Módulos ERP
  * Incluir este archivo en cada página: require_once '../../core/layout/header_universal.php';
- * Uso: echo renderHeader($usuario, $esAdmin, 'Título de la Página');
+ * Uso: echo renderHeader($usuario, 'Título de la Página');
  */
 
 /**
  * Función para renderizar el header universal
  * @param array $usuario - Array con datos del usuario
- * @param bool $esAdmin - Si el usuario es administrador
  * @param string $titulo - Título de la página (opcional)
  * @return string HTML del header
  */
-function renderHeader($usuario, $esAdmin = false, $titulo = '')
+function renderHeader($usuario, $titulo = '')
 {
     // Obtener cantidad de anuncios no leídos
     $cantidadAnunciosNoLeidos = 0;
@@ -530,9 +529,7 @@ function renderHeader($usuario, $esAdmin = false, $titulo = '')
                         : (isset($usuario['Genero']) && strtoupper($usuario['Genero']) === 'M'
                             ? 'Bienvenido'
                             : 'Bienvenid@')
-                        ?>         <?= $esAdmin ?
-                                 htmlspecialchars($usuario['nombre']) :
-                                 htmlspecialchars($usuario['Nombre']) ?>!
+                        ?>         <?= htmlspecialchars($usuario['Nombre'] ?? $usuario['nombre'] ?? '') ?>!
                 </h1>
 
             <?php endif; ?>
@@ -554,30 +551,24 @@ function renderHeader($usuario, $esAdmin = false, $titulo = '')
 
         <div class="user-info">
             <div class="user-avatar"
-                title="<?php echo $esAdmin ? htmlspecialchars($usuario['Nombre']) : htmlspecialchars($usuario['Nombre'] . ' ' . $usuario['Apellido']); ?>">
+                title="<?php echo htmlspecialchars(trim(($usuario['Nombre'] ?? $usuario['nombre'] ?? '') . ' ' . ($usuario['Apellido'] ?? ''))); ?>">
                 <?php
                 // Verificar si existe foto de perfil
-                $fotoPerfil = $esAdmin ? ($usuario['foto_perfil'] ?? null) : ($usuario['foto_perfil'] ?? null);
+                $fotoPerfil = $usuario['foto_perfil'] ?? null;
 
                 if (!empty($fotoPerfil) && file_exists('../../' . $fotoPerfil)):
                     ?>
                     <img src="../../<?= htmlspecialchars($fotoPerfil) ?>" alt="Foto de perfil">
                 <?php else: ?>
-                    <?= $esAdmin ?
-                        strtoupper(substr($usuario['nombre'], 0, 1)) :
-                        strtoupper(substr($usuario['Nombre'], 0, 1)) ?>
+                    <?= strtoupper(substr($usuario['Nombre'] ?? $usuario['nombre'] ?? 'U', 0, 1)) ?>
                 <?php endif; ?>
             </div>
             <div class="user-details">
                 <div class="user-name">
-                    <?= $esAdmin ?
-                        htmlspecialchars($usuario['nombre']) :
-                        htmlspecialchars($usuario['Nombre'] . ' ' . $usuario['Apellido']) ?>
+                    <?= htmlspecialchars(trim(($usuario['Nombre'] ?? $usuario['nombre'] ?? '') . ' ' . ($usuario['Apellido'] ?? ''))) ?>
                 </div>
                 <small class="user-role">
-                    <?= $esAdmin ?
-                        'Administrador' :
-                        htmlspecialchars($usuario['cargo_nombre'] ?? 'Sin cargo definido') ?>
+                    <?= htmlspecialchars($usuario['cargo_nombre'] ?? (isset($usuario['nombre']) ? 'Administrador' : 'Sin cargo definido')) ?>
                 </small>
             </div>
         </div>

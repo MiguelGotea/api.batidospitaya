@@ -571,7 +571,7 @@ function renderMenuLateral($cargoOperario)
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="<?php echo generarUrlModulo('../../assets/img/icon12.png'); ?>" alt="Batidos Pitaya" class="logo">
+            <img src="<?php echo generarUrlModulo('../../core/assets/img/icon12.png'); ?>" alt="Batidos Pitaya" class="logo">
         </div>
 
         <?php foreach ($menuFiltrado as $index => $grupo): ?>

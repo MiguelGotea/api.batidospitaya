@@ -1261,7 +1261,7 @@ function renderMenuLateral($cargoOperario) {
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="<?php echo generarUrlModulo('../../assets/img/icon12.png'); ?>" alt="Batidos Pitaya" class="logo">
+            <img src="<?php echo generarUrlModulo('../../core/assets/img/icon12.png'); ?>" alt="Batidos Pitaya" class="logo">
         </div>
         
         <?php foreach ($menuFiltrado as $index => $grupo): ?>
@@ -5292,7 +5292,7 @@ function verificarAccesoModulo($modulo) {
 
 ## /public_html/core/assets/css/indexmodulos.css
 ```css
-/* public_html/assets/indexmodulos.css */
+/* public_html/core/assets/css/indexmodulos.css */
 @import 'global_tools.css';
 /* ==================== CONTENEDOR PRINCIPAL ==================== */
 
@@ -5480,7 +5480,7 @@ function verificarAccesoModulo($modulo) {
 
 ## /public_html/core/assets/css/global_tools.css
 ```css
-/* public_html/assets/css/global_tools.css */
+/* public_html/core/assets/css/global_tools.css */
 
 * {
     box-sizing: border-box;

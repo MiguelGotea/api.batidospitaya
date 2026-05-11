@@ -47,6 +47,11 @@
 
 .btn-floating-pitaya i {
     transition: transform 0.4s ease;
+    font-size: 28px !important; /* Asegurar tamaño consistente */
+    line-height: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 /* Forzar icono de Herramientas (fa-wrench) globalmente para estandarizar */

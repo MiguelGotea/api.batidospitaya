@@ -2,10 +2,20 @@
    BOTÓN FLOTANTE DE ACCIÓN (FAB) — Estándar Pitaya ERP
    Ubicación: /core/assets/css/fab_button.css
 
-   Uso: Incluir en cualquier página de historial/listado
-        que tenga un botón de "Nuevo Registro".
+    Uso: Incluir en cualquier página de historial/listado.
+         El botón principal actúa como un menú de "Herramientas".
 
-   <link rel="stylesheet" href="/core/assets/css/fab_button.css">
+    <div class="fab-container">
+        <div class="fab-options">
+            <div class="fab-option" onclick="accion()">
+                <span class="fab-label">Opción</span>
+                <div class="fab-icon-holder"><i class="fas fa-plus"></i></div>
+            </div>
+        </div>
+        <div class="btn-floating-pitaya" title="Herramientas">
+            <i class="fas fa-wrench"></i>
+        </div>
+    </div>
    ========================================================= */
 
 .btn-floating-pitaya {
@@ -37,6 +47,13 @@
 
 .btn-floating-pitaya i {
     transition: transform 0.4s ease;
+}
+
+/* Forzar icono de Herramientas (fa-wrench) globalmente para estandarizar */
+.btn-floating-pitaya i::before {
+    content: "\f0ad" !important; /* FontAwesome wrench */
+    font-family: "Font Awesome 5 Free" !important;
+    font-weight: 900 !important;
 }
 
 /* =========================================================
@@ -158,8 +175,8 @@
     box-shadow: 0 6px 20px rgba(81, 184, 172, 0.4);
 }
 
-/* Girar el icono del botón principal al hacer hover o estar activo */
+/* Ajuste de animación para el icono de herramientas (evitar rotación de 135deg) */
 .fab-container:hover .btn-floating-pitaya i,
 .fab-container.active .btn-floating-pitaya i {
-    transform: rotate(135deg);
+    transform: scale(1.1) rotate(15deg);
 }

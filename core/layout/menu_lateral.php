@@ -131,9 +131,9 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54]
             ],
             [
-                'nombre' => 'Gestión de Tiendas',
+                'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36]
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42]
             ],
             [
                 'nombre' => 'Gestion de Feriados',

@@ -83,7 +83,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33]
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43]
             ],
             [
                 'nombre' => 'Viaticos',
@@ -1150,7 +1150,8 @@ function renderMenuLateral($cargoOperario)
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <img src="<?php echo generarUrlModulo('../../core/assets/img/icon12.png'); ?>" alt="Batidos Pitaya" class="logo">
+            <img src="<?php echo generarUrlModulo('../../core/assets/img/icon12.png'); ?>" alt="Batidos Pitaya"
+                class="logo">
         </div>
 
         <?php foreach ($menuFiltrado as $index => $grupo): ?>

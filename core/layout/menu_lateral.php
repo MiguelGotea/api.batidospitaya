@@ -83,7 +83,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43]
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33]
             ],
             [
                 'nombre' => 'Viaticos',
@@ -103,12 +103,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Confirmar Horarios',
                 'url' => 'supervision/programar_horarios_operaciones.php',
-                'cargos_permitidos' => [16, 21, 36, 11]
+                'cargos_permitidos' => [16, 21, 36, 11, 33]
             ],
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33]
             ],
             [
                 'nombre' => 'Reportes de Personal',
@@ -128,12 +128,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54]
+                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36, 11, 39, 42]
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33]
             ],
             [
                 'nombre' => 'Gestion de Feriados',

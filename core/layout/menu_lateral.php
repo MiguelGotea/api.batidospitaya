@@ -113,7 +113,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Reportes de Personal',
                 'url' => 'rrhh/reportes.php',
-                'cargos_permitidos' => [49, 16, 21]
+                'cargos_permitidos' => [49, 16, 21, 33]
             ],
             [
                 'nombre' => 'Generar Horarios',
@@ -209,7 +209,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Auditorías de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
-                'cargos_permitidos' => [49, 11, 21, 16, 42]
+                'cargos_permitidos' => [49, 11, 21, 16, 42, 33]
             ],
             [
                 'nombre' => 'Deducciones',
@@ -219,7 +219,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Control de Inventario',
                 'url' => 'supervision/inventario.php',
-                'cargos_permitidos' => [49, 21, 16]
+                'cargos_permitidos' => [49, 21, 16, 33]
             ],
             [
                 'nombre' => 'Faltantes de Caja',
@@ -237,17 +237,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Nuevo Reclamo',
                 'url' => 'supervision/auditorias_original/nuevoreclamo.php',
-                'cargos_permitidos' => [49, 16, 21, 28, 50]
+                'cargos_permitidos' => [49, 16, 21, 28, 50, 33]
             ],
             [
                 'nombre' => 'Procesar Reclamos',
                 'url' => 'supervision/auditorias_original/reclamospend.php',
-                'cargos_permitidos' => [49, 16, 11, 21, 42, 50]
+                'cargos_permitidos' => [49, 16, 11, 21, 42, 50, 33]
             ],
             [
                 'nombre' => 'Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
-                'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42]
+                'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42, 33]
             ],
             [
                 'nombre' => 'Historial Reseñas Google',
@@ -308,7 +308,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21, 33]
             ],
             [
                 'nombre' => 'Agenda Diaria',
@@ -323,7 +323,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Calendario',
                 'url' => 'mantenimiento/programacion_solicitudes.php',
-                'cargos_permitidos' => [49, 21, 16, 35]
+                'cargos_permitidos' => [49, 21, 16, 35, 33]
             ],
             [
                 'nombre' => 'Planificacion',
@@ -378,7 +378,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Aprobación de Anulaciones',
                 'url' => 'sistemas/gestion_anulaciones.php',
-                'cargos_permitidos' => [49, 11, 21]
+                'cargos_permitidos' => [49, 11, 21, 33]
             ],
             [
                 'nombre' => 'Configuración de Tiendas',
@@ -405,7 +405,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21]
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33]
             ],
         ]
     ],
@@ -489,7 +489,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
             ],
             [
                 'nombre' => 'Balance Inventario Access',
@@ -560,7 +560,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21, 33]
             ],
 
         ]

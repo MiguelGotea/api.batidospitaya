@@ -78,27 +78,27 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33]
+                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33]
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52]
             ],
             [
                 'nombre' => 'Viaticos',
                 'url' => 'operaciones/viaticos.php',
-                'cargos_permitidos' => [49, 16, 8]
+                'cargos_permitidos' => [49, 16, 8, 52]
             ],
             [
                 'nombre' => 'Vacaciones',
                 'url' => 'lideres/vacaciones.php',
-                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54]
+                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52]
             ],
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]
             ],
             [
                 'nombre' => 'Confirmar Horarios',
@@ -108,7 +108,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33, 52]
             ],
             [
                 'nombre' => 'Reportes de Personal',
@@ -123,12 +123,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33]
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52]
             ],
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33]
+                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
@@ -209,7 +209,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Auditorías de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
-                'cargos_permitidos' => [49, 11, 21, 16, 42, 33]
+                'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52]
             ],
             [
                 'nombre' => 'Deducciones',
@@ -219,7 +219,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Control de Inventario',
                 'url' => 'supervision/inventario.php',
-                'cargos_permitidos' => [49, 21, 16, 33]
+                'cargos_permitidos' => [49, 21, 16, 33, 52]
             ],
             [
                 'nombre' => 'Faltantes de Caja',
@@ -242,17 +242,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Procesar Reclamos',
                 'url' => 'supervision/auditorias_original/reclamospend.php',
-                'cargos_permitidos' => [49, 16, 11, 21, 42, 50, 33]
+                'cargos_permitidos' => [49, 16, 11, 21, 42, 50, 33, 52]
             ],
             [
                 'nombre' => 'Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
-                'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42, 33]
+                'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42, 33, 52]
             ],
             [
                 'nombre' => 'Historial Reseñas Google',
                 'url' => 'marketing/resenas_google_descargado.php',
-                'cargos_permitidos' => [49, 16, 28, 50, 42, 53]
+                'cargos_permitidos' => [49, 16, 28, 50, 42, 53, 52]
             ],
         ]
     ],
@@ -289,7 +289,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [9, 15, 16, 49]
             ],
             [
-                'nombre' => 'Proovedores',
+                'nombre' => 'Proveedores',
                 'url' => 'compras/proveedores.php',
                 'cargos_permitidos' => [49]
             ],
@@ -308,7 +308,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21, 33]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21, 33, 52]
             ],
             [
                 'nombre' => 'Agenda Diaria',
@@ -323,7 +323,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Calendario',
                 'url' => 'mantenimiento/programacion_solicitudes.php',
-                'cargos_permitidos' => [49, 21, 16, 35, 33]
+                'cargos_permitidos' => [49, 21, 16, 35, 33, 52]
             ],
             [
                 'nombre' => 'Planificacion',
@@ -405,7 +405,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33]
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33, 52]
             ],
         ]
     ],
@@ -459,7 +459,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43]
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52]
             ],
             [
                 'nombre' => 'Liderazgo',
@@ -494,7 +494,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Balance Inventario Access',
                 'url' => 'productos/balance_inventario_access_host.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 52]
             ],
         ]
     ],
@@ -560,7 +560,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21, 33]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21, 33, 52]
             ],
 
         ]
@@ -727,7 +727,7 @@ function renderMenuLateral($cargoOperario)
     $moduloActual = detectarModuloActual();
 
     ob_start();
-    ?>
+?>
 
     <!-- Font Awesome Universal -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -1212,13 +1212,13 @@ function renderMenuLateral($cargoOperario)
 
     <!-- JavaScript del menú -->
     <script>
-        (function () {
+        (function() {
             'use strict';
 
             let activeGroupIndex = null;
 
             // Función para toggle de grupo (acordeón)
-            window.toggleMenuGroup = function (index) {
+            window.toggleMenuGroup = function(index) {
                 const grupo = document.getElementById('grupo-' + index);
                 const allGroups = document.querySelectorAll('.menu-group');
                 const titulo = grupo.querySelector('.menu-group-title');
@@ -1239,7 +1239,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para abrir sidebar en móvil
-            window.toggleSidebarMobile = function () {
+            window.toggleSidebarMobile = function() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1256,7 +1256,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para cerrar sidebar en móvil
-            window.closeSidebarMobile = function () {
+            window.closeSidebarMobile = function() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1278,7 +1278,7 @@ function renderMenuLateral($cargoOperario)
 
             // Cerrar menú en móvil al hacer clic en un enlace
             document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function () {
+                item.addEventListener('click', function() {
                     if (window.innerWidth <= 768) {
                         closeSidebarMobile();
                     }
@@ -1286,7 +1286,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Marcar grupo activo si hay una página activa
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const activeItem = document.querySelector('.menu-item.active');
                 if (activeItem) {
                     const parentGroup = activeItem.closest('.menu-group');
@@ -1317,8 +1317,8 @@ function renderMenuLateral($cargoOperario)
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
 
-            const observer = new MutationObserver(function (mutations) {
-                mutations.forEach(function (mutation) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
                     if (mutation.attributeName === 'class') {
                         if (sidebar.classList.contains('show')) {
                             document.body.style.overflow = 'hidden';
@@ -1334,7 +1334,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Soporte para teclado (accesibilidad)
-            document.addEventListener('keydown', function (e) {
+            document.addEventListener('keydown', function(e) {
                 // ESC para cerrar menú en móvil
                 if (e.key === 'Escape' && window.innerWidth <= 768) {
                     closeSidebarMobile();
@@ -1344,6 +1344,6 @@ function renderMenuLateral($cargoOperario)
         })();
     </script>
 
-    <?php
+<?php
     return ob_get_clean();
 }

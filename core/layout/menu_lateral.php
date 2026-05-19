@@ -128,7 +128,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas_nuevo.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42]
+                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',

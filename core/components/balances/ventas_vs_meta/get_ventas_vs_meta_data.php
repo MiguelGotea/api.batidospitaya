@@ -32,7 +32,8 @@ try {
     $className = "Core\\Components\\Balances\\List\\VentasVsMetaBalance";
     $balance = new $className($conn, $row['config_json']);
 
-    $data = $balance->fetchData($codOperario);
+    $sucursalParam = isset($_GET['sucursal']) ? $_GET['sucursal'] : null;
+    $data = $balance->fetchData($codOperario, ['sucursal' => $sucursalParam]);
 
     header('Content-Type: application/json');
     echo json_encode($data);

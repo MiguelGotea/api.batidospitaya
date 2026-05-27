@@ -197,24 +197,32 @@ class ComponentRegistry
                 error_log("DEBUG ComponentRegistry: ✓ Clase $className encontrada");
                 try {
                     $balance = new $className($this->conn, $row['config_json']);
-                    $balanceData = $balance->render($userId);
+                    $renderResult = $balance->render($userId);
 
-                    // Agregar metadata
-                    $balanceData['id'] = $row['id'];
-                    $balanceData['grupo'] = $row['grupo'];
-                    $balanceData['nombre_herramienta'] = $row['nombre'];
-                    $balanceData['codigo'] = $row['class_name'];
+                    // Si el render retorna múltiples balances (por ejemplo, uno para cada sucursal)
+                    $renderList = isset($renderResult[0]) ? $renderResult : [$renderResult];
 
-                    // Determinar carpeta modular
-                    $folderName = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', str_replace('Balance', '', $row['class_name'])));
-                    $balanceData['assets'] = [
-                        'css' => "core/components/balances/{$folderName}/{$folderName}.css",
-                        'js' => "core/components/balances/{$folderName}/{$folderName}.js"
-                    ];
-                    $balanceData['container_id'] = $folderName . '_balance';
-                    $balanceData['ajax_url'] = "../../core/components/balances/{$folderName}/get_{$folderName}_data.php"; // Estándar propuesto
+                    foreach ($renderList as $balanceData) {
+                        // Agregar metadata
+                        $balanceData['id'] = $row['id'];
+                        $balanceData['grupo'] = $row['grupo'];
+                        $balanceData['nombre_herramienta'] = $row['nombre'];
+                        $balanceData['codigo'] = $row['class_name'];
 
-                    $balances[] = $balanceData;
+                        // Determinar carpeta modular
+                        $folderName = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', str_replace('Balance', '', $row['class_name'])));
+                        $balanceData['assets'] = [
+                            'css' => "core/components/balances/{$folderName}/{$folderName}.css",
+                            'js' => "core/components/balances/{$folderName}/{$folderName}.js"
+                        ];
+                        
+                        // Generar ajax_url estándar si no viene especificado
+                        if (empty($balanceData['ajax_url'])) {
+                            $balanceData['ajax_url'] = "../../core/components/balances/{$folderName}/get_{$folderName}_data.php";
+                        }
+
+                        $balances[] = $balanceData;
+                    }
                 } catch (\Exception $e) {
                     error_log("Error cargando balance {$row['nombre']}: " . $e->getMessage());
                 }

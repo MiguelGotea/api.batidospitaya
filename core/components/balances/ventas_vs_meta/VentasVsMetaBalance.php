@@ -16,13 +16,35 @@ class VentasVsMetaBalance extends BaseBalance
      */
     public function render($userId)
     {
-        return [
-            'nombre' => $this->config['nombre'] ?? 'Ventas vs Meta',
-            'icono' => $this->config['icono'] ?? 'fa-chart-line',
-            'container_id' => 'ventasBalanceContainer',
-            'ajax_url' => $this->config['ajax_url'] ?? 'ajax/get_ventas_balance.php',
-            'config' => $this->config
-        ];
+        // Obtener sucursales del líder usando la función estándar
+        $sucursales = obtenerSucursalesLider($userId);
+
+        if (empty($sucursales)) {
+            return [
+                'nombre' => $this->config['nombre'] ?? 'Ventas vs Meta',
+                'icono' => $this->config['icono'] ?? 'fa-chart-line',
+                'container_id' => 'ventasBalanceContainer',
+                'ajax_url' => '../../core/components/balances/ventas_vs_meta/get_ventas_vs_meta_data.php',
+                'config' => $this->config
+            ];
+        }
+
+        $renders = [];
+        foreach ($sucursales as $sucursal) {
+            $cod = $sucursal['codigo'];
+            $nombreSucursal = $sucursal['nombre'];
+
+            $renders[] = [
+                'nombre' => $this->config['nombre'] ?? 'Ventas vs Meta',
+                'badge' => $nombreSucursal,
+                'icono' => $this->config['icono'] ?? 'fa-chart-line',
+                'container_id' => 'ventasBalanceContainer_' . $cod,
+                'ajax_url' => '../../core/components/balances/ventas_vs_meta/get_ventas_vs_meta_data.php?sucursal=' . urlencode($cod),
+                'config' => $this->config
+            ];
+        }
+
+        return $renders;
     }
 
     /**
@@ -45,7 +67,22 @@ class VentasVsMetaBalance extends BaseBalance
             return ['success' => false, 'message' => 'Sin sucursales asignadas'];
         }
 
-        $sucursalCodigo = $sucursales[0]['codigo'];
+        // Si se especificó una sucursal en los parámetros y es parte de las sucursales del líder
+        $sucursalCodigo = null;
+        if (!empty($params['sucursal'])) {
+            foreach ($sucursales as $s) {
+                if ($s['codigo'] == $params['sucursal']) {
+                    $sucursalCodigo = $s['codigo'];
+                    break;
+                }
+            }
+        }
+
+        // Si no se especificó o no es permitida, usar la primera por defecto
+        if ($sucursalCodigo === null) {
+            $sucursalCodigo = $sucursales[0]['codigo'];
+        }
+
         $fechaReferencia = date('Y-m-d', strtotime('-1 day'));
         $primerDiaMes = date('Y-m-01', strtotime($fechaReferencia));
         $diaActual = (int) date('d', strtotime($fechaReferencia));

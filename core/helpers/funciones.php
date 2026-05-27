@@ -432,7 +432,6 @@ function obtenerSucursalesLider($codOperario)
         AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
         AND s.activa = 1
         ORDER BY anc.Fecha ASC, s.nombre
-        LIMIT 1  -- Solo la primera sucursal
     ");
     $stmt->execute([$codOperario]);
     return $stmt->fetchAll();
@@ -2047,7 +2046,7 @@ function obtenerSucursalesPermitidasMantenimiento($codOperario)
         return $stmt->fetchAll();
     }
 
-    // Para líderes y otros, obtener solo la PRIMERA sucursal asignada (simplificación)
+    // Para líderes y otros, obtener todas las sucursales asignadas
     $stmt = $conn->prepare("
         SELECT DISTINCT s.codigo, s.nombre 
         FROM AsignacionNivelesCargos anc
@@ -2056,7 +2055,6 @@ function obtenerSucursalesPermitidasMantenimiento($codOperario)
         AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
         AND s.activa = 1
         ORDER BY anc.Fecha ASC, s.nombre
-        LIMIT 1  -- Solo permitimos una sucursal para simplificar el formulario
     ");
     $stmt->execute([$codOperario]);
     return $stmt->fetchAll();

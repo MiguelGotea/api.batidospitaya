@@ -33,3 +33,34 @@ body {
         margin-left: 0;
     }
 }
+
+/* ──────────────────────────────────────────────────────── */
+/* SCROLLBAR PERSONALIZADO PITAYA ERP                       */
+/* ──────────────────────────────────────────────────────── */
+
+/* Firefox 64+ (Estándar W3C) */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: #51B8AC #f0f0f0;
+}
+
+/* Chrome, Edge, Safari y navegadores basados en WebKit */
+::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #51B8AC;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #0E544C;
+}

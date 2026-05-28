@@ -209,7 +209,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Anulacion de Pedidos',
                 'url' => 'sistemas/gestion_anulaciones.php',
-                'cargos_permitidos' => [49, 11, 21, 33]
+                'cargos_permitidos' => [49, 11, 21, 33, 42]
             ],
             [
                 'nombre' => 'Auditorías de Efectivo',

@@ -207,6 +207,11 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
+                'nombre' => 'Anulacion de Pedidos',
+                'url' => 'sistemas/gestion_anulaciones.php',
+                'cargos_permitidos' => [49, 11, 21, 33]
+            ],
+            [
                 'nombre' => 'Auditorías de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
                 'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52]
@@ -374,11 +379,6 @@ $menuGlobal = [
                 'nombre' => 'Monitor de Conexión',
                 'url' => 'sistemas/conexion_monitor.php',
                 'cargos_permitidos' => [49, 15]
-            ],
-            [
-                'nombre' => 'Aprobación de Anulaciones',
-                'url' => 'sistemas/gestion_anulaciones.php',
-                'cargos_permitidos' => [49, 11, 21, 33]
             ],
             [
                 'nombre' => 'Configuración de Tiendas',

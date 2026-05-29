@@ -88,7 +88,9 @@ function verificarAccesoModulo($modulo)
         46 => ['operarios'],
         47 => ['operarios'],
         49 => ['gerencia'],
-        36 => ['operaciones']
+        36 => ['operaciones'],
+        61 => ['almacen'],
+        56 => ['mantenimiento']
     ];
 
     $cargo = $_SESSION['cargo_cod'] ?? null;

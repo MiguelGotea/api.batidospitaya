@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 /**
  * Formatea una fecha al formato ej: 31-abr-25
@@ -198,7 +198,8 @@ function requerirCargo($cargoRequerido)
 }
 
 /**
- * Redirige a la página de inicio según el cargo
+ * Redirige al hub de módulos, que determina el destino según los cargos del usuario.
+ * Toda la lógica de routing vive en /modulos/index.php (única fuente de verdad).
  */
 function redirigirSegunCargo()
 {
@@ -208,69 +209,8 @@ function redirigirSegunCargo()
         exit();
     }
 
-    // Si no tiene cargo definido, va al index principal
-    if (!isset($_SESSION['cargo_cod'])) {
-        header("Location: /index.php");
-        exit();
-    }
-
-    // Obtener todos los cargos activos del usuario
-    $cargosUsuario = obtenerCargosUsuario($_SESSION['usuario_id']);
-
-    // Mapeo de cargos a rutas
-    $redirecciones = [
-        2 => '/modulos/operarios/', // Operario
-        5 => '/modulos/lideres/', // Líder de Sucursal
-        8 => '/modulos/contabilidad/', // Jefe de Contabilidad
-        9 => '/modulos/compras/', // Jefe de Compras
-        10 => '/modulos/logistica/', // Jefe de Logística
-        11 => '/modulos/operaciones/', // Jefe de Operaciones
-        55 => '/modulos/operaciones/', // Jefe de Operaciones
-        12 => '/modulos/produccion/', // Jefe de Producción
-        13 => '/modulos/rh/', // Jefe de Recursos Humanos
-        14 => '/modulos/mantenimiento/', // Jefe de Mantenimiento
-        56 => '/modulos/mantenimiento/', // Jefe de Mantenimiento
-        63 => '/modulos/mantenimiento/', // Supervisor de Mantenimiento e Infraestructura
-        15 => '/modulos/sistemas/', // Jefe de Sistemas
-        16 => '/modulos/gerencia/', // Gerencia
-        17 => '/modulos/almacen/', // Jefe de Almacén
-        19 => '/modulos/cds/', // Jefe de CDS
-        20 => '/modulos/chofer/', // Chofer
-        21 => '/modulos/supervision/', // Supervisor de Sucursales
-        22 => '/modulos/atencioncliente/', // Atencion al Cliente
-        23 => '/modulos/almacen/', // Auxiliar de Almacen
-        24 => '/modulos/motorizado/', // Motorizado
-        25 => '/modulos/diseno/', // Diseñador
-        26 => '/modulos/marketing/', // Jefe de Marketing
-        27 => '/modulos/sucursales/' // Sucursales
-    ];
-
-    // Ordenar los cargos para priorizar los que no son 2 (Operario)
-    usort($cargosUsuario, function ($a, $b) {
-        // Si ambos son 2 o ambos no son 2, mantener el orden original
-        if (($a == 2 && $b == 2) || ($a != 2 && $b != 2)) {
-            return 0;
-        }
-        // Priorizar el que no es 2
-        return ($a == 2) ? 1 : -1;
-    });
-
-    // Buscar el primer cargo que tenga un módulo asignado
-    foreach ($cargosUsuario as $cargoCod) {
-        if (array_key_exists($cargoCod, $redirecciones)) {
-            $destino = $redirecciones[$cargoCod];
-
-            // Verificar que el archivo del módulo exista
-            $rutaArchivo = $_SERVER['DOCUMENT_ROOT'] . $destino . 'index.php';
-            if (file_exists($rutaArchivo)) {
-                header("Location: $destino");
-                exit();
-            }
-        }
-    }
-
-    // Si no se encontró un módulo válido, redirigir al inicio
-    header("Location: /index.php");
+    // Para todos los demás usuarios, delegar el routing a /modulos/index.php
+    header("Location: /modulos/");
     exit();
 }
 

@@ -313,12 +313,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 12, 26, 42, 53, 21, 33, 52]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52]
             ],
             [
                 'nombre' => 'Agenda Diaria',
                 'url' => 'mantenimiento/agenda_colaborador.php',
-                'cargos_permitidos' => [49, 14, 56, 16, 35]
+                'cargos_permitidos' => [49, 14, 56, 63, 16, 35]
             ],
             [
                 'nombre' => 'Informe Diario',
@@ -346,12 +346,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Historial Equipos',
                 'url' => 'mantenimiento/equipos_lista.php',
-                'cargos_permitidos' => [49, 16, 14, 56, 35]
+                'cargos_permitidos' => [49, 16, 14, 56, 63, 35]
             ],
             [
                 'nombre' => 'Nuevo Equipo',
                 'url' => 'mantenimiento/equipos_registro.php',
-                'cargos_permitidos' => [49, 16, 14, 56, 35]
+                'cargos_permitidos' => [49, 16, 14, 56, 63, 35]
             ],
             [
                 'nombre' => 'Movimiento de Activos',

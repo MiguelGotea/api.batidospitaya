@@ -51,29 +51,42 @@ class SolicitudesConcluidasIndicator extends BaseIndicator
         try {
             // Determinar si el usuario está en una tienda física o no
             $whereClause = "";
+            $paramsQuery = [];
 
             if ($userId !== null) {
-                // Obtener la sucursal del usuario desde AsignacionNivelesCargos
+                // Obtener todas las sucursales asignadas al usuario desde AsignacionNivelesCargos
                 $stmt = $this->conn->prepare("
-                    SELECT 
+                    SELECT DISTINCT
                         s.codigo as cod_sucursal,
                         s.sucursal as es_tienda
                     FROM AsignacionNivelesCargos anc
                     INNER JOIN sucursales s ON anc.sucursal = s.codigo
                     WHERE anc.CodOperario = ?
                     AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
-                    LIMIT 1
+                    AND s.activa = 1
                 ");
                 $stmt->execute([$userId]);
-                $asignacion = $stmt->fetch(\PDO::FETCH_ASSOC);
+                $asignaciones = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-                if ($asignacion) {
-                    // Si es tienda física (sucursal = 1), filtrar solo por esa sucursal
-                    if ($asignacion['es_tienda'] == 1) {
-                        $whereClause = " AND t.cod_sucursal = '" . $asignacion['cod_sucursal'] . "'";
-
+                if (!empty($asignaciones)) {
+                    // Verificar si tiene alguna sucursal que NO sea tienda física (es_tienda = 0)
+                    $tieneNoTienda = false;
+                    $codigosTiendas = [];
+                    foreach ($asignaciones as $asig) {
+                        if ($asig['es_tienda'] == 0) {
+                            $tieneNoTienda = true;
+                            break;
+                        } else {
+                            $codigosTiendas[] = $asig['cod_sucursal'];
+                        }
                     }
-                    // Si NO es tienda (sucursal = 0), mostrar todas las solicitudes (sin filtro adicional)
+
+                    // Si es tienda física (es_tienda = 1) en todas sus asignaciones, filtrar por ellas
+                    if (!$tieneNoTienda && !empty($codigosTiendas)) {
+                        $placeholders = implode(',', array_fill(0, count($codigosTiendas), '?'));
+                        $whereClause = " AND t.cod_sucursal IN ($placeholders)";
+                        $paramsQuery = $codigosTiendas;
+                    }
                 }
             }
 
@@ -93,7 +106,7 @@ class SolicitudesConcluidasIndicator extends BaseIndicator
             ";
 
             $stmt = $this->conn->prepare($query);
-            $stmt->execute();
+            $stmt->execute($paramsQuery);
             $result = $stmt->fetch(\PDO::FETCH_ASSOC);
 
             $total = $result['total'] ?? 0;

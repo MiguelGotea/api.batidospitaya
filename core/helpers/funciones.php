@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 /**
  * Formatea una fecha al formato ej: 31-abr-25
@@ -172,7 +172,7 @@ function tieneCargo($cargoRequerido)
     // Los cargos pueden tener jerarquía si es necesario
     $jerarquia = [
         'gerencia' => 16,
-        'jefe' => [8, 9, 10, 11, 12, 13, 14, 56, 15, 17, 19, 21, 22, 26],
+        'jefe' => [8, 9, 10, 11, 12, 13, 14, 56, 63, 15, 17, 19, 21, 22, 26],
         // ... definir según necesidades
     ];
 
@@ -230,6 +230,7 @@ function redirigirSegunCargo()
         13 => '/modulos/rh/', // Jefe de Recursos Humanos
         14 => '/modulos/mantenimiento/', // Jefe de Mantenimiento
         56 => '/modulos/mantenimiento/', // Jefe de Mantenimiento
+        63 => '/modulos/mantenimiento/', // Supervisor de Mantenimiento e Infraestructura
         15 => '/modulos/sistemas/', // Jefe de Sistemas
         16 => '/modulos/gerencia/', // Gerencia
         17 => '/modulos/almacen/', // Jefe de Almacén
@@ -1804,7 +1805,7 @@ function obtenerSucursalesPermitidas($codOperario)
         SELECT COUNT(*) as tiene_cargo 
         FROM AsignacionNivelesCargos 
         WHERE CodOperario = ? 
-        AND CodNivelesCargos IN (14, 56, 35)
+        AND CodNivelesCargos IN (14, 56, 63, 35)
         AND (Fin IS NULL OR Fin >= CURDATE())
     ");
     $stmt->execute([$codOperario]);
@@ -1849,7 +1850,7 @@ function verificarAccesoSucursal($codOperario, $codSucursal)
         SELECT COUNT(*) as tiene_cargo 
         FROM AsignacionNivelesCargos 
         WHERE CodOperario = ? 
-        AND CodNivelesCargos IN (14, 56, 35)
+        AND CodNivelesCargos IN (14, 56, 63, 35)
         AND (Fin IS NULL OR Fin >= CURDATE())
     ");
     $stmt->execute([$codOperario]);

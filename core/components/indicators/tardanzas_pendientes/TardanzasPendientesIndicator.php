@@ -337,16 +337,16 @@ class TardanzasPendientesIndicator extends BaseIndicator
 
     /**
      * Obtener sucursales según el tipo de sucursal del usuario
-     * Si está en tienda física (sucursal=1): solo esa sucursal
+     * Si está en tienda física (sucursal=1): todas las sucursales asignadas
      * Si NO está en tienda (sucursal=0): todas las sucursales activas
      */
     private function obtenerSucursalesLider($codOperario)
     {
         global $conn;
 
-        // Obtener la sucursal del usuario y verificar si es tienda física
+        // Obtener todas las asignaciones de sucursales activas del usuario
         $stmt = $conn->prepare("
-            SELECT 
+            SELECT DISTINCT
                 s.codigo,
                 s.nombre,
                 s.sucursal as es_tienda
@@ -355,27 +355,35 @@ class TardanzasPendientesIndicator extends BaseIndicator
             WHERE anc.CodOperario = ?
             AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
             AND s.activa = 1
-            ORDER BY anc.Fecha DESC
-            LIMIT 1
         ");
         $stmt->execute([$codOperario]);
-        $asignacion = $stmt->fetch();
+        $asignaciones = $stmt->fetchAll();
 
-        if (!$asignacion) {
+        if (empty($asignaciones)) {
             return [];
         }
 
-        // Si es tienda física (sucursal = 1), retornar solo esa sucursal
-        if ($asignacion['es_tienda'] == 1) {
-            return [
-                [
-                    'codigo' => $asignacion['codigo'],
-                    'nombre' => $asignacion['nombre']
-                ]
-            ];
+        // Verificar si tiene alguna sucursal que NO sea tienda física (es_tienda = 0)
+        $tieneNoTienda = false;
+        $sucursalesFisicas = [];
+        foreach ($asignaciones as $asig) {
+            if ($asig['es_tienda'] == 0) {
+                $tieneNoTienda = true;
+                break;
+            } else {
+                $sucursalesFisicas[] = [
+                    'codigo' => $asig['codigo'],
+                    'nombre' => $asig['nombre']
+                ];
+            }
         }
 
-        // Si NO es tienda (sucursal = 0), retornar todas las sucursales activas
+        // Si es tienda física (sucursal = 1) en todas sus asignaciones, retornar solo esas
+        if (!$tieneNoTienda) {
+            return $sucursalesFisicas;
+        }
+
+        // Si NO es tienda en al menos una (sucursal = 0), retornar todas las sucursales activas
         $stmt = $conn->query("
             SELECT codigo, nombre
             FROM sucursales

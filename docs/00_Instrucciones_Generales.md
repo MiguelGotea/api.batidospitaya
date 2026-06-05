@@ -320,3 +320,12 @@ Para cada módulo nuevo, generar:
  - [**05_Guia_Instalacion_Nueva_PC.md**](05_Guia_Instalacion_Nueva_PC.md): Pasos detallados para configurar GitHub, Git, SSH y sincronización en una máquina nueva.
 - [**DEPLOY_SETUP.md**](DEPLOY_SETUP.md): Detalles técnicos del servidor y llaves SSH.
 
+---
+
+## 🤖 REGLAS IMPORTANTES PARA ASISTENTES DE CODIFICACIÓN (IA)
+
+- **No intentar conectar ni verificar la base de datos local (MySQL, XAMPP, Laragon, root, puertos)**. El entorno local no cuenta con la base de datos del proyecto importada.
+- **Utilizar únicamente los archivos SQL del repositorio** (`/SQL/u839374897_erp (solo script de tablas).sql` y `/SQL/u839374897_erp (completo).sql`) para analizar el esquema y la estructura de las tablas.
+- **Toda modificación del esquema o datos de la base de datos se debe escribir en un script SQL** (por ejemplo, en la carpeta `/SQL/migraciones/`) para que el usuario pueda transcribirla a Hostinger manualmente.
+
+

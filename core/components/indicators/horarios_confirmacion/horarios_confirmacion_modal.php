@@ -73,7 +73,7 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 15px;">
                             <?php foreach ($hc_estadoConfirmacion['sucursales_pendientes'] as $sucursalPendiente): ?>
                                 <div class="sucursal-card-pendiente"
-                                    onclick="window.open('programar_horarios_operaciones.php?semana=<?= $hc_estadoConfirmacion['semana_siguiente']['numero_semana'] ?? '' ?>&sucursal=<?= $sucursalPendiente['sucursal']['codigo'] ?>', '_blank')">
+                                    onclick="window.open('/modulos/supervision/programar_horarios_operaciones.php?semana=<?= $hc_estadoConfirmacion['semana_siguiente']['numero_semana'] ?? '' ?>&sucursal=<?= $sucursalPendiente['sucursal']['codigo'] ?>', '_blank')">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                         <strong style="flex: 1;"><?= htmlspecialchars($sucursalPendiente['sucursal']['nombre']) ?></strong>
                                         <span style="background: #dc3545; color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; display:none;">
@@ -104,7 +104,7 @@
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;">
                             <?php foreach ($hc_estadoConfirmacion['ediciones_pendientes'] as $edicion): ?>
                                 <div class="sucursal-card-edicion"
-                                    onclick="window.open('programar_horarios_operaciones.php?semana=<?= $edicion['numero_semana'] ?>&sucursal=<?= $edicion['cod_sucursal'] ?>', '_blank')">
+                                    onclick="window.open('/modulos/supervision/programar_horarios_operaciones.php?semana=<?= $edicion['numero_semana'] ?>&sucursal=<?= $edicion['cod_sucursal'] ?>', '_blank')">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                         <strong style="flex: 1;"><?= htmlspecialchars($edicion['sucursal_nombre']) ?></strong>
                                     </div>

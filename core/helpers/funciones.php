@@ -228,23 +228,19 @@ function verificarAccesoCargo($cargosRequeridos)
         return true;
     }
 
-    global $conn;
+    $cargosUsuario = obtenerCargosUsuario($_SESSION['usuario_id']);
+    if (empty($cargosUsuario)) {
+        return false;
+    }
+
     $cargosRequeridos = (array) $cargosRequeridos;
-    $placeholders = implode(',', array_fill(0, count($cargosRequeridos), '?'));
+    foreach ($cargosRequeridos as $req) {
+        if (in_array($req, $cargosUsuario)) {
+            return true;
+        }
+    }
 
-    $stmt = $conn->prepare("
-        SELECT COUNT(*) as tiene_cargo 
-        FROM AsignacionNivelesCargos 
-        WHERE CodOperario = ? 
-        AND CodNivelesCargos IN ($placeholders)
-        AND (Fin IS NULL OR Fin >= NOW())
-    ");
-
-    $params = array_merge([$_SESSION['usuario_id']], $cargosRequeridos);
-    $stmt->execute($params);
-    $result = $stmt->fetch();
-
-    return $result['tiene_cargo'] > 0;
+    return false;
 }
 
 /**
@@ -1142,6 +1138,14 @@ function obtenerCargoCodigoPrincipalUsuario($codOperario)
  */
 function obtenerCargosUsuario($codOperario)
 {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+
+    if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $codOperario && isset($_SESSION['cargos_usuario'])) {
+        return $_SESSION['cargos_usuario'];
+    }
+
     global $conn;
 
     $stmt = $conn->prepare("
@@ -1152,7 +1156,13 @@ function obtenerCargosUsuario($codOperario)
         ORDER BY CodNivelesCargos ASC
     ");
     $stmt->execute([$codOperario]);
-    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    $cargos = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    if (isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] == $codOperario) {
+        $_SESSION['cargos_usuario'] = $cargos;
+    }
+
+    return $cargos;
 }
 
 /**

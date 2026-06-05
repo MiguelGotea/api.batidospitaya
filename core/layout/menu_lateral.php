@@ -133,7 +133,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33]
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28]
             ],
             [
                 'nombre' => 'Gestion de Feriados',
@@ -616,8 +616,11 @@ function generarUrlModulo($rutaDestino)
 {
     $rutaBase = detectarRutaBase();
 
-    // Si el destino es solo "index.php", apuntar al index del módulo actual
+    // Si el destino es solo "index.php", apuntar al index del módulo actual o usar la ruta de sesión del módulo
     if ($rutaDestino === 'index.php') {
+        if (isset($_SESSION['modulo_ruta']) && !empty($_SESSION['modulo_ruta'])) {
+            return '/modulos/' . $_SESSION['modulo_ruta'] . '/index.php';
+        }
         return $rutaBase . 'index.php';
     }
 

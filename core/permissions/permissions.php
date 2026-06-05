@@ -11,6 +11,48 @@
  */
 
 /**
+ * Carga todos los permisos de una herramienta para un cargo en la sesión PHP
+ */
+function cargarPermisosHerramientaEnSesion($nombreHerramienta, $codNivelCargo)
+{
+    global $conn;
+
+    try {
+        $sql = "
+            SELECT a.nombre_accion, p.permiso
+            FROM tools_erp t
+            INNER JOIN acciones_tools_erp a ON t.id = a.tool_erp_id
+            LEFT JOIN permisos_tools_erp p ON a.id = p.accion_tool_erp_id 
+                AND p.CodNivelesCargos = :codNivelCargo
+            WHERE t.nombre = :nombreHerramienta
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':nombreHerramienta' => $nombreHerramienta,
+            ':codNivelCargo' => $codNivelCargo
+        ]);
+
+        $permisos = [];
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $permisos[$row['nombre_accion']] = ($row['permiso'] === 'allow');
+        }
+
+        if (!isset($_SESSION['permisos_tools_erp'])) {
+            $_SESSION['permisos_tools_erp'] = [];
+        }
+        if (!isset($_SESSION['permisos_tools_erp'][$codNivelCargo])) {
+            $_SESSION['permisos_tools_erp'][$codNivelCargo] = [];
+        }
+
+        $_SESSION['permisos_tools_erp'][$codNivelCargo][$nombreHerramienta] = $permisos;
+
+    } catch (PDOException $e) {
+        error_log("Error en cargarPermisosHerramientaEnSesion: " . $e->getMessage());
+    }
+}
+
+/**
  * Verifica si un cargo tiene permiso para realizar una acción en una herramienta
  * 
  * @param string $nombreHerramienta Nombre de la herramienta (campo 'nombre' de tools_erp)
@@ -20,48 +62,17 @@
  */
 function tienePermiso($nombreHerramienta, $nombreAccion, $codNivelCargo)
 {
-    global $conn;
-
     // Validar parámetros
     if (empty($nombreHerramienta) || empty($nombreAccion) || empty($codNivelCargo)) {
         error_log("tienePermiso: Parámetros inválidos - Herramienta: $nombreHerramienta, Acción: $nombreAccion, Cargo: $codNivelCargo");
         return false;
     }
 
-    try {
-        // Consulta que une las 4 tablas para verificar el permiso
-        $sql = "
-            SELECT p.permiso
-            FROM tools_erp t
-            INNER JOIN acciones_tools_erp a ON t.id = a.tool_erp_id
-            INNER JOIN permisos_tools_erp p ON a.id = p.accion_tool_erp_id
-            WHERE t.nombre = :nombreHerramienta
-              AND a.nombre_accion = :nombreAccion
-              AND p.CodNivelesCargos = :codNivelCargo
-            LIMIT 1
-        ";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':nombreHerramienta' => $nombreHerramienta,
-            ':nombreAccion' => $nombreAccion,
-            ':codNivelCargo' => $codNivelCargo
-        ]);
-
-        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        // Si no existe registro, no tiene permiso
-        if (!$resultado) {
-            return false;
-        }
-
-        // Si existe registro, verificar si es 'allow' o 'deny'
-        return $resultado['permiso'] === 'allow';
-
-    } catch (PDOException $e) {
-        error_log("Error en tienePermiso: " . $e->getMessage());
-        return false;
+    if (!isset($_SESSION['permisos_tools_erp'][$codNivelCargo][$nombreHerramienta])) {
+        cargarPermisosHerramientaEnSesion($nombreHerramienta, $codNivelCargo);
     }
+
+    return $_SESSION['permisos_tools_erp'][$codNivelCargo][$nombreHerramienta][$nombreAccion] ?? false;
 }
 
 /**
@@ -91,36 +102,15 @@ function verificarPermisoORedireccionar($nombreHerramienta, $nombreAccion, $codN
  */
 function obtenerPermisosHerramienta($nombreHerramienta, $codNivelCargo)
 {
-    global $conn;
-
-    try {
-        $sql = "
-            SELECT a.nombre_accion, p.permiso
-            FROM tools_erp t
-            INNER JOIN acciones_tools_erp a ON t.id = a.tool_erp_id
-            LEFT JOIN permisos_tools_erp p ON a.id = p.accion_tool_erp_id 
-                AND p.CodNivelesCargos = :codNivelCargo
-            WHERE t.nombre = :nombreHerramienta
-        ";
-
-        $stmt = $conn->prepare($sql);
-        $stmt->execute([
-            ':nombreHerramienta' => $nombreHerramienta,
-            ':codNivelCargo' => $codNivelCargo
-        ]);
-
-        $permisos = [];
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // Si no existe permiso o es 'deny', se considera sin permiso
-            $permisos[$row['nombre_accion']] = ($row['permiso'] === 'allow');
-        }
-
-        return $permisos;
-
-    } catch (PDOException $e) {
-        error_log("Error en obtenerPermisosHerramienta: " . $e->getMessage());
+    if (empty($nombreHerramienta) || empty($codNivelCargo)) {
         return [];
     }
+
+    if (!isset($_SESSION['permisos_tools_erp'][$codNivelCargo][$nombreHerramienta])) {
+        cargarPermisosHerramientaEnSesion($nombreHerramienta, $codNivelCargo);
+    }
+
+    return $_SESSION['permisos_tools_erp'][$codNivelCargo][$nombreHerramienta] ?? [];
 }
 
 /**

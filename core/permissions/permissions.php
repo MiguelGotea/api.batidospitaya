@@ -87,6 +87,7 @@ function tienePermiso($nombreHerramienta, $nombreAccion, $codNivelCargo)
 function verificarPermisoORedireccionar($nombreHerramienta, $nombreAccion, $codNivelCargo, $urlRedireccion = '../../../index.php')
 {
     if (!tienePermiso($nombreHerramienta, $nombreAccion, $codNivelCargo)) {
+        session_write_close();
         header("Location: $urlRedireccion");
         exit();
     }

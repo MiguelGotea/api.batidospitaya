@@ -205,11 +205,13 @@ function redirigirSegunCargo()
 {
     // Si es admin, va al index principal
     if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'admin') {
+        session_write_close();
         header("Location: /index.php");
         exit();
     }
 
     // Para todos los demás usuarios, delegar el routing a /modulos/index.php
+    session_write_close();
     header("Location: /modulos/");
     exit();
 }

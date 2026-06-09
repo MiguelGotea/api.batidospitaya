@@ -69,8 +69,23 @@
         width: 55px;
         height: 55px;
         font-size: 24px;
-        bottom: 25px;
-        right: 25px;
+        /* Anclar siempre a la esquina visible del viewport en móvil */
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        top: auto !important;
+        touch-action: manipulation;
+    }
+
+    .fab-container {
+        /* Anclar el contenedor al viewport en móvil, ignorando scroll */
+        position: fixed !important;
+        bottom: 20px !important;
+        right: 20px !important;
+        left: auto !important;
+        top: auto !important;
+        touch-action: manipulation;
     }
 
     /* Reducción visual al estar "abierto" o presionado */
@@ -94,6 +109,9 @@
     align-items: flex-end;
     gap: 15px;
     pointer-events: none;
+    /* Garantizar que el FAB no sea afectado por transform/overflow de padres */
+    transform: none !important;
+    will-change: auto;
 }
 
 .fab-container > * {

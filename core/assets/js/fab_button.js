@@ -56,13 +56,19 @@
      * Inicializa el drag sobre el elemento fab-container dado
      */
     function initDraggable(fab) {
-        // Restaurar posición guardada
+        // ── Mover el FAB directamente al <body> para escapar de cualquier
+        //    contenedor padre con overflow/transform que rompa position:fixed
+        if (fab.parentElement !== document.body) {
+            document.body.appendChild(fab);
+        }
+
+        // Restaurar posición guardada (después de mover al body)
         applyStoredPosition(fab);
 
-        let dragging  = false;
-        let didDrag   = false;   // Distinguir drag de click/tap
-        let startX    = 0;
-        let startY    = 0;
+        let dragging    = false;
+        let didDrag     = false;   // Distinguir drag de click/tap
+        let startX      = 0;
+        let startY      = 0;
         let startRight  = 0;
         let startBottom = 0;
 
@@ -82,22 +88,21 @@
             // Solo botón izquierdo en mouse
             if (e.button !== undefined && e.button !== 0) return;
 
-            dragging  = true;
-            didDrag   = false;
+            dragging = true;
+            didDrag  = false;
 
             const coords = getCoords(e);
             startX = coords.x;
             startY = coords.y;
 
-            // Posición actual del FAB (right/bottom relativos al viewport)
-            const rect = fab.getBoundingClientRect();
+            // Capturar posición actual como right/bottom desde el viewport
+            const rect  = fab.getBoundingClientRect();
             startRight  = window.innerWidth  - rect.right;
             startBottom = window.innerHeight - rect.bottom;
 
             handle.style.cursor = 'grabbing';
             fab.classList.add('fab-dragging');
 
-            // Capturar eventos globales
             document.addEventListener('mousemove', onPointerMove, { passive: false });
             document.addEventListener('mouseup',   onPointerUp);
             document.addEventListener('touchmove', onPointerMove, { passive: false });
@@ -109,25 +114,26 @@
             if (!dragging) return;
 
             const coords = getCoords(e);
-            const dx = coords.x - startX;
-            const dy = coords.y - startY;
+            const dx = coords.x - startX;   // positivo → movimiento a la derecha
+            const dy = coords.y - startY;   // positivo → movimiento hacia abajo
 
-            // Umbral mínimo para considerar que es drag (evita bloquear clicks)
             if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
                 didDrag = true;
-                e.preventDefault(); // Evitar scroll mientras drags
+                e.preventDefault(); // Evitar scroll del navegador durante drag
             }
 
             if (!didDrag) return;
 
-            // Calcular nueva posición (right/bottom basado en viewport)
             const fabW = fab.offsetWidth;
             const fabH = fab.offsetHeight;
 
+            // right  decrece cuando nos movemos a la derecha (dx positivo)
             let newRight  = startRight  - dx;
-            let newBottom = startBottom + dy;
+            // bottom decrece cuando nos movemos hacia abajo (dy positivo)
+            // CORRECCIÓN: bottom es inverso a Y → restar dy
+            let newBottom = startBottom - dy;
 
-            // Confinarlo dentro del viewport con margen
+            // Confinar dentro del viewport
             newRight  = clamp(newRight,  MARGIN, window.innerWidth  - fabW - MARGIN);
             newBottom = clamp(newBottom, MARGIN, window.innerHeight - fabH - MARGIN);
 
@@ -138,7 +144,7 @@
         }
 
         /* ── FIN DEL DRAG ── */
-        function onPointerUp(e) {
+        function onPointerUp() {
             if (!dragging) return;
             dragging = false;
             handle.style.cursor = 'grab';
@@ -150,21 +156,20 @@
             document.removeEventListener('touchend',  onPointerUp);
 
             if (didDrag) {
-                // Guardar posición final
                 const right  = parseFloat(fab.style.right)  || 20;
                 const bottom = parseFloat(fab.style.bottom) || 20;
                 savePosition(right, bottom);
 
-                // Evitar que el click post-drag dispare el menú del FAB
+                // Bloquear el click que dispararía el menú al soltar el drag
                 fab.classList.add('fab-just-dragged');
-                setTimeout(() => fab.classList.remove('fab-just-dragged'), 200);
+                setTimeout(() => fab.classList.remove('fab-just-dragged'), 250);
             }
         }
 
         handle.addEventListener('mousedown',  onPointerDown);
         handle.addEventListener('touchstart', onPointerDown, { passive: true });
 
-        // Evitar que un drag active el menú al soltar
+        // Interceptar click post-drag para no abrir el menú
         fab.addEventListener('click', function (e) {
             if (fab.classList.contains('fab-just-dragged')) {
                 e.stopPropagation();

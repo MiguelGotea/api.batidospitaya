@@ -3,7 +3,7 @@
  * Ubicación: /core/assets/js/fab_button.js
  *
  * Permite arrastrar el botón flotante libremente dentro del viewport.
- * La posición se guarda en localStorage por página para no perderla al recargar.
+ * La posición es solo de sesión: al recargar la página vuelve a la esquina.
  * Funciona con mouse (desktop) y touch (móvil/tablet).
  *
  * Uso: Incluir después del DOM cargado, en páginas que usen .fab-container
@@ -12,9 +12,6 @@
 
 (function () {
     'use strict';
-
-    // Clave única por URL para guardar posición independiente por página
-    const STORAGE_KEY = 'fab_pos_' + window.location.pathname;
 
     // Margen mínimo desde los bordes del viewport (px)
     const MARGIN = 10;
@@ -27,57 +24,42 @@
     }
 
     /**
-     * Aplica la posición guardada al FAB container
+     * Aplica position:fixed directamente como estilo inline para
+     * garantizar que ningún padre (con overflow/transform) lo rompa.
      */
-    function applyStoredPosition(el) {
-        try {
-            const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
-            if (saved && typeof saved.right === 'number' && typeof saved.bottom === 'number') {
-                el.style.right  = saved.right  + 'px';
-                el.style.bottom = saved.bottom + 'px';
-                el.style.left   = 'auto';
-                el.style.top    = 'auto';
-            }
-        } catch (e) {
-            // Sin posición guardada → mantener la del CSS
-        }
-    }
-
-    /**
-     * Guarda la posición actual (right, bottom) en localStorage
-     */
-    function savePosition(right, bottom) {
-        try {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify({ right, bottom }));
-        } catch (e) { /* silencioso */ }
+    function forceFixed(el) {
+        el.style.position = 'fixed';
+        el.style.left     = 'auto';
+        el.style.top      = 'auto';
+        el.style.margin   = '0';
+        el.style.zIndex   = '9999';
     }
 
     /**
      * Inicializa el drag sobre el elemento fab-container dado
      */
     function initDraggable(fab) {
-        // ── Mover el FAB directamente al <body> para escapar de cualquier
-        //    contenedor padre con overflow/transform que rompa position:fixed
+        // ── Mover al <body> para escapar de contenedores con overflow/transform
         if (fab.parentElement !== document.body) {
             document.body.appendChild(fab);
         }
 
-        // Restaurar posición guardada (después de mover al body)
-        applyStoredPosition(fab);
+        // ── Forzar position:fixed via inline style (máxima prioridad)
+        forceFixed(fab);
+        fab.style.bottom = '20px';
+        fab.style.right  = '20px';
 
         let dragging    = false;
-        let didDrag     = false;   // Distinguir drag de click/tap
+        let didDrag     = false;
         let startX      = 0;
         let startY      = 0;
         let startRight  = 0;
         let startBottom = 0;
 
-        // El handle de drag es solo el botón principal, no las opciones
         const handle = fab.querySelector('.btn-floating-pitaya') || fab;
-
         handle.style.cursor = 'grab';
 
-        /* ── Obtener coordenadas normalizadas (mouse o touch) ── */
+        /* ── Coordenadas normalizadas mouse/touch ── */
         function getCoords(e) {
             const t = e.touches ? e.touches[0] : e;
             return { x: t.clientX, y: t.clientY };
@@ -85,7 +67,6 @@
 
         /* ── INICIO DEL DRAG ── */
         function onPointerDown(e) {
-            // Solo botón izquierdo en mouse
             if (e.button !== undefined && e.button !== 0) return;
 
             dragging = true;
@@ -95,10 +76,10 @@
             startX = coords.x;
             startY = coords.y;
 
-            // Capturar posición actual como right/bottom desde el viewport
-            const rect  = fab.getBoundingClientRect();
-            startRight  = window.innerWidth  - rect.right;
-            startBottom = window.innerHeight - rect.bottom;
+            // Leer posición actual desde los estilos inline (no getBoundingClientRect
+            // para evitar que el scroll afecte la lectura en móvil)
+            startRight  = parseFloat(fab.style.right)  || 20;
+            startBottom = parseFloat(fab.style.bottom) || 20;
 
             handle.style.cursor = 'grabbing';
             fab.classList.add('fab-dragging');
@@ -114,12 +95,12 @@
             if (!dragging) return;
 
             const coords = getCoords(e);
-            const dx = coords.x - startX;   // positivo → movimiento a la derecha
-            const dy = coords.y - startY;   // positivo → movimiento hacia abajo
+            const dx = coords.x - startX;  // + → derecha
+            const dy = coords.y - startY;  // + → abajo
 
             if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
                 didDrag = true;
-                e.preventDefault(); // Evitar scroll del navegador durante drag
+                e.preventDefault(); // Bloquea scroll nativo durante el drag
             }
 
             if (!didDrag) return;
@@ -127,20 +108,15 @@
             const fabW = fab.offsetWidth;
             const fabH = fab.offsetHeight;
 
-            // right  decrece cuando nos movemos a la derecha (dx positivo)
+            // right decrece al mover derecha (dx+), bottom decrece al mover abajo (dy+)
             let newRight  = startRight  - dx;
-            // bottom decrece cuando nos movemos hacia abajo (dy positivo)
-            // CORRECCIÓN: bottom es inverso a Y → restar dy
             let newBottom = startBottom - dy;
 
-            // Confinar dentro del viewport
             newRight  = clamp(newRight,  MARGIN, window.innerWidth  - fabW - MARGIN);
             newBottom = clamp(newBottom, MARGIN, window.innerHeight - fabH - MARGIN);
 
             fab.style.right  = newRight  + 'px';
             fab.style.bottom = newBottom + 'px';
-            fab.style.left   = 'auto';
-            fab.style.top    = 'auto';
         }
 
         /* ── FIN DEL DRAG ── */
@@ -156,11 +132,7 @@
             document.removeEventListener('touchend',  onPointerUp);
 
             if (didDrag) {
-                const right  = parseFloat(fab.style.right)  || 20;
-                const bottom = parseFloat(fab.style.bottom) || 20;
-                savePosition(right, bottom);
-
-                // Bloquear el click que dispararía el menú al soltar el drag
+                // Bloquear el click que dispararía el menú al soltar
                 fab.classList.add('fab-just-dragged');
                 setTimeout(() => fab.classList.remove('fab-just-dragged'), 250);
             }
@@ -176,12 +148,29 @@
                 e.preventDefault();
             }
         }, true);
+
+        // ── Seguro extra para navegadores móviles con scroll problemático:
+        //    re-afirmar position:fixed si el scroll mueve el elemento
+        window.addEventListener('scroll', function () {
+            if (!dragging) {
+                forceFixed(fab);
+            }
+        }, { passive: true });
+
+        window.addEventListener('resize', function () {
+            // Al rotar pantalla, re-confinar dentro del nuevo viewport
+            const fabW = fab.offsetWidth;
+            const fabH = fab.offsetHeight;
+            const r = clamp(parseFloat(fab.style.right)  || 20, MARGIN, window.innerWidth  - fabW - MARGIN);
+            const b = clamp(parseFloat(fab.style.bottom) || 20, MARGIN, window.innerHeight - fabH - MARGIN);
+            fab.style.right  = r + 'px';
+            fab.style.bottom = b + 'px';
+        }, { passive: true });
     }
 
     /* ── Esperar a que el DOM esté listo ── */
     function init() {
-        const fabs = document.querySelectorAll('.fab-container');
-        fabs.forEach(initDraggable);
+        document.querySelectorAll('.fab-container').forEach(initDraggable);
     }
 
     if (document.readyState === 'loading') {

@@ -133,7 +133,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28]
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21]
             ],
             [
                 'nombre' => 'Gestion de Feriados',
@@ -318,7 +318,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Agenda Diaria',
                 'url' => 'mantenimiento/agenda_colaborador.php',
-                'cargos_permitidos' => [49, 14, 56, 63, 16, 35]
+                'cargos_permitidos' => [49, 14, 56, 63, 16, 35, 61]
             ],
             [
                 'nombre' => 'Informe Diario',
@@ -328,12 +328,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Calendario',
                 'url' => 'mantenimiento/programacion_solicitudes.php',
-                'cargos_permitidos' => [49, 21, 16, 35, 33, 52]
+                'cargos_permitidos' => [49, 21, 16, 35, 33, 52, 61]
             ],
             [
                 'nombre' => 'Planificacion',
                 'url' => 'mantenimiento/planificacion_mantenimiento.php',
-                'cargos_permitidos' => [49, 35]
+                'cargos_permitidos' => [49, 35, 61]
             ]
         ]
 

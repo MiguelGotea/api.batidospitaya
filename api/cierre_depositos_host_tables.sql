@@ -55,3 +55,27 @@ CREATE TABLE IF NOT EXISTS `msaccess_masivo_Depositos` (
     INDEX `idx_fecha`       (`Fecha`),
     INDEX `idx_sucursal`    (`Sucursal`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- ─────────────────────────────────────────────────────
+-- 3. EstadoInicial
+-- ─────────────────────────────────────────────────────
+-- Nota: el campo Access se llama "TipoCambio$_C$"; en MySQL
+--       se guarda como TipoCambio_C (sin $ para evitar conflictos).
+CREATE TABLE IF NOT EXISTS `msaccess_masivo_EstadoInicial` (
+    `id_host`         INT          NOT NULL AUTO_INCREMENT,
+    `Sucursal`        INT          NOT NULL,
+    `CodCajaInicial`  INT          NOT NULL,
+    `Dinero`          DOUBLE           DEFAULT NULL,
+    `Fecha`           DATETIME         DEFAULT NULL,
+    `Selladora`       INT              DEFAULT NULL,
+    `TipoCambio_C`    DOUBLE           DEFAULT NULL,
+    `Feriado`         TINYINT          DEFAULT NULL,
+    `Observaciones`   VARCHAR(50)      DEFAULT NULL,
+    `Eventos`         VARCHAR(50)      DEFAULT NULL,
+    `FechaUltimoSync` DATETIME         DEFAULT NULL,
+    PRIMARY KEY (`id_host`),
+    UNIQUE KEY `uk_suc_cod` (`Sucursal`, `CodCajaInicial`),
+    INDEX `idx_fecha`       (`Fecha`),
+    INDEX `idx_sucursal`    (`Sucursal`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

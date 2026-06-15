@@ -1,19 +1,22 @@
 ' =============================================================
 ' Módulo: modSyncCierreDepositos
 ' Propósito: Sincronización unidireccional Access → Host MySQL
-'            de las tablas CierreDiario y Depositos.
+'            de las tablas CierreDiario, Depositos y EstadoInicial.
 '
 ' FLUJO DIARIO (cierre de caja):
 '   SyncCierreDiario30Dias()
 '     → Elimina últimos 30 días del host y re-sube ese período.
 '   SyncDepositos30Dias()
 '     → Elimina últimos 30 días del host y re-sube ese período.
+'   SyncEstadoInicial30Dias()
+'     → Elimina últimos 30 días del host y re-sube ese período.
 '   SyncCierreDepositosTienda30Dias()
-'     → Corre ambas funciones anteriores juntas (botón de cierre).
+'     → Corre las tres funciones anteriores juntas (botón de cierre).
 '
 ' FLUJO MASIVO (historial completo, botón panel admin):
 '   SyncCierreDiarioMasivo()
 '   SyncDepositosMasivo()
+'   SyncEstadoInicialMasivo()
 '   SyncCierreDepositosTiendaMasivo()
 '     → Elimina TODO de esta sucursal y re-sube toda la tabla.
 '
@@ -21,8 +24,9 @@
 '   Alt+F11 → Archivo → Importar → modulo_sync_cierre_depositos.bas
 '
 ' NOTA sobre nombres de tablas Access:
-'   CierreDiario → tabla Access "CierreDiario" (ajustar si es distinto)
-'   Depositos    → tabla Access "Depositos"    (ajustar si es distinto)
+'   CierreDiario  → tabla Access "CierreDiario"  (ajustar si es distinto)
+'   Depositos     → tabla Access "Depositos"     (ajustar si es distinto)
+'   EstadoInicial → tabla Access "EstadoInicial" (ajustar si es distinto)
 ' =============================================================
 
 Option Explicit
@@ -53,13 +57,23 @@ Public Function SyncDepositos30Dias() As Boolean
         "limpiar_30dias", "DEP", c)
 End Function
 
-' ── Master cierre TIENDA (llama ambas tablas juntas) ──────
+Public Function SyncEstadoInicial30Dias() As Boolean
+    Dim c As String : c = CStr(codigoLocal())
+    Dim f As String : f = Format(DateAdd("d", -30, Date()), "yyyy-mm-dd")
+    SyncEstadoInicial30Dias = ScdSyncTabla( _
+        SCD_BASE_URL & "sync_estado_inicial.php", _
+        "SELECT * FROM EstadoInicial WHERE Fecha >= #" & f & "#", _
+        "limpiar_30dias", "EI", c)
+End Function
+
+' ── Master cierre TIENDA (llama las tres tablas juntas) ───
 ' Llamar en el procedimiento de cierre de caja de cada tienda.
 Public Function SyncCierreDepositosTienda30Dias() As Boolean
     Dim bOk As Boolean : bOk = True
     ScdLog "CierreTienda", "Iniciando sync 30 dias - " & Now()
-    If Not SyncCierreDiario30Dias() Then bOk = False
-    If Not SyncDepositos30Dias()    Then bOk = False
+    If Not SyncCierreDiario30Dias()   Then bOk = False
+    If Not SyncDepositos30Dias()      Then bOk = False
+    If Not SyncEstadoInicial30Dias()  Then bOk = False
     ScdLog "CierreTienda", IIf(bOk, "OK", "Con errores") & " - " & Now()
     SyncCierreDepositosTienda30Dias = bOk
 End Function
@@ -84,15 +98,24 @@ Public Function SyncDepositosMasivo() As Boolean
         "limpiar_total", "DEP", c)
 End Function
 
+Public Function SyncEstadoInicialMasivo() As Boolean
+    Dim c As String : c = CStr(codigoLocal())
+    SyncEstadoInicialMasivo = ScdSyncTabla( _
+        SCD_BASE_URL & "sync_estado_inicial.php", _
+        "SELECT * FROM EstadoInicial ORDER BY CodCajaInicial", _
+        "limpiar_total", "EI", c)
+End Function
+
 ' ── Master masivo TIENDA ─────────────────────────────────
 ' Activar desde botón panel admin.
 Public Function SyncCierreDepositosTiendaMasivo() As Boolean
     Dim bOk As Boolean : bOk = True
     ScdLog "MasivoTienda", "Iniciando masivo - " & Now()
-    If Not SyncCierreDiarioMasivo() Then bOk = False
-    If Not SyncDepositosMasivo()    Then bOk = False
+    If Not SyncCierreDiarioMasivo()    Then bOk = False
+    If Not SyncDepositosMasivo()       Then bOk = False
+    If Not SyncEstadoInicialMasivo()   Then bOk = False
     ScdLog "MasivoTienda", IIf(bOk, "OK", "Con errores") & " - " & Now()
-    MsgBox "Masivo Cierre/Depósitos " & IIf(bOk, "OK.", "con errores (ver log)."), _
+    MsgBox "Masivo Cierre/Depósitos/EstadoInicial " & IIf(bOk, "OK.", "con errores (ver log)."), _
            IIf(bOk, vbInformation, vbExclamation), "Sync Cierre & Depósitos Masivo"
     SyncCierreDepositosTiendaMasivo = bOk
 End Function
@@ -169,6 +192,7 @@ Private Function ScdBuildRow(rs As DAO.Recordset, codSuc As String, tid As Strin
     Select Case tid
         Case "CD"  : ScdBuildRow = ScdRowCD(rs, codSuc)
         Case "DEP" : ScdBuildRow = ScdRowDEP(rs, codSuc)
+        Case "EI"  : ScdBuildRow = ScdRowEI(rs, codSuc)
         Case Else  : ScdBuildRow = "{}"
     End Select
 End Function
@@ -213,6 +237,24 @@ Private Function ScdRowDEP(rs As DAO.Recordset, c As String) As String
     s = s & """Sucursal"":"     & ScdStr(c)
     s = s & "}"
     On Error GoTo 0 : ScdRowDEP = s
+End Function
+
+' EstadoInicial
+Private Function ScdRowEI(rs As DAO.Recordset, c As String) As String
+    On Error Resume Next
+    Dim s As String : s = "{"
+    s = s & """CodCajaInicial"":"    & ScdVal(rs!CodCajaInicial)              & ","
+    s = s & """Dinero"":"            & ScdVal(rs!Dinero)                       & ","
+    s = s & """Fecha"":"             & ScdFechaHora(rs!Fecha)                  & ","
+    s = s & """Selladora"":"         & ScdVal(rs!Selladora)                    & ","
+    s = s & """TipoCambio$_C$"":"    & ScdVal(rs![TipoCambio$_C$])             & ","
+    s = s & """Feriado"":"           & ScdVal(rs!Feriado)                      & ","
+    s = s & """Observaciones"":"     & ScdStr(rs!Observaciones)                & ","
+    s = s & """Eventos"":"           & ScdStr(rs!Eventos)                      & ","
+    s = s & """Sucursal"":"          & ScdStr(c)                               & ","
+    s = s & """FechaUltimoSync"":"   & ScdFechaHora(Now())
+    s = s & "}"
+    On Error GoTo 0 : ScdRowEI = s
 End Function
 
 ' ══════════════════════════════════════════════════════════

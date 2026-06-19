@@ -363,7 +363,7 @@ function obtenerSucursalesLider($codOperario)
     global $conn;
 
     $stmt = $conn->prepare("
-        SELECT DISTINCT s.codigo, s.nombre 
+        SELECT DISTINCT s.codigo, s.nombre, s.ip_impresora 
         FROM AsignacionNivelesCargos anc
         JOIN sucursales s ON anc.Sucursal = s.codigo
         WHERE anc.CodOperario = ? 
@@ -631,7 +631,7 @@ function obtenerTodasSucursales()
     global $conn;
 
     $stmt = $conn->prepare("
-        SELECT id, codigo, nombre, cod_departamento, departamento
+        SELECT id, codigo, nombre, cod_departamento, departamento, ip_impresora
         FROM sucursales 
         WHERE activa = 1
         ORDER BY nombre

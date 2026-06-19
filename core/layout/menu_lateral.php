@@ -402,6 +402,11 @@ $menuGlobal = [
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
                 'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33, 52, 61]
             ],
+            [
+                'nombre' => 'Proyeccion',
+                'url' => 'productos/pronostico_abastecimiento.php',
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
+            ],
         ]
     ],
     [

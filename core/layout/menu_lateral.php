@@ -393,6 +393,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 12]
             ],
             [
+                'nombre' => 'Configuracion Despacho',
+                'url' => 'nventario/plan_despacho_global.php',
+                'cargos_permitidos' => [49, 16]
+            ],
+            [
                 'nombre' => 'Pedido Central',
                 'url' => 'sucursales/compra_local_registro_pedidos.php',
                 'cargos_permitidos' => [49, 27]

@@ -2165,6 +2165,17 @@ function aplicaViaticoDepartamento($codDepartamento, $fecha)
     // Convertir a string para comparación segura
     $codDepartamento = (string) $codDepartamento;
 
+    // HARDCODED: Las reglas de qué días de la semana aplica el viático por departamento
+    // están literalizadas en este switch. Si cambia la regla de un departamento o se agrega
+    // uno nuevo, hay que modificar este código PHP.
+    // Reglas actuales:
+    //   - 1 (Managua):  aplica todos los días (siempre retorna true)
+    //   - 3 (Masaya):   aplica todos los días (siempre retorna true)
+    //   - 4 (Granada):  solo aplica jueves (4) a domingo (7) según ISO weekday
+    //   - Default:      cualquier otro departamento NO aplica (retorna false)
+    // TODO: Migrar a BD con una columna en 'departamentos' tipo:
+    //   'dias_semana_viatico' VARCHAR(13) almacenando los días ISO separados por coma,
+    //   ej. '1,2,3,4,5,6,7' (todos), '4,5,6,7' (jue-dom). NULL = no aplica.
     switch ($codDepartamento) {
         case '1': // Managua - todos los días
         case '3': // Masaya - todos los días

@@ -394,7 +394,7 @@ $menuGlobal = [
             ],
             [
                 'nombre' => 'Configuracion Despacho',
-                'url' => 'nventario/plan_despacho_global.php',
+                'url' => 'inventario/plan_despacho_global.php',
                 'cargos_permitidos' => [49, 16]
             ],
             [

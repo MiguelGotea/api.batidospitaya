@@ -550,11 +550,6 @@ $menuGlobal = [
                 'url' => 'inventario/inventario_semanal.php',
                 'cargos_permitidos' => [27, 16, 49, 55]
             ],
-            [
-                'nombre' => 'Configuración Porcentajes',
-                'url' => 'inventario/configuracion_porcentajes.php',
-                'cargos_permitidos' => [27, 16, 55]
-            ],
         ]
     ],
     [

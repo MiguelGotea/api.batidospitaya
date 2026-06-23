@@ -3,7 +3,7 @@
 
 ' Función principal que retorna array con datos del cliente club
 ' Parámetros: membresia (número de membresía), sucursal (código de sucursal)
-' Retorna: Array(existe, membresia, nombre, puntos, puntos_iniciales)
+' Retorna: Array(existe, membresia, nombre, puntos, puntos_iniciales, nombre_completo)
 Public Function DatosClubHost(ByVal membresia As Long, ByVal Sucursal As Long) As Variant
     On Error GoTo ErrorHandler
     
@@ -32,7 +32,7 @@ Public Function DatosClubHost(ByVal membresia As Long, ByVal Sucursal As Long) A
     Else
         ' Error HTTP - retornar array con valores por defecto
         MsgBox "Error HTTP: " & http.Status & " - " & http.StatusText, vbCritical
-        DatosClubHost = Array(0, 0, "", 0, 0)
+        DatosClubHost = Array(0, 0, "", 0, 0, "")
     End If
     
     Set http = Nothing
@@ -41,7 +41,7 @@ Public Function DatosClubHost(ByVal membresia As Long, ByVal Sucursal As Long) A
 ErrorHandler:
     ' En caso de error, retornar array con valores por defecto
     'MsgBox "Error en DatosClubHost: " & Err.Description, vbCritical
-    DatosClubHost = Array(0, 0, "", 0, 0)
+    DatosClubHost = Array(0, 0, "", 0, 0, "")
 End Function
 
 ' Función auxiliar para parsear la respuesta JSON del API
@@ -51,11 +51,12 @@ Private Function ParsearRespuestaCliente(ByVal jsonText As String) As Variant
     Dim Nombre As String
     Dim Puntos As Double
     Dim puntosIniciales As Long
+    Dim nombreCompleto As String
     
     ' Verificar si la operación fue exitosa
     If InStr(1, jsonText, """success"":true", vbTextCompare) = 0 Then
         ' Error en la respuesta
-        ParsearRespuestaCliente = Array(0, 0, "", 0, 0)
+        ParsearRespuestaCliente = Array(0, 0, "", 0, 0, "")
         Exit Function
     End If
     
@@ -64,7 +65,7 @@ Private Function ParsearRespuestaCliente(ByVal jsonText As String) As Variant
     
     If existe = 0 Then
         ' Cliente no existe
-        ParsearRespuestaCliente = Array(0, 0, "", 0, 0)
+        ParsearRespuestaCliente = Array(0, 0, "", 0, 0, "")
     Else
         ' Cliente existe, extraer datos del objeto "datos"
         Dim datosStart As Long, datosEnd As Long, datosText As String
@@ -80,6 +81,9 @@ Private Function ParsearRespuestaCliente(ByVal jsonText As String) As Variant
             
             ' Extraer nombre
             Nombre = ExtraerValorJSON(datosText, "nombre")
+            
+            ' Extraer nombre_completo
+            nombreCompleto = ExtraerValorJSON(datosText, "nombre_completo")
             
             ' Extraer puntos
             Dim puntosStr As String
@@ -100,10 +104,10 @@ Private Function ParsearRespuestaCliente(ByVal jsonText As String) As Variant
             End If
             
             ' Retornar array con datos
-            ParsearRespuestaCliente = Array(1, membresia, Nombre, Puntos, puntosIniciales)
+            ParsearRespuestaCliente = Array(1, membresia, Nombre, Puntos, puntosIniciales, nombreCompleto)
         Else
             ' No se encontró el objeto datos
-            ParsearRespuestaCliente = Array(0, 0, "", 0, 0)
+            ParsearRespuestaCliente = Array(0, 0, "", 0, 0, "")
         End If
     End If
 End Function

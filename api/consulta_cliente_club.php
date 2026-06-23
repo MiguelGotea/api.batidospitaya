@@ -87,6 +87,7 @@ function consultarClienteClub()
                 'datos' => [
                     'membresia' => 0,
                     'nombre' => '',
+                    'nombre_completo' => '',
                     'puntos' => 0,
                     'puntos_iniciales' => 0
                 ]
@@ -106,11 +107,13 @@ function consultarClienteClub()
 
         // Construir nombre completo
         $nombreCompleto = trim($cliente['nombre']);
+        $apellido = trim($cliente['apellido'] ?? '');
+        $nombreYApellido = trim($nombreCompleto . ' ' . $apellido);
 
         // Obtener puntos iniciales
         $puntosIniciales = intval($cliente['puntos_iniciales'] ?? 0);
 
-        logMessage("SUCCESS: Cliente encontrado - Membresia: $membresia, Nombre: $nombreCompleto, Puntos: $puntos, Puntos Iniciales: $puntosIniciales");
+        logMessage("SUCCESS: Cliente encontrado - Membresia: $membresia, Nombre: $nombreCompleto, Apellido: $apellido, Puntos: $puntos, Puntos Iniciales: $puntosIniciales");
 
         echo json_encode([
             'success' => true,
@@ -120,6 +123,7 @@ function consultarClienteClub()
             'datos' => [
                 'membresia' => intval($cliente['membresia']),
                 'nombre' => $nombreCompleto,
+                'nombre_completo' => $nombreYApellido,
                 'puntos' => $puntos,
                 'puntos_iniciales' => $puntosIniciales
             ]

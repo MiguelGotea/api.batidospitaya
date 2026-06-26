@@ -64,3 +64,47 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: #0E544C;
 }
+
+/* ──────────────────────────────────────────────────────── */
+/* BARRA DE FORMATO HTML (html-toolbar)                     */
+/* Usada en textareas con contenido HTML editable           */
+/* ──────────────────────────────────────────────────────── */
+
+.btn-xs {
+    padding: 0.18rem 0.55rem;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    border-radius: 4px;
+}
+
+.html-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 6px 8px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px 6px 0 0;
+    border-bottom: none;
+}
+
+.html-toolbar + .form-text,
+.html-toolbar + div.form-text {
+    margin-top: 0;
+    padding: 2px 6px;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-top: 1px dashed #ced4da;
+    border-bottom: none;
+    border-radius: 0;
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+
+.html-toolbar ~ textarea.form-control,
+.html-toolbar + .form-text + textarea.form-control,
+.html-toolbar + div.form-text + textarea.form-control {
+    border-radius: 0 0 6px 6px;
+    border-top: 1px dashed #ced4da;
+}
+

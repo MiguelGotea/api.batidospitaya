@@ -65,7 +65,11 @@ El sistema utiliza una arquitectura modular donde solo los módulos autorizados 
 1. **Módulos Trackeados**: Solo los módulos listados en el `.gitignore` (vía `!/modulos/{nombre}/`) se suben a GitHub.
 2. **Despliegue Automático**: El workflow `deploy-erp.yml` sincroniza estos mismos módulos al host. Si un módulo no está en la lista `MODULES` del workflow, no se subirá al servidor.
 3. **Subida de Cambios**:
+<<<<<<< Updated upstream
    - **Global**: `./.scripts/gitpush_*.ps1` (Sube todos los cambios de forma unificada).
+=======
+   - **Global**: `./.scripts/gitpush_erp.ps1` (Sube todo el ERP de forma unificada).
+>>>>>>> Stashed changes
 
 ---
 

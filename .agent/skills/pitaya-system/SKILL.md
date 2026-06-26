@@ -51,7 +51,7 @@ El ecosistema utiliza el modelo **Mano de Hierro (Iron Sync v13.1)** de Inyecci�
 1. **Desarrollo en el Maestro**: Realiza cambios globales exclusivamente en `PitayaCore`.
 2. **Inyección Maestro**: Usa el script de push para disparar la orquestación global:
    ```powershell
-   ./PitayaCore/.scripts/gitpush.ps1
+   ./.scripts/gitpush_*.ps1  # ej: gitpush_erp.ps1, gitpush_talento.ps1, gitpush_pos.ps1
    ```
 3. **Sincronización Local**: Actualiza todos tus repositorios locales con:
    ```powershell
@@ -117,7 +117,7 @@ No todos los mÃ³dulos en la carpeta `modulos/` se suben a GitHub o al host. Es
 1. **GitHub (`.gitignore`)**: Solo las carpetas con una regla `!/modulos/{nombre}/` son rastreadas.
 2. **Deploy (`deploy-erp.yml`)**: El script de despliegue tiene una lista `MODULES` que define quÃ© se sincroniza con el host.
 3. **Push de Cambios**:
-   - Usa `./.scripts/gitpush.ps1` para subir todos los cambios de forma unificada.
+   - Usa `./.scripts/gitpush_erp.ps1` para subir todos los cambios de forma unificada.
 
 
 ## ðŸŽ¨ Identidad Visual

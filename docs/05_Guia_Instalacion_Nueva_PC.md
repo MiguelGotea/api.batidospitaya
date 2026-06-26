@@ -90,7 +90,11 @@ Si hace falta alguno o deseas crearlos de cero, estos son los requeridos (ejempl
 Una vez configurado, el sistema funcionará de la siguiente manera:
 
 1. **Desarrollo**: Trabajas normalmente en tu repositorio (ej: `pos.batidospitaya`).
+<<<<<<< Updated upstream
 2. **Push de Cambios**: Ejecutas `.\.scripts\gitpush_talento.ps1` (o el script correspondiente del proyecto: `gitpush_erp.ps1`, `gitpush_pos.ps1`).
+=======
+2. **Push de Cambios**: Ejecutas `.\.scripts\gitpush_erp.ps1` (o el script correspondiente: `gitpush_talento.ps1`, `gitpush_pos.ps1`).
+>>>>>>> Stashed changes
 3. **Actualización del Core (Automática)**: 
    - Si GitHub detecta cambios en las carpetas `core/`, `docs/` o `.agent/`, activará el workflow **"Propose Core Update"**.
    - Este proceso inyectará tus cambios al Maestro (`PitayaCore`).

@@ -90,7 +90,7 @@ Si hace falta alguno o deseas crearlos de cero, estos son los requeridos (ejempl
 Una vez configurado, el sistema funcionará de la siguiente manera:
 
 1. **Desarrollo**: Trabajas normalmente en tu repositorio (ej: `pos.batidospitaya`).
-2. **Push de Cambios**: Ejecutas `.\.scripts\gitpush.ps1`.
+2. **Push de Cambios**: Ejecutas `.\.scripts\gitpush_talento.ps1` (o el script correspondiente del proyecto: `gitpush_erp.ps1`, `gitpush_pos.ps1`).
 3. **Actualización del Core (Automática)**: 
    - Si GitHub detecta cambios en las carpetas `core/`, `docs/` o `.agent/`, activará el workflow **"Propose Core Update"**.
    - Este proceso inyectará tus cambios al Maestro (`PitayaCore`).
@@ -101,7 +101,7 @@ Una vez configurado, el sistema funcionará de la siguiente manera:
 
 ¿Qué pasa si cambias algo en la PC principal y al mismo tiempo en la nueva cuenta? **Nada malo.**
 
-El script `gitpush.ps1` (Tanque v7) está diseñado para evitar sobreescrituras:
+Los scripts `gitpush_*.ps1` (Tanque v7) están diseñados para evitar sobreescrituras:
 - **`git pull --rebase`**: Antes de subir, descarga e integra los cambios del servidor.
 - **Auto-Stack**: Tus cambios locales se "apilan" ordenadamente después de lo descargado.
 - **Cero Pérdida**: El sistema fusiona ambos trabajos de forma inteligente.

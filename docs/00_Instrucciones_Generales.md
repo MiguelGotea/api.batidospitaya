@@ -331,5 +331,6 @@ Para cada módulo nuevo, generar:
 - **No intentar conectar ni verificar la base de datos local (MySQL, XAMPP, Laragon, root, puertos)**. El entorno local no cuenta con la base de datos del proyecto importada.
 - **Utilizar únicamente los archivos SQL del repositorio** (`/SQL/u839374897_erp (solo script de tablas).sql` y `/SQL/u839374897_erp (completo).sql`) para analizar el esquema y la estructura de las tablas.
 - **Toda modificación del esquema o datos de la base de datos se debe escribir en un script SQL** (por ejemplo, en la carpeta `/SQL/migraciones/`) para que el usuario pueda transcribirla a Hostinger manualmente.
+- **EVITAR ARCHIVOS VACÍOS (0 BYTES)**: Queda estrictamente prohibido crear, modificar o guardar archivos de código vacíos o sin contenido. Antes de cualquier commit, se debe validar que los archivos no estén vacíos. Si el asistente detecta archivos en blanco, debe restaurarlos a su última versión con código o informar al usuario.
 
 

@@ -90,15 +90,16 @@ try {
 
     $sql = "INSERT INTO `" . SDEP_TABLE . "`
                 (Sucursal, CodDeposito, Monto, Denominacion, Tipo,
-                 Fecha, Observacion, DuranteTurno, FechaUltimoSync)
+                 Fecha, Hora, Observacion, DuranteTurno, FechaUltimoSync)
             VALUES
                 (:suc, :cod, :monto, :denom, :tipo,
-                 :fecha, :obs, :turno, NOW())
+                 :fecha, :hora, :obs, :turno, NOW())
             ON DUPLICATE KEY UPDATE
                 Monto           = VALUES(Monto),
                 Denominacion    = VALUES(Denominacion),
                 Tipo            = VALUES(Tipo),
                 Fecha           = VALUES(Fecha),
+                Hora            = VALUES(Hora),
                 Observacion     = VALUES(Observacion),
                 DuranteTurno    = VALUES(DuranteTurno),
                 FechaUltimoSync = NOW()";
@@ -109,6 +110,14 @@ try {
         $cod = isset($r['CodDeposito']) ? (int)$r['CodDeposito'] : 0;
         if ($cod < 1) { sdepLog("Fila $idx ignorada: CodDeposito inválido."); continue; }
 
+        $hora_val = !empty($r['Hora']) ? $r['Hora'] : null;
+        if ($hora_val !== null) {
+            $ts = strtotime($hora_val);
+            if ($ts !== false) {
+                $hora_val = date('H:i:s', $ts);
+            }
+        }
+
         $stmt->execute([
             ':suc'   => $sucursal,
             ':cod'   => $cod,
@@ -116,6 +125,7 @@ try {
             ':denom' => $r['Denominacion']        ?? null,
             ':tipo'  => $r['Tipo']                ?? null,
             ':fecha' => !empty($r['Fecha'])        ? $r['Fecha']             : null,
+            ':hora'  => $hora_val,
             ':obs'   => $r['Observacion']          ?? null,
             ':turno' => isset($r['DuranteTurno']) ? (int)$r['DuranteTurno'] : null,
         ]);

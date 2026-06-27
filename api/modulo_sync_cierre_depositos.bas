@@ -232,6 +232,7 @@ Private Function ScdRowDEP(rs As DAO.Recordset, c As String) As String
     s = s & """Denominacion"":" & ScdStr(rs!Denominacion)   & ","
     s = s & """Tipo"":"         & ScdStr(rs!Tipo)            & ","
     s = s & """Fecha"":"        & ScdFecha(rs!Fecha)         & ","
+    s = s & """Hora"":"         & ScdFechaHora(rs!Hora)      & ","
     s = s & """Observacion"":"  & ScdStr(rs!Observacion)    & ","
     s = s & """DuranteTurno"":" & ScdVal(rs!DuranteTurno)   & ","
     s = s & """Sucursal"":"     & ScdStr(c)

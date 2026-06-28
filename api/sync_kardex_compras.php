@@ -89,12 +89,12 @@ try {
     $insertados = $actualizados = 0;
 
     $sql = "INSERT INTO `" . KC_TABLE . "`
-                (Sucursal, CodIngresoAlmacen, CodCotizacion, Cantidad, Fecha,
+                (Sucursal, CodIngresoAlmacen, CodCotizacion, Cantidad, Fecha, Hora,
                  CostoTotal, Observaciones, CodProveedor, Destino, Tipo,
                  Pagado, NumeroFactura, CodOperario, Ingresado, Lote, Peso,
                  FechaUltimoSync)
             VALUES
-                (:suc, :cod, :codcot, :cant, :fecha,
+                (:suc, :cod, :codcot, :cant, :fecha, :hora,
                  :costo, :obs, :prov, :dest, :tipo,
                  :pagado, :factura, :oper, :ing, :lote, :peso,
                  NOW())
@@ -102,6 +102,7 @@ try {
                 CodCotizacion   = VALUES(CodCotizacion),
                 Cantidad        = VALUES(Cantidad),
                 Fecha           = VALUES(Fecha),
+                Hora            = VALUES(Hora),
                 CostoTotal      = VALUES(CostoTotal),
                 Observaciones   = VALUES(Observaciones),
                 CodProveedor    = VALUES(CodProveedor),
@@ -130,6 +131,7 @@ try {
             ':codcot' => isset($r['CodCotizacion'])  ? (int)$r['CodCotizacion']   : null,
             ':cant'   => isset($r['Cantidad'])        ? (float)$r['Cantidad']      : null,
             ':fecha'  => !empty($r['Fecha'])          ? $r['Fecha']                : null,
+            ':hora'   => !empty($r['Hora'])           ? $r['Hora']                 : null,
             ':costo'  => isset($r['CostoTotal'])      ? (float)$r['CostoTotal']    : null,
             ':obs'    => $r['Observaciones']          ?? null,
             ':prov'   => isset($r['CodProveedor'])    ? (int)$r['CodProveedor']    : null,

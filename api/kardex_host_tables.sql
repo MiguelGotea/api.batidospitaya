@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS `msaccess_masivo_Compras` (
     `CodCotizacion`     INT              DEFAULT NULL,
     `Cantidad`          DOUBLE           DEFAULT NULL,
     `Fecha`             DATE             DEFAULT NULL,
+    `Hora`              TIME             DEFAULT NULL,
     `CostoTotal`        DOUBLE           DEFAULT NULL,
     `Observaciones`     VARCHAR(255)     DEFAULT NULL,
     `CodProveedor`      INT              DEFAULT NULL,

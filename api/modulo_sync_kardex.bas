@@ -348,6 +348,7 @@ Private Function KdxRowC(rs As DAO.Recordset, c As String) As String
     s = s & """CodCotizacion"":"     & KdxVal(rs!CodCotizacion)      & ","
     s = s & """Cantidad"":"          & KdxVal(rs!Cantidad)            & ","
     s = s & """Fecha"":"             & KdxFecha(rs!Fecha)             & ","
+    s = s & """Hora"":"              & KdxHora(rs!Hora)               & ","
     s = s & """CostoTotal"":"        & KdxVal(rs!CostoTotal)          & ","
     s = s & """Observaciones"":"     & KdxStr(rs!Observaciones)       & ","
     s = s & """CodProveedor"":"      & KdxVal(rs!CodProveedor)        & ","

@@ -227,7 +227,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 8, 16]
             ],
             [
-                'nombre' => 'Historial Cierres Diarios',
+                'nombre' => 'Cierres Diarios',
                 'url' => 'contabilidad/historial_cierres_diarios.php',
                 'cargos_permitidos' => [49, 42]
             ],

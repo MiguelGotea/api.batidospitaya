@@ -639,3 +639,107 @@ Public Sub ProbarSyncAnulaciones()
         MsgBox "Error en lectura. Ver Ctrl+G.", vbExclamation, "Sync Anulaciones"
     End If
 End Sub
+
+' ══════════════════════════════════════════════════════════
+' Sincronización Bidireccional de Anulación de Cierres Diarios
+' Llamar en un Timer cada 30 segundos (junto a los de pedidos o similares)
+' ══════════════════════════════════════════════════════════
+Public Function SyncAnularCierresPendientes() As Boolean
+    On Error GoTo ErrorHandler
+
+    Dim sUrlLeer As String
+    sUrlLeer = "https://proxy.batidospitaya.com/api/read_anulacion_cierres_diarios.php"
+
+    Dim codSuc As String
+    codSuc = CStr(codigoLocal())
+    If codSuc = "0" Or codSuc = "" Then
+        AnulacionLog "SyncCierres", "codigoLocal() inválido."
+        Exit Function
+    End If
+    
+    Dim sPayload As String
+    Dim sResp As String
+    sPayload = "{""sucursal"":""" & codSuc & """}"
+
+    If Not HttpPost(sUrlLeer, sPayload, sResp) Then
+        AnulacionLog "SyncCierres", "Fallo HTTP lectura: " & sResp
+        Exit Function
+    End If
+    
+    If InStr(sResp, """success"":true") = 0 Then
+        Exit Function
+    End If
+    
+    Dim posStart As Long, posEnd As Long
+    posStart = InStr(sResp, """registros"":[")
+    If posStart = 0 Then Exit Function
+    posStart = InStr(posStart, sResp, "[") + 1
+    
+    Dim posObj As Long
+    Dim posObjEnd As Long
+    posObj = posStart
+    
+    Dim sListaProcesados As String
+    sListaProcesados = "["
+    Dim bPrimero As Boolean
+    bPrimero = True
+    Dim cantProcesados As Integer
+    cantProcesados = 0
+    
+    Do
+        posObj = InStr(posObj, sResp, "{")
+        If posObj = 0 Then Exit Do
+        
+        posObjEnd = InStr(posObj, sResp, "}")
+        If posObjEnd = 0 Then Exit Do
+        
+        Dim sObj As String
+        sObj = Mid(sResp, posObj, posObjEnd - posObj + 1)
+        
+        Dim lngCodCierre As Long
+        lngCodCierre = CLng(AnulExtraerJSON(sObj, "CodigoCierre"))
+        
+        If lngCodCierre > 0 Then
+            On Error Resume Next
+            DoCmd.SetWarnings False
+            DoCmd.RunSQL "UPDATE CierreDiario SET HoraFinal = DateAdd('n', 1, HoraInicial) WHERE CodigoCierre = " & lngCodCierre
+            DoCmd.SetWarnings True
+            
+            If Err.Number = 0 Then
+                If Not bPrimero Then sListaProcesados = sListaProcesados & ","
+                sListaProcesados = sListaProcesados & CStr(lngCodCierre)
+                bPrimero = False
+                cantProcesados = cantProcesados + 1
+            Else
+                AnulacionLog "SyncCierres", "Error update Cierre: " & Err.Description
+                Err.Clear
+            End If
+            On Error GoTo ErrorHandler
+        End If
+        
+        posObj = posObjEnd + 1
+    Loop
+    
+    sListaProcesados = sListaProcesados & "]"
+    
+    If cantProcesados > 0 Then
+        Dim sUrlConfirm As String
+        sUrlConfirm = "https://proxy.batidospitaya.com/api/confirm_anulacion_cierres_diarios.php"
+        
+        Dim sPayloadConfirm As String
+        Dim sRespConfirm As String
+        
+        sPayloadConfirm = "{""sucursal"":""" & codSuc & """,""codigos"":" & sListaProcesados & "}"
+        If HttpPost(sUrlConfirm, sPayloadConfirm, sRespConfirm) Then
+            AnulacionLog "SyncCierres", "Confirmados " & CStr(cantProcesados) & " cierres."
+        Else
+            AnulacionLog "SyncCierres", "Fallo HTTP confirmar: " & sRespConfirm
+        End If
+    End If
+
+    SyncAnularCierresPendientes = True
+    Exit Function
+ErrorHandler:
+    AnulacionLog "SyncCierres", "Error " & Err.Number & ": " & Err.Description
+    SyncAnularCierresPendientes = False
+End Function

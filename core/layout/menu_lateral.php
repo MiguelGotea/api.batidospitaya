@@ -566,6 +566,38 @@ $menuGlobal = [
         ]
     ],
     [
+        'nombre' => 'Portal Talento',
+        'icon' => 'fas fa-globe',
+        'cargos_permitidos' => [],
+        'items' => [
+            [
+                'nombre' => 'Sobre Nosotros',
+                'url' => 'talento_contenido/nosotros.php',
+                'cargos_permitidos' => [16, 49, 42, 50]
+            ],
+            [
+                'nombre' => 'Colaboradores Portal',
+                'url' => 'talento_contenido/colaboradores.php',
+                'cargos_permitidos' => [16, 49, 42, 50]
+            ],
+            [
+                'nombre' => 'Noticias Portal',
+                'url' => 'talento_contenido/noticias.php',
+                'cargos_permitidos' => [16, 49, 42, 50]
+            ],
+            [
+                'nombre' => 'Habilidades Portal',
+                'url' => 'talento_contenido/habilidades.php',
+                'cargos_permitidos' => [16, 49, 42, 50]
+            ],
+            [
+                'nombre' => 'Configuración Portal',
+                'url' => 'talento_contenido/configuracion.php',
+                'cargos_permitidos' => [16, 49, 42, 50]
+            ],
+        ]
+    ],
+    [
         'nombre' => 'Cerrar Sesion',
         'icon' => 'fas fa-sign-out-alt',
         'cargos_permitidos' => [],

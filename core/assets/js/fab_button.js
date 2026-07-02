@@ -141,6 +141,29 @@
         handle.addEventListener('mousedown',  onPointerDown);
         handle.addEventListener('touchstart', onPointerDown, { passive: true });
 
+        // Toggle active state on click (supports tap on mobile and click on desktop to keep menu open)
+        handle.addEventListener('click', function (e) {
+            if (fab.classList.contains('fab-just-dragged')) {
+                return;
+            }
+            fab.classList.toggle('active');
+            e.stopPropagation();
+        });
+
+        // Close menu when clicking outside of the fab container
+        document.addEventListener('click', function (e) {
+            if (!fab.contains(e.target)) {
+                fab.classList.remove('active');
+            }
+        });
+
+        // Close menu when clicking an option (event delegation)
+        fab.addEventListener('click', function (e) {
+            if (e.target.closest('.fab-option')) {
+                fab.classList.remove('active');
+            }
+        });
+
         // Interceptar click post-drag para no abrir el menú
         fab.addEventListener('click', function (e) {
             if (fab.classList.contains('fab-just-dragged')) {

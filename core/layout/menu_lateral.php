@@ -398,6 +398,11 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
+                'nombre' => 'Historial Despachos',
+                'url' => 'despacho/historial_despacho.php',
+                'cargos_permitidos' => [49, 12, 16]
+            ],
+            [
                 'nombre' => 'Compras Locales Configuracion',
                 'url' => 'cds/compra_local_configuracion_despacho.php',
                 'cargos_permitidos' => [49, 12]

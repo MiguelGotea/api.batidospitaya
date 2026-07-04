@@ -21,7 +21,10 @@
 .btn-floating-pitaya {
     position: fixed;
     bottom: 35px;
+    /* iOS notch/home-indicator: alejar del borde inferior en dispositivos con safe area */
+    bottom: calc(35px + env(safe-area-inset-bottom, 0px));
     right: 35px;
+    right: calc(35px + env(safe-area-inset-right, 0px));
     width: 65px;
     height: 65px;
     border-radius: 50%;
@@ -83,11 +86,21 @@
         touch-action: manipulation;
     }
 
+    /* Reset positioning inside fab-container to allow normal flex layout */
+    .fab-container .btn-floating-pitaya {
+        position: relative !important;
+        bottom: auto !important;
+        right: auto !important;
+        left: auto !important;
+        top: auto !important;
+    }
+
     .fab-container {
         /* Anclar el contenedor al viewport en móvil, ignorando scroll */
         position: fixed !important;
-        bottom: 20px !important;
-        right: 20px !important;
+        /* Safe area: respetar el indicador de inicio en iPhones con notch */
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+        right: calc(20px + env(safe-area-inset-right, 0px)) !important;
         left: auto !important;
         top: auto !important;
         touch-action: manipulation;
@@ -107,7 +120,10 @@
 .fab-container {
     position: fixed;
     bottom: 35px;
+    /* iOS safe area (desktop no la tiene, env() devuelve 0px por defecto) */
+    bottom: calc(35px + env(safe-area-inset-bottom, 0px));
     right: 35px;
+    right: calc(35px + env(safe-area-inset-right, 0px));
     z-index: 1000;
     display: flex;
     flex-direction: column;
@@ -143,7 +159,12 @@
     /* Limitar altura máxima para que las opciones nunca salgan del viewport */
     max-height: calc(100vh - 160px);
     overflow-y: auto;
-    overflow-x: visible;
+    /* CRÍTICO: no usar overflow-x: visible con overflow-y: auto —
+       CSS fuerza ambos a auto, lo que puede generar scroll horizontal.
+       hidden previene cualquier desbordamiento lateral. */
+    overflow-x: hidden;
+    /* Limitar ancho total para que las etiquetas no salgan del viewport */
+    max-width: calc(100vw - 80px);
     /* Scrollbar discreta */
     scrollbar-width: thin;
     scrollbar-color: #51B8AC transparent;
@@ -178,15 +199,31 @@
     white-space: nowrap;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     opacity: 0;
-    transform: translateX(10px);
+    /* Animamos desde la izquierda (−8px), nunca hacia la derecha,
+       para evitar que la etiqueta sobrepase el borde derecho del viewport
+       durante la transición de entrada. */
+    transform: translateX(-8px);
     transition: all 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
+    /* Evitar que etiquetas largas desborden el viewport */
+    max-width: clamp(140px, 55vw, 280px);
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .fab-option:hover .fab-label,
 .fab-container.active .fab-label {
     opacity: 1;
     transform: translateX(0);
+}
+
+/* En pantallas pequeñas reducir el tamaño de las etiquetas */
+@media (max-width: 480px) {
+    .fab-label {
+        font-size: 0.78rem;
+        padding: 5px 10px;
+        max-width: clamp(110px, 52vw, 200px);
+    }
 }
 
 .fab-icon-holder {

@@ -17,6 +17,37 @@
     const MARGIN = 10;
 
     /**
+     * Lee los safe area insets del entorno del navegador.
+     * En iOS (iPhone X+) devuelve el espacio ocupado por el home indicator / notch.
+     * En el resto de dispositivos devuelve {bottom: 0, right: 0}.
+     * Se usa un elemento temporal con padding seteado a env() para leer el valor.
+     */
+    function getSafeAreaInsets() {
+        try {
+            const probe = document.createElement('div');
+            probe.style.cssText = [
+                'position:fixed',
+                'bottom:0',
+                'right:0',
+                'height:0',
+                'width:0',
+                'padding-bottom:env(safe-area-inset-bottom,0px)',
+                'padding-right:env(safe-area-inset-right,0px)',
+                'visibility:hidden',
+                'pointer-events:none'
+            ].join(';');
+            document.documentElement.appendChild(probe);
+            const cs = window.getComputedStyle(probe);
+            const bottom = parseFloat(cs.paddingBottom) || 0;
+            const right  = parseFloat(cs.paddingRight)  || 0;
+            document.documentElement.removeChild(probe);
+            return { bottom, right };
+        } catch (e) {
+            return { bottom: 0, right: 0 };
+        }
+    }
+
+    /**
      * Clamp un valor entre min y max
      */
     function clamp(val, min, max) {
@@ -44,10 +75,15 @@
             document.body.appendChild(fab);
         }
 
+        // ── Leer safe area una sola vez al iniciar (ej. iPhone home indicator)
+        const safeArea = getSafeAreaInsets();
+        const INIT_BOTTOM = 20 + safeArea.bottom;
+        const INIT_RIGHT  = 20 + safeArea.right;
+
         // ── Forzar position:fixed via inline style (máxima prioridad)
         forceFixed(fab);
-        fab.style.bottom = '20px';
-        fab.style.right  = '20px';
+        fab.style.bottom = INIT_BOTTOM + 'px';
+        fab.style.right  = INIT_RIGHT  + 'px';
 
         let dragging    = false;
         let didDrag     = false;
@@ -71,8 +107,11 @@
         /* ── Aplicar posición con seguridad de límites ── */
         function safePosition(right, bottom) {
             const { w, h } = getTriggerSize();
-            const r = clamp(right,  MARGIN, Math.max(MARGIN, window.innerWidth  - w - MARGIN));
-            const b = clamp(bottom, MARGIN, Math.max(MARGIN, window.innerHeight - h - MARGIN));
+            // Mínimo bottom respeta el safe area (home indicator iOS)
+            const minBottom = MARGIN + safeArea.bottom;
+            const minRight  = MARGIN + safeArea.right;
+            const r = clamp(right,  minRight,  Math.max(minRight,  window.innerWidth  - w - MARGIN));
+            const b = clamp(bottom, minBottom, Math.max(minBottom, window.innerHeight - h - MARGIN));
             fab.style.right  = r + 'px';
             fab.style.bottom = b + 'px';
         }
@@ -196,12 +235,12 @@
         }, { passive: true });
 
         window.addEventListener('resize', function () {
-            // BUG FIX: usar safePosition que basa los límites en el trigger,
-            // NO en fab.offsetHeight (que incluye opciones expandidas y produce
-            // bottom negativo → FAB desaparece de pantalla).
+            // Re-leer safe area en caso de cambio de orientación (portrait ↔ landscape)
+            // No se necesita actualizar safeArea porque los valores env() se recalculan
+            // via CSS; sólo reclampeamos la posición para que siga dentro del viewport.
             safePosition(
-                parseFloat(fab.style.right)  || 20,
-                parseFloat(fab.style.bottom) || 20
+                parseFloat(fab.style.right)  || INIT_RIGHT,
+                parseFloat(fab.style.bottom) || INIT_BOTTOM
             );
             // Recalcular altura de opciones si el menú está abierto
             if (fab.classList.contains('active')) {

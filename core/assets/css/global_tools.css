@@ -8,6 +8,11 @@
     font-size: clamp(12px, 2vw, 18px) 
 }
 
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
 body {
     background-color: #F6F6F6;
     color: #333;

@@ -59,6 +59,24 @@
         const handle = fab.querySelector('.btn-floating-pitaya') || fab;
         handle.style.cursor = 'grab';
 
+        /* ── Dimensiones seguras del trigger (no del contenedor expandido) ── */
+        function getTriggerSize() {
+            const t = fab.querySelector('.btn-floating-pitaya') || fab;
+            return {
+                w: t.offsetWidth  || 65,
+                h: t.offsetHeight || 65
+            };
+        }
+
+        /* ── Aplicar posición con seguridad de límites ── */
+        function safePosition(right, bottom) {
+            const { w, h } = getTriggerSize();
+            const r = clamp(right,  MARGIN, Math.max(MARGIN, window.innerWidth  - w - MARGIN));
+            const b = clamp(bottom, MARGIN, Math.max(MARGIN, window.innerHeight - h - MARGIN));
+            fab.style.right  = r + 'px';
+            fab.style.bottom = b + 'px';
+        }
+
         /* ── Coordenadas normalizadas mouse/touch ── */
         function getCoords(e) {
             const t = e.touches ? e.touches[0] : e;
@@ -105,18 +123,8 @@
 
             if (!didDrag) return;
 
-            const fabW = fab.offsetWidth;
-            const fabH = fab.offsetHeight;
-
             // right decrece al mover derecha (dx+), bottom decrece al mover abajo (dy+)
-            let newRight  = startRight  - dx;
-            let newBottom = startBottom - dy;
-
-            newRight  = clamp(newRight,  MARGIN, window.innerWidth  - fabW - MARGIN);
-            newBottom = clamp(newBottom, MARGIN, window.innerHeight - fabH - MARGIN);
-
-            fab.style.right  = newRight  + 'px';
-            fab.style.bottom = newBottom + 'px';
+            safePosition(startRight - dx, startBottom - dy);
         }
 
         /* ── FIN DEL DRAG ── */
@@ -141,12 +149,14 @@
         handle.addEventListener('mousedown',  onPointerDown);
         handle.addEventListener('touchstart', onPointerDown, { passive: true });
 
-        // Toggle active state on click (supports tap on mobile and click on desktop to keep menu open)
         handle.addEventListener('click', function (e) {
             if (fab.classList.contains('fab-just-dragged')) {
                 return;
             }
             fab.classList.toggle('active');
+            if (fab.classList.contains('active')) {
+                ajustarAlturaOpciones(fab);
+            }
             e.stopPropagation();
         });
 
@@ -173,22 +183,68 @@
         }, true);
 
         // ── Seguro extra para navegadores móviles con scroll problemático:
-        //    re-afirmar position:fixed si el scroll mueve el elemento
+        //    re-afirmar position:fixed si el scroll mueve el elemento.
+        //    Throttle con rAF para no disparar decenas de veces por segundo.
+        let scrollRafId = null;
         window.addEventListener('scroll', function () {
-            if (!dragging) {
-                forceFixed(fab);
+            if (!dragging && !scrollRafId) {
+                scrollRafId = requestAnimationFrame(function () {
+                    scrollRafId = null;
+                    forceFixed(fab);
+                });
             }
         }, { passive: true });
 
         window.addEventListener('resize', function () {
-            // Al rotar pantalla, re-confinar dentro del nuevo viewport
-            const fabW = fab.offsetWidth;
-            const fabH = fab.offsetHeight;
-            const r = clamp(parseFloat(fab.style.right)  || 20, MARGIN, window.innerWidth  - fabW - MARGIN);
-            const b = clamp(parseFloat(fab.style.bottom) || 20, MARGIN, window.innerHeight - fabH - MARGIN);
-            fab.style.right  = r + 'px';
-            fab.style.bottom = b + 'px';
+            // BUG FIX: usar safePosition que basa los límites en el trigger,
+            // NO en fab.offsetHeight (que incluye opciones expandidas y produce
+            // bottom negativo → FAB desaparece de pantalla).
+            safePosition(
+                parseFloat(fab.style.right)  || 20,
+                parseFloat(fab.style.bottom) || 20
+            );
+            // Recalcular altura de opciones si el menú está abierto
+            if (fab.classList.contains('active')) {
+                ajustarAlturaOpciones(fab);
+            }
         }, { passive: true });
+    }
+
+    /**
+     * Ajusta el max-height de .fab-options según el espacio disponible
+     * hacia arriba del trigger en el viewport, evitando desbordamiento
+     * y que las opciones tapen el botón principal.
+     */
+    function ajustarAlturaOpciones(fab) {
+        const options = fab.querySelector('.fab-options');
+        if (!options) return;
+
+        const trigger = fab.querySelector('.btn-floating-pitaya');
+        const GAP = 15; // gap del flex-container entre options y trigger
+        const PADDING_SAFE = 12; // espacio extra desde el borde superior del viewport
+
+        // Posición del botón trigger relativa al viewport
+        let triggerBottom;
+        if (trigger) {
+            const rect = trigger.getBoundingClientRect();
+            // La parte superior del trigger dentro del viewport
+            triggerBottom = rect.top;
+        } else {
+            // Fallback: usar el bottom del fab
+            const fabBottom = parseFloat(fab.style.bottom) || 20;
+            triggerBottom = window.innerHeight - fabBottom - 65;
+        }
+
+        // Espacio disponible hacia arriba: desde el tope del viewport hasta justo
+        // encima del trigger, menos el gap y el padding de seguridad
+        const espacioDisponible = triggerBottom - GAP - PADDING_SAFE;
+
+        if (espacioDisponible > 60) {
+            options.style.maxHeight = espacioDisponible + 'px';
+        } else {
+            // Muy poco espacio: colapsar a mínimo con scroll
+            options.style.maxHeight = '60px';
+        }
     }
 
     /* ── Esperar a que el DOM esté listo ── */

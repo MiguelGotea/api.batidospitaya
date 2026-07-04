@@ -140,6 +140,15 @@
     visibility: hidden;
     transform: translateY(20px);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Limitar altura máxima para que las opciones nunca salgan del viewport */
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    overflow-x: visible;
+    /* Scrollbar discreta */
+    scrollbar-width: thin;
+    scrollbar-color: #51B8AC transparent;
+    /* Padding inferior para que el último botón no quede pegado al trigger */
+    padding-bottom: 4px;
 }
 
 .fab-container:hover .fab-options,

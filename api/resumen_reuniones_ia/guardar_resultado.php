@@ -28,6 +28,8 @@ if (!$body) {
 
 $tokenReunion   = trim($body['token']            ?? '');
 $resultadoFinal = trim($body['resultado_final']  ?? '');
+$transcripcion  = trim($body['transcripcion']    ?? '');
+$resumen        = trim($body['resumen']          ?? '');
 $rutaAudio      = trim($body['ruta_audio']       ?? '');
 
 if (empty($tokenReunion)) {
@@ -64,6 +66,8 @@ try {
         UPDATE resumen_reuniones_ia
         SET
             resultado_final  = :resultado_final,
+            transcripcion    = :transcripcion,
+            resumen          = :resumen,
             ruta_audio       = :ruta_audio,
             estado           = 'completada',
             fecha_completada = NOW()
@@ -72,6 +76,8 @@ try {
 
     $update->execute([
         ':resultado_final' => $resultadoFinal,
+        ':transcripcion'   => $transcripcion,
+        ':resumen'         => $resumen,
         ':ruta_audio'      => $rutaAudio ?: null,
         ':id'              => (int) $reunion['id'],
     ]);

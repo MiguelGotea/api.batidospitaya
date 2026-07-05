@@ -76,6 +76,16 @@ try {
 
     $estadoActual = $reunion['estado'];
 
+    // Idempotente: si ya está en ese estado, retornar éxito sin error
+    if ($estadoActual === $nuevoEstado) {
+        reunionOk([
+            'reunion_id'    => (int) $reunion['id'],
+            'estado_previo' => $estadoActual,
+            'estado_nuevo'  => $nuevoEstado,
+            'idempotent'    => true,
+        ]);
+    }
+
     // Validar transición
     $permitidos = $transicionesValidas[$estadoActual] ?? [];
     if (!in_array($nuevoEstado, $permitidos, true)) {
@@ -85,6 +95,7 @@ try {
             422
         );
     }
+
 
     // Construir UPDATE
     $campos = ['estado = :estado'];

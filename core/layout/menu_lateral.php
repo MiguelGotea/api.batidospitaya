@@ -561,8 +561,8 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Inventario Semanal',
-                'url' => 'inventario/inventario_semanal.php',
+                'nombre' => 'Conteo Cíclico',
+                'url' => 'inventario/conteo_ciclico.php',
                 'cargos_permitidos' => [27, 16, 49, 55]
             ],
         ]

@@ -25,20 +25,44 @@ define('HUELLA_VPS_URL', 'http://198.211.97.243:8889');
 
 // ── Tokens ───────────────────────────────────────────────────
 define('HUELLA_TOKEN_VPS', 'hv_7f3a9c2e5b8d1470f3a9c8e2b5d7a4c1e8f4b9d3a6c2e7f1b8d5a4c9e3f2b5d8');
-define('HUELLA_TOKEN_ERP', 'he_4f7a2c9e1d8b3650a9f2c8e3b1d7a5c2e8f4b9d3a6c1e7f2b8d5a3c9e6f1b4d7');
+define('HUELLA_TOKEN_ERP', 'he_4f7a2c9e1d8b3650a9f2c8e3b1d7a5c2e8f4b9d3a6c2e7f1b8d5a4c9e3f2b5d8');
+
+/**
+ * Lee el token de todas las fuentes posibles.
+ * Fallback para Apache/Hostinger que a veces no pasa headers custom a PHP.
+ */
+function _leerTokenHuella(): string
+{
+    // 1. Forma estándar: $_SERVER (funciona en nginx y Apache con mod_php)
+    $token = $_SERVER['HTTP_X_HUELLA_TOKEN'] ?? '';
+
+    // 2. getallheaders() — funciona en Apache mod_php
+    if (empty($token) && function_exists('getallheaders')) {
+        $h     = getallheaders();
+        $token = $h['X-Huella-Token'] ?? $h['x-huella-token'] ?? '';
+    }
+
+    // 3. Body JSON — fallback para entornos donde Apache stripea headers custom
+    if (empty($token)) {
+        $raw  = @file_get_contents('php://input');
+        $body = $raw ? (json_decode($raw, true) ?? []) : [];
+        $token = $body['_huella_token'] ?? '';
+    }
+
+    // 4. Query string como último recurso
+    if (empty($token)) {
+        $token = $_GET['_huella_token'] ?? '';
+    }
+
+    return $token;
+}
 
 /**
  * Verifica que el header X-Huella-Token sea válido (VPS o ERP).
  */
 function verificarTokenHuella(): void
 {
-    $token = $_SERVER['HTTP_X_HUELLA_TOKEN'] ?? '';
-
-    if (empty($token) && function_exists('getallheaders')) {
-        $h     = getallheaders();
-        $token = $h['X-Huella-Token'] ?? $h['x-huella-token'] ?? '';
-    }
-
+    $token = _leerTokenHuella();
     if (empty($token) || ($token !== HUELLA_TOKEN_VPS && $token !== HUELLA_TOKEN_ERP)) {
         http_response_code(401);
         echo json_encode(['error' => 'No autorizado — token inválido o ausente']);
@@ -51,13 +75,7 @@ function verificarTokenHuella(): void
  */
 function verificarTokenHuellaERP(): void
 {
-    $token = $_SERVER['HTTP_X_HUELLA_TOKEN'] ?? '';
-
-    if (empty($token) && function_exists('getallheaders')) {
-        $h     = getallheaders();
-        $token = $h['X-Huella-Token'] ?? $h['x-huella-token'] ?? '';
-    }
-
+    $token = _leerTokenHuella();
     if (empty($token) || $token !== HUELLA_TOKEN_ERP) {
         http_response_code(401);
         echo json_encode(['error' => 'No autorizado — se requiere token ERP']);

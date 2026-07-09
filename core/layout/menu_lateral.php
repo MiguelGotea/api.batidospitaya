@@ -795,7 +795,7 @@ function renderMenuLateral($cargoOperario)
             box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
             overflow-y: auto;
             overflow-x: hidden;
-            z-index: 1000;
+            z-index: 1040;
             transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -1021,7 +1021,7 @@ function renderMenuLateral($cargoOperario)
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 1030;
             opacity: 0;
             transition: opacity 0.3s ease;
         }

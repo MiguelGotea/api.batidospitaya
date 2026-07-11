@@ -19,7 +19,7 @@ bash wireguard-install.sh (repetir para crear nuevo usuario)
 sed -i 's|AllowedIPs = 0.0.0.0/0,::/0|AllowedIPs = 0.0.0.0/1, 128.0.0.0/1, ::/1, 8000::/1|g' /root/wg0-client-contabilidad.conf && echo 'Listo:' && grep AllowedIPs /root/wg0-client-contabilidad.conf
 ```
 
-**Powershell (descargar archivo .conf)**
+**Powershell (descargar archivo .conf) descargar en powershell de pc**
 ```bash
 scp root@198.211.97.243:/root/wg0-client-contabilidad.conf "C:\Users\migue\Google Drive BP\Sistema Ultima Version\Llaves WireGuard\wg0-client-contabilidad.conf"
 ```

@@ -37,7 +37,6 @@ try {
             colaboradores,
             creado_por,
             token,
-            token_expira,
             estado,
             ruta_audio,
             audio_borrado,
@@ -58,12 +57,7 @@ try {
         reunionErr('Esta reunión ha sido cerrada y aprobada. El acceso ha sido revocado.', 410);
     }
 
-    // Verificar expiración
-    $ahora     = new DateTime();
-    $expiracion = new DateTime($reunion['token_expira']);
-    if ($ahora > $expiracion) {
-        reunionErr('El token de esta reunión ha expirado (6 horas desde la creación).', 403);
-    }
+
 
     // Decodificar colaboradores JSON
     $colaboradores = json_decode($reunion['colaboradores'] ?? '[]', true) ?: [];
@@ -76,7 +70,6 @@ try {
         'colaboradores'  => $colaboradores,
         'creado_por'     => (int) $reunion['creado_por'],
         'estado'         => $reunion['estado'],
-        'token_expira'   => $reunion['token_expira'],
         'ruta_audio'     => $reunion['ruta_audio'],
         'audio_borrado'  => (bool) $reunion['audio_borrado'],
         'fecha_creacion' => $reunion['fecha_creacion'],

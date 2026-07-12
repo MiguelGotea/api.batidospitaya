@@ -58,10 +58,10 @@ try {
 
     $stmt = $conn->prepare("
         INSERT INTO resumen_reuniones_ia
-            (titulo, descripcion, tipo_reunion, colaboradores, creado_por, token, token_expira, estado, fecha_creacion)
+            (titulo, descripcion, tipo_reunion, colaboradores, creado_por, token, estado, fecha_creacion)
         VALUES
             (:titulo, :descripcion, :tipo_reunion, :colaboradores, :creado_por, :token,
-             DATE_ADD(NOW(), INTERVAL 6 HOUR), 'creada', NOW())
+             'creada', NOW())
     ");
 
     $stmt->execute([

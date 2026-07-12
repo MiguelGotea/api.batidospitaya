@@ -55,7 +55,7 @@ $transicionesValidas = [
 try {
     // Obtener estado actual
     $stmt = $conn->prepare("
-        SELECT id, estado, token_expira
+        SELECT id, estado
         FROM resumen_reuniones_ia
         WHERE token = ?
         LIMIT 1
@@ -67,12 +67,7 @@ try {
         reunionErr('Token de reunión no encontrado', 404);
     }
 
-    // Verificar expiración
-    $ahora      = new DateTime();
-    $expiracion = new DateTime($reunion['token_expira']);
-    if ($ahora > $expiracion) {
-        reunionErr('El token de esta reunión ha expirado', 403);
-    }
+
 
     $estadoActual = $reunion['estado'];
 

@@ -27,6 +27,7 @@ if (!$body) {
 
 $titulo      = trim($body['titulo']      ?? '');
 $descripcion = trim($body['descripcion'] ?? '');
+$tipo_reunion = trim($body['tipo_reunion'] ?? 'general');
 $colaboradores = $body['colaboradores']  ?? [];
 $creado_por  = intval($body['creado_por'] ?? 0);
 
@@ -57,15 +58,16 @@ try {
 
     $stmt = $conn->prepare("
         INSERT INTO resumen_reuniones_ia
-            (titulo, descripcion, colaboradores, creado_por, token, token_expira, estado, fecha_creacion)
+            (titulo, descripcion, tipo_reunion, colaboradores, creado_por, token, token_expira, estado, fecha_creacion)
         VALUES
-            (:titulo, :descripcion, :colaboradores, :creado_por, :token,
+            (:titulo, :descripcion, :tipo_reunion, :colaboradores, :creado_por, :token,
              DATE_ADD(NOW(), INTERVAL 6 HOUR), 'creada', NOW())
     ");
 
     $stmt->execute([
         ':titulo'        => $titulo,
         ':descripcion'   => $descripcion ?: null,
+        ':tipo_reunion'  => $tipo_reunion,
         ':colaboradores' => json_encode($colaboradores),
         ':creado_por'    => $creado_por,
         ':token'         => $token,

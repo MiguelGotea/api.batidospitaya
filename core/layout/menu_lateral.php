@@ -425,7 +425,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Proyeccion',
                 'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 52]
             ],
         ]
     ],

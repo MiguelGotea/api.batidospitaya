@@ -279,7 +279,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Clientes Club',
                 'url' => 'atencioncliente/historial_clientes.php',
-                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50]
+                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50, 33, 21]
             ],
             [
                 'nombre' => 'Campañas WSP',

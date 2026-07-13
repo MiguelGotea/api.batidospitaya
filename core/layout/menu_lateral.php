@@ -247,7 +247,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Nuevo Reclamo',
                 'url' => 'supervision/auditorias_original/nuevoreclamo.php',
-                'cargos_permitidos' => [49, 16, 28, 50, 33, 21]
+                'cargos_permitidos' => [49, 16, 28, 50, 33]
             ],
             [
                 'nombre' => 'Procesar Reclamos',
@@ -262,7 +262,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Historial Reseñas Google',
                 'url' => 'marketing/resenas_google_descargado.php',
-                'cargos_permitidos' => [49, 16, 28, 50, 42, 53, 52]
+                'cargos_permitidos' => [49, 16, 28, 50, 42, 53, 52, 33, 21]
             ],
         ]
     ],

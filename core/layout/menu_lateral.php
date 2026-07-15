@@ -403,6 +403,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 12, 16]
             ],
             [
+                'nombre' => 'Plan Despachos',
+                'url' => 'despacho/historial_despacho.php',
+                'cargos_permitidos' => [49, 12, 16, 19, 61]
+            ],
+            [
                 'nombre' => 'Compras Locales Configuracion',
                 'url' => 'cds/compra_local_configuracion_despacho.php',
                 'cargos_permitidos' => [49, 12]
@@ -425,7 +430,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Proyeccion',
                 'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 52]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 52, 19, 61]
             ],
         ]
     ],

@@ -411,7 +411,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Plan Despachos',
                 'url' => 'despacho/historial_despachos.php',
-                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33]
+                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43]
             ],
             [
                 'nombre' => 'Compras Locales Configuracion',

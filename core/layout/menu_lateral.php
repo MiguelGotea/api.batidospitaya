@@ -76,6 +76,12 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 27, 16]
             ],
             [
+                'nombre' => 'Registrar Huella',
+                'url' => 'sucursales/registrar_huella_personal.php',
+                'cargos_permitidos' => [],
+                'hidden' => true
+            ],
+            [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
                 'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52]
@@ -730,7 +736,7 @@ function filtrarMenuPorPermisos($menu, $cargoOperario)
         // Si el grupo tiene items, su visibilidad depende de éstos
         if (!empty($grupo['items'])) {
             foreach ($grupo['items'] as $item) {
-                if (tieneAcceso($cargoOperario, $item['cargos_permitidos'])) {
+                if (empty($item['hidden']) && tieneAcceso($cargoOperario, $item['cargos_permitidos'])) {
                     $itemsFiltrados[] = $item;
                 }
             }

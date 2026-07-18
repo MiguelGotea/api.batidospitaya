@@ -76,11 +76,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 27, 16]
             ],
             [
-                'nombre' => 'Registrar Huellas',
-                'url' => 'sucursales/registrar_huella_personal.php',
-                'cargos_permitidos' => [27, 16, 49]
-            ],
-            [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
                 'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52]

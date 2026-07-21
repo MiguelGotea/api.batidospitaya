@@ -237,6 +237,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [33, 8, 42, 52, 21, 49]
             ],
             [
+                'nombre' => 'Mermas',
+                'url' => 'inventario/mermas_productos.php',
+                'cargos_permitidos' => [33, 8, 42, 52, 21, 49]
+            ],
+            [
                 'nombre' => 'Balance Inventario',
                 'url' => 'productos/balance_inventario_access_host.php',
                 'cargos_permitidos' => [49, 12, 55, 16, 42, 52, 11, 21]

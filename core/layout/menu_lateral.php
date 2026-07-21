@@ -232,7 +232,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 42, 8, 33, 21]
             ],
             [
-                'nombre' => 'Depósitos de Tiendas',
+                'nombre' => 'Depósitos',
                 'url' => 'contabilidad/masivo_depositos.php',
                 'cargos_permitidos' => [33, 8, 42, 52, 21, 49]
             ],

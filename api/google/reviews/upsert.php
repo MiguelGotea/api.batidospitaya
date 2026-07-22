@@ -32,15 +32,7 @@ if (empty($locationId)) {
     hikErr('Falta locationId en el body.');
 }
 
-// ── Asegurar que deleted_at existe ───────────────────────────────────────────
-try {
-    $col = $conn->query("SHOW COLUMNS FROM ResenasGoogle LIKE 'deleted_at'")->fetch();
-    if (!$col) {
-        $conn->exec("ALTER TABLE ResenasGoogle ADD COLUMN deleted_at DATETIME DEFAULT NULL");
-    }
-} catch (Exception $e) {
-    hikErr('Error al verificar schema: ' . $e->getMessage(), 500);
-}
+
 
 // ── Procesar batch en transacción ─────────────────────────────────────────────
 $inserted = 0;

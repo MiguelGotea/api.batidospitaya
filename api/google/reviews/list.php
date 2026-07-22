@@ -19,11 +19,7 @@ if (empty($locationId)) {
 }
 
 try {
-    // Asegurarse de que la columna deleted_at existe antes de usarla
-    $col = $conn->query("SHOW COLUMNS FROM ResenasGoogle LIKE 'deleted_at'")->fetch();
-    if (!$col) {
-        $conn->exec("ALTER TABLE ResenasGoogle ADD COLUMN deleted_at DATETIME DEFAULT NULL");
-    }
+
 
     $stmt = $conn->prepare("
         SELECT

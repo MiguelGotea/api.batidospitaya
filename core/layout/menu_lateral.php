@@ -155,7 +155,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Colaboradores',
                 'url' => 'rh/colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 42]
             ],
             [
                 'nombre' => 'Agenda Colaboradores',

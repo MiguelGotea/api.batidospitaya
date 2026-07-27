@@ -3773,6 +3773,7 @@ if (!function_exists('obtenerFechaInicioContinua')) {
     function obtenerFechaInicioContinua($codOperario)
     {
         global $conn;
+
         try {
             $stmt = $conn->prepare("
                 SELECT MIN(inicio_contrato) as fecha_inicio

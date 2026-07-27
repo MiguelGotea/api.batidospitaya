@@ -568,6 +568,11 @@ $menuGlobal = [
                 'url' => 'productos/accessantiguo_diccionario_productos.php',
                 'cargos_permitidos' => [55, 49]
             ],
+            [
+                'nombre' => 'Costos Unitarios',
+                'url' => 'contabilidad/costo_unitario_productos.php',
+                'cargos_permitidos' => [42, 16, 8, 49]
+            ],
         ]
     ],
     [

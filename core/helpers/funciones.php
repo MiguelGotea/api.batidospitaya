@@ -441,10 +441,17 @@ function obtenerOperariosSucursalConHorario($codSucursal, $idSemana)
             o.Nombre, 
             o.Apellido, 
             o.Apellido2,
-            o.Operativo,
-            o.Fin,
             hs.total_horas,
-            hs.cod_contrato
+            hs.cod_contrato,
+            CASE
+                WHEN o.Operativo = 0 THEN 1
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM AsignacionNivelesCargos anc_check
+                    WHERE anc_check.CodOperario = o.CodOperario
+                      AND (anc_check.Fin IS NULL OR anc_check.Fin = '' OR anc_check.Fin > CURDATE())
+                ) THEN 1
+                ELSE 0
+            END AS es_baja
         FROM Operarios o
         INNER JOIN HorariosSemanales hs ON o.CodOperario = hs.cod_operario
         INNER JOIN SemanasSistema ss ON hs.id_semana_sistema = ss.id

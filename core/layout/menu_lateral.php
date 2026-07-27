@@ -583,7 +583,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Conteo Cíclico',
                 'url' => 'inventario/conteo_ciclico.php',
-                'cargos_permitidos' => [27, 16, 49, 55]
+                'cargos_permitidos' => [27, 16, 49, 55, 33]
             ],
         ]
     ],

@@ -16,13 +16,13 @@ function formatoFecha($fecha)
         $mes = $meses[(int) $fechaObj->format('m') - 1];
         return $fechaObj->format('d') . '-' . $mes . '-' . $fechaObj->format('y');
     } catch (Exception $e) {
-        // Si hay error al parsear la fecha, devolver string vacÃ­o
+        // Si hay error al parsear la fecha, devolver string vacío
         return '';
     }
 }
 
 /**
- * Obtiene el nombre del mes en espaÃ±ol
+ * Obtiene el nombre del mes en español
  */
 function obtenerMesEspanol($fecha)
 {
@@ -52,7 +52,7 @@ function formatoMesAnio($fecha)
 
     $fechaObj = new DateTime($fecha);
 
-    // Usar IntlDateFormatter si estÃ¡ disponible (extensiÃ³n intl)
+    // Usar IntlDateFormatter si está disponible (extensión intl)
     if (class_exists('IntlDateFormatter')) {
         $formatter = new IntlDateFormatter(
             'es_ES',
@@ -65,7 +65,7 @@ function formatoMesAnio($fecha)
         return ucfirst($formatter->format($fechaObj));
     }
 
-    // Fallback: array de meses en espaÃ±ol (no requiere extensiones del servidor)
+    // Fallback: array de meses en español (no requiere extensiones del servidor)
     $meses = [
         1 => 'Enero',
         2 => 'Febrero',
@@ -85,7 +85,7 @@ function formatoMesAnio($fecha)
 }
 
 /**
- * Formatea una fecha al formato espaÃ±ol ej: 15-oct-2025
+ * Formatea una fecha al formato español ej: 15-oct-2025
  * Reemplaza a strftime() obsoleto
  */
 function formatoFechaEspanol($fecha = null)
@@ -127,14 +127,23 @@ function formatoFechaEspanol($fecha = null)
 }
 
 /**
- * Formatea fecha en espaÃ±ol con hora (Migrada desde auditorÃ­as)
+ * Formatea fecha en español con hora (Migrada desde auditorías)
  */
 function formatFechaEspanol($fecha = 'now')
 {
     $meses = [
-        1 => 'ene', 2 => 'feb', 3 => 'mar', 4 => 'abr',
-        5 => 'may', 6 => 'jun', 7 => 'jul', 8 => 'ago',
-        9 => 'sep', 10 => 'oct', 11 => 'nov', 12 => 'dic'
+        1 => 'ene',
+        2 => 'feb',
+        3 => 'mar',
+        4 => 'abr',
+        5 => 'may',
+        6 => 'jun',
+        7 => 'jul',
+        8 => 'ago',
+        9 => 'sep',
+        10 => 'oct',
+        11 => 'nov',
+        12 => 'dic'
     ];
 
     try {
@@ -147,7 +156,7 @@ function formatFechaEspanol($fecha = 'now')
 }
 
 /**
- * Formatea fecha para reportes (Migrada desde auditorÃ­as)
+ * Formatea fecha para reportes (Migrada desde auditorías)
  */
 function formatFechaReporte($fecha)
 {
@@ -161,7 +170,7 @@ function formatFechaReporte($fecha)
 }
 
 /**
- * Verifica si un usuario tiene un cargo especÃ­fico
+ * Verifica si un usuario tiene un cargo específico
  */
 function tieneCargo($cargoRequerido)
 {
@@ -169,11 +178,11 @@ function tieneCargo($cargoRequerido)
         return false;
     }
 
-    // Los cargos pueden tener jerarquÃ­a si es necesario
+    // Los cargos pueden tener jerarquía si es necesario
     $jerarquia = [
         'gerencia' => 16,
         'jefe' => [8, 9, 10, 11, 12, 13, 14, 56, 63, 15, 17, 19, 21, 22, 26],
-        // ... definir segÃºn necesidades
+        // ... definir según necesidades
     ];
 
     // Caso especial para admin
@@ -181,7 +190,7 @@ function tieneCargo($cargoRequerido)
         return true;
     }
 
-    // Verificar cargo especÃ­fico
+    // Verificar cargo específico
     return $_SESSION['cargo_cod'] == $cargoRequerido ||
         (is_array($cargoRequerido) && in_array($_SESSION['cargo_cod'], $cargoRequerido));
 }
@@ -198,8 +207,8 @@ function requerirCargo($cargoRequerido)
 }
 
 /**
- * Redirige al hub de mÃ³dulos, que determina el destino segÃºn los cargos del usuario.
- * Toda la lÃ³gica de routing vive en /modulos/index.php (Ãºnica fuente de verdad).
+ * Redirige al hub de módulos, que determina el destino según los cargos del usuario.
+ * Toda la lógica de routing vive en /modulos/index.php (única fuente de verdad).
  */
 function redirigirSegunCargo()
 {
@@ -210,7 +219,7 @@ function redirigirSegunCargo()
         exit();
     }
 
-    // Para todos los demÃ¡s usuarios, delegar el routing a /modulos/index.php
+    // Para todos los demás usuarios, delegar el routing a /modulos/index.php
     session_write_close();
     header("Location: /modulos/");
     exit();
@@ -260,7 +269,7 @@ function obtenerNombreUsuario()
 }
 
 /**
- * Verifica si el usuario tiene un cargo especÃ­fico y estÃ¡ asignado a una sucursal especÃ­fica
+ * Verifica si el usuario tiene un cargo específico y está asignado a una sucursal específica
  */
 function verificarAccesoSucursalCargo($cargosRequeridos, $sucursalesRequeridas)
 {
@@ -290,7 +299,7 @@ function verificarAccesoSucursalCargo($cargosRequeridos, $sucursalesRequeridas)
         AND (Fin IS NULL OR Fin >= NOW())
     ");
 
-    // Combinamos los parÃ¡metros
+    // Combinamos los parámetros
     $params = array_merge(
         [$_SESSION['usuario_id']],
         $cargosRequeridos,
@@ -337,7 +346,7 @@ function obtenerSemanaPorId($id)
 }
 
 /**
- * Obtiene las semanas disponibles para programaciÃ³n
+ * Obtiene las semanas disponibles para programación
  */
 function obtenerSemanasDisponibles()
 {
@@ -355,7 +364,7 @@ function obtenerSemanasDisponibles()
 }
 
 /**
- * Obtiene las sucursales asignadas a un lÃ­der
+ * Obtiene las sucursales asignadas a un líder
  * MODIFICADA: Prioriza la primera sucursal encontrada
  */
 function obtenerSucursalesLider($codOperario)
@@ -378,7 +387,7 @@ function obtenerSucursalesLider($codOperario)
 
 /**
  * Obtiene los operarios activos de una sucursal para un rango de fechas
- * MODIFICADA: Filtra por fecha de liquidaciÃ³n
+ * MODIFICADA: Filtra por fecha de liquidación
  */
 function obtenerOperariosSucursal($codSucursal, $fechaInicio, $fechaFin)
 {
@@ -405,7 +414,7 @@ function obtenerOperariosSucursal($codSucursal, $fechaInicio, $fechaFin)
             ) c2 ON c1.cod_operario = c2.cod_operario AND c1.CodContrato = c2.max_contrato
         ) c ON o.CodOperario = c.cod_operario
         WHERE anc.Sucursal = ?
-        -- Validamos que la asignaciÃ³n estÃ© activa durante el rango de la semana
+        -- Validamos que la asignación esté activa durante el rango de la semana
         AND anc.Fecha <= ? 
         AND (anc.Fin IS NULL OR anc.Fin >= ?)
         AND o.CodOperario NOT IN (
@@ -414,7 +423,7 @@ function obtenerOperariosSucursal($codSucursal, $fechaInicio, $fechaFin)
             WHERE anc2.CodNivelesCargos = 27
             AND (anc2.Fin IS NULL OR anc2.Fin >= ?)
         )
-        -- FILTRO: Solo operarios activos segÃºn fecha de liquidaciÃ³n relativa a la semana
+        -- FILTRO: Solo operarios activos según fecha de liquidación relativa a la semana
         AND (
             c.fecha_liquidacion IS NULL 
             OR c.fecha_liquidacion = '0000-00-00'
@@ -429,7 +438,7 @@ function obtenerOperariosSucursal($codSucursal, $fechaInicio, $fechaFin)
 
 /**
  * Obtiene TODOS los operarios que tienen horario guardado para una semana/sucursal
- * MODIFICADA: Filtra por fecha de liquidaciÃ³n
+ * MODIFICADA: Filtra por fecha de liquidación
  */
 function obtenerOperariosSucursalConHorario($codSucursal, $idSemana)
 {
@@ -467,7 +476,7 @@ function obtenerOperariosSucursalConHorario($codSucursal, $idSemana)
         ) c ON o.CodOperario = c.cod_operario
         WHERE hs.cod_sucursal = ?
         AND hs.id_semana_sistema = ?
-        -- Validar asignaciÃ³n activa durante la semana seleccionada
+        -- Validar asignación activa durante la semana seleccionada
         AND anc.Fecha <= ss.fecha_fin
         AND (anc.Fin IS NULL OR anc.Fin >= ss.fecha_inicio)
         AND o.CodOperario NOT IN (
@@ -476,7 +485,7 @@ function obtenerOperariosSucursalConHorario($codSucursal, $idSemana)
             WHERE anc2.CodNivelesCargos = 27
             AND (anc2.Fin IS NULL OR anc2.Fin >= ss.fecha_inicio)
         )
-        -- FILTRO: Solo operarios activos segÃºn fecha de liquidaciÃ³n relativa a la semana
+        -- FILTRO: Solo operarios activos según fecha de liquidación relativa a la semana
         AND (
             c.fecha_liquidacion IS NULL 
             OR c.fecha_liquidacion = '0000-00-00'
@@ -490,7 +499,7 @@ function obtenerOperariosSucursalConHorario($codSucursal, $idSemana)
 }
 
 /**
- * Obtiene el horario de un operario para una semana y sucursal especÃ­fica
+ * Obtiene el horario de un operario para una semana y sucursal específica
  * ACTUALIZADA: Incluye cod_contrato
  */
 function obtenerHorarioOperario($codOperario, $numeroSemana, $codSucursal)
@@ -515,7 +524,7 @@ function obtenerHorarioOperario($codOperario, $numeroSemana, $codSucursal)
 }
 
 /**
- * Obtiene una semana por su nÃºmero de semana
+ * Obtiene una semana por su número de semana
  */
 function obtenerSemanaPorNumero($numeroSemana)
 {
@@ -531,12 +540,12 @@ function obtenerSemanaPorNumero($numeroSemana)
 }
 
 /**
- * Formatea una fecha al formato ej: 31-abr-25 (dÃ­a-mes-aÃ±o)
- * MEJORADA: Maneja valores nulos y formatos invÃ¡lidos
+ * Formatea una fecha al formato ej: 31-abr-25 (día-mes-año)
+ * MEJORADA: Maneja valores nulos y formatos inválidos
  */
 function formatoFechaCorta($fecha)
 {
-    // Si la fecha estÃ¡ vacÃ­a o es nula, retornar string vacÃ­o
+    // Si la fecha está vacía o es nula, retornar string vacío
     if (empty($fecha) || $fecha === null || $fecha === '0000-00-00') {
         return '';
     }
@@ -544,7 +553,7 @@ function formatoFechaCorta($fecha)
     $meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
     try {
-        // Verificar si la fecha tiene un formato vÃ¡lido
+        // Verificar si la fecha tiene un formato válido
         $timestamp = strtotime($fecha);
         if ($timestamp === false) {
             return '';
@@ -554,7 +563,7 @@ function formatoFechaCorta($fecha)
         $mes = $meses[(int) $fechaObj->format('m') - 1];
         return $fechaObj->format('d') . '-' . $mes . '-' . $fechaObj->format('y');
     } catch (Exception $e) {
-        // Si hay error al parsear la fecha, devolver string vacÃ­o
+        // Si hay error al parsear la fecha, devolver string vacío
         error_log("Error formateando fecha: " . $e->getMessage() . " - Fecha: " . $fecha);
         return '';
     }
@@ -572,7 +581,7 @@ function formatoHoraAmPm($hora)
 }
 
 /**
- * Obtiene la semana del sistema para una fecha especÃ­fica
+ * Obtiene la semana del sistema para una fecha específica
  */
 function obtenerSemanaPorFecha($fecha)
 {
@@ -588,13 +597,13 @@ function obtenerSemanaPorFecha($fecha)
 }
 
 /**
- * Obtiene el horario programado para un operario en una semana, sucursal y dÃ­a especÃ­fico
+ * Obtiene el horario programado para un operario en una semana, sucursal y día específico
  */
 function obtenerHorarioOperacionesPorDia($codOperario, $idSemana, $codSucursal, $fecha)
 {
     global $conn;
 
-    // Primero obtener el dÃ­a de la semana (0=domingo, 1=lunes, etc.)
+    // Primero obtener el día de la semana (0=domingo, 1=lunes, etc.)
     $stmt = $conn->prepare("SELECT DAYOFWEEK(?) as dia_semana");
     $stmt->execute([$fecha]);
     $diaSemana = $stmt->fetch()['dia_semana'];
@@ -616,7 +625,7 @@ function obtenerHorarioOperacionesPorDia($codOperario, $idSemana, $codSucursal, 
     ];
     $diaColumna = $dias[$diaSemana];
 
-    // Obtener el horario para ese dÃ­a especÃ­fico
+    // Obtener el horario para ese día específico
     $stmt = $conn->prepare("
         SELECT 
             {$diaColumna}_estado as estado,
@@ -650,7 +659,7 @@ function obtenerTodasSucursales()
 }
 
 /**
- * Obtiene solo las sucursales fÃ­sicas (donde sucursal = 1), porque hay sucursales en la tabla de la bd sucursales donde no son sucursales en sÃ­ y se identifica con el valor 1
+ * Obtiene solo las sucursales físicas (donde sucursal = 1), porque hay sucursales en la tabla de la bd sucursales donde no son sucursales en sí y se identifica con el valor 1
  */
 function obtenerSucursalesFisicas()
 {
@@ -716,7 +725,7 @@ function verificarIpSucursal($codSucursal)
     $stmt->execute([$codDepartamento]);
     $ipsDepartamento = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    // Verificar si la IP del cliente estÃ¡ en alguna de las IPs del departamento
+    // Verificar si la IP del cliente está en alguna de las IPs del departamento
     return in_array($ipCliente, $ipsDepartamento);
 }
 
@@ -728,7 +737,7 @@ function obtenerIpCliente()
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         return $_SERVER['HTTP_CLIENT_IP'];
     } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        // X-Forwarded-For puede contener mÃºltiples IPs, la primera es la del cliente
+        // X-Forwarded-For puede contener múltiples IPs, la primera es la del cliente
         $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
         return trim($ips[0]);
     } else {
@@ -737,7 +746,7 @@ function obtenerIpCliente()
 }
 
 /**
- * Verifica si el dispositivo y navegador estÃ¡n autorizados para una sucursal.
+ * Verifica si el dispositivo y navegador están autorizados para una sucursal.
  * Solo permite navegadores basados en Chromium (Chrome/Edge).
  * Verifica la existencia y validez de la cookie erp_device_token.
  */
@@ -751,7 +760,7 @@ function verificarDispositivoAutorizado($codSucursal)
         return ['status' => false, 'msg' => 'Navegador no permitido. Favor usar Google Chrome o Microsoft Edge.'];
     }
 
-    // 2. Verificar si la sucursal tiene algÃºn dispositivo autorizado
+    // 2. Verificar si la sucursal tiene algún dispositivo autorizado
     global $conn;
     try {
         // Comprobar si la sucursal tiene al menos un dispositivo registrado
@@ -762,17 +771,17 @@ function verificarDispositivoAutorizado($codSucursal)
         if ($totalDispositivos === 0) {
             return [
                 'status' => false,
-                'msg'    => 'Esta sucursal todavÃ­a no ha sido autorizada para este proceso de marcaciÃ³n. Contacta con soporte tÃ©cnico.'
+                'msg'    => 'Esta sucursal todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.'
             ];
         }
 
-        // 3. Verificar si ESTE dispositivo estÃ¡ autorizado para esta sucursal
+        // 3. Verificar si ESTE dispositivo está autorizado para esta sucursal
         $tokenCookie = $_COOKIE['erp_device_token'] ?? null;
 
         if (!$tokenCookie) {
             return [
                 'status' => false,
-                'msg'    => 'Este dispositivo no estÃ¡ autorizado para realizar marcaciones en esta sucursal o la sesiÃ³n de autorizaciÃ³n expirÃ³.'
+                'msg'    => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
             ];
         }
 
@@ -788,17 +797,17 @@ function verificarDispositivoAutorizado($codSucursal)
 
         return [
             'status' => false,
-            'msg'    => 'Este dispositivo no estÃ¡ autorizado para realizar marcaciones en esta sucursal o la sesiÃ³n de autorizaciÃ³n expirÃ³.'
+            'msg'    => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
         ];
     } catch (Exception $e) {
-        error_log("Error en validaciÃ³n de dispositivo: " . $e->getMessage());
+        error_log("Error en validación de dispositivo: " . $e->getMessage());
         return ['status' => false, 'msg' => 'Error de sistema al validar dispositivo.'];
     }
 }
 
 
 /**
- * Obtiene las sucursales asignadas a un usuario (no necesariamente lÃ­der)
+ * Obtiene las sucursales asignadas a un usuario (no necesariamente líder)
  */
 function obtenerSucursalesUsuario($codOperario)
 {
@@ -818,7 +827,7 @@ function obtenerSucursalesUsuario($codOperario)
 }
 
 /**
- * Obtiene el nombre de una sucursal por su cÃ³digo
+ * Obtiene el nombre de una sucursal por su código
  */
 function obtenerNombreSucursal($codSucursal)
 {
@@ -832,7 +841,7 @@ function obtenerNombreSucursal($codSucursal)
 }
 
 /**
- * Verifica si el operario tuvo una omisiÃ³n de marcaciÃ³n el dÃ­a anterior
+ * Verifica si el operario tuvo una omisión de marcación el día anterior
  */
 function verificarOmisionDiaAnterior($codOperario, $sucursalCodigo)
 {
@@ -851,7 +860,7 @@ function verificarOmisionDiaAnterior($codOperario, $sucursalCodigo)
     $stmt = ejecutarConsulta($sql, [$codOperario, $sucursalCodigo, $ayer]);
 
     if ($stmt && $resultado = $stmt->fetch()) {
-        // OmisiÃ³n si no hay marcaciones o si no tiene salida
+        // Omisión si no hay marcaciones o si no tiene salida
         return $resultado['total_marcaciones'] == 0 || $resultado['tiene_salida'] === null;
     }
 
@@ -859,7 +868,7 @@ function verificarOmisionDiaAnterior($codOperario, $sucursalCodigo)
 }
 
 /**
- * Obtiene el cÃ³digo de departamento de una sucursal (usando la nueva estructura)
+ * Obtiene el código de departamento de una sucursal (usando la nueva estructura)
  */
 function obtenerCodigoDepartamentoSucursal($codSucursal)
 {
@@ -873,13 +882,13 @@ function obtenerCodigoDepartamentoSucursal($codSucursal)
 }
 
 /**
- * Obtiene los operarios activos de una sucursal para un lÃ­der especÃ­fico
+ * Obtiene los operarios activos de una sucursal para un líder específico
  */
 function obtenerOperariosSucursalLider($codSucursal, $codLider)
 {
     global $conn;
 
-    // Verificar que el lÃ­der tenga asignada esta sucursal
+    // Verificar que el líder tenga asignada esta sucursal
     $stmt = $conn->prepare("
         SELECT COUNT(*) as es_lider 
         FROM AsignacionNivelesCargos 
@@ -925,13 +934,13 @@ function obtenerOperariosSucursalLider($codSucursal, $codLider)
 }
 
 /**
- * Obtiene los operarios activos de una sucursal (para lÃ­der o RH)
+ * Obtiene los operarios activos de una sucursal (para líder o RH)
  */
 function obtenerOperariosSucursalParaFaltas($codSucursal, $codUsuario = null)
 {
     global $conn;
 
-    // Si se proporciona un cÃ³digo de usuario, verificar si es lÃ­der de esa sucursal
+    // Si se proporciona un código de usuario, verificar si es líder de esa sucursal
     if ($codUsuario) {
         $stmt = $conn->prepare("
             SELECT COUNT(*) as es_lider 
@@ -944,7 +953,7 @@ function obtenerOperariosSucursalParaFaltas($codSucursal, $codUsuario = null)
         $stmt->execute([$codUsuario, $codSucursal]);
         $result = $stmt->fetch();
 
-        // Si no es lÃ­der y no es RH, devolver array vacÃ­o
+        // Si no es líder y no es RH, devolver array vacío
         if ((!$result || $result['es_lider'] == 0) && !verificarAccesoCargo([13, 39, 30, 37, 28])) {
             return [];
         }
@@ -980,13 +989,13 @@ function obtenerOperariosSucursalParaFaltas($codSucursal, $codUsuario = null)
 }
 
 /**
- * Obtiene el horario programado de un operario para una fecha especÃ­fica
+ * Obtiene el horario programado de un operario para una fecha específica
  */
 function obtenerHorarioProgramadoFaltaManual($codOperario, $codSucursal, $fecha)
 {
     global $conn;
 
-    // Primero obtener el dÃ­a de la semana (1=lunes, 2=martes, ..., 7=domingo)
+    // Primero obtener el día de la semana (1=lunes, 2=martes, ..., 7=domingo)
     $stmt = $conn->prepare("SELECT DAYOFWEEK(?) as dia_semana");
     $stmt->execute([$fecha]);
     $diaSemana = $stmt->fetch()['dia_semana'];
@@ -1008,7 +1017,7 @@ function obtenerHorarioProgramadoFaltaManual($codOperario, $codSucursal, $fecha)
     ];
     $diaColumna = $dias[$diaSemana];
 
-    // Obtener el horario para ese dÃ­a especÃ­fico
+    // Obtener el horario para ese día específico
     $stmt = $conn->prepare("
         SELECT 
             hs.{$diaColumna}_entrada as hora_entrada_programada,
@@ -1027,7 +1036,7 @@ function obtenerHorarioProgramadoFaltaManual($codOperario, $codSucursal, $fecha)
 }
 
 /**
- * Obtiene las marcaciones de un operario en una fecha especÃ­fica
+ * Obtiene las marcaciones de un operario en una fecha específica
  */
 function obtenerMarcaciones($codOperario, $codSucursal, $fecha)
 {
@@ -1046,7 +1055,7 @@ function obtenerMarcaciones($codOperario, $codSucursal, $fecha)
     return $stmt->fetch() ?: null;
 }
 /**
- * Obtiene los nombres completos de operarios/colaboradores en bd por el cÃ³digo del operario
+ * Obtiene los nombres completos de operarios/colaboradores en bd por el código del operario
  */
 function obtenerDatosCompletosOperario($codOperario)
 {
@@ -1086,7 +1095,7 @@ function obtenerNombreCompletoOperario($operario)
 }
 
 /**
- * Obtiene el cargo principal de un usuario (priorizando cÃ³digos diferentes a 2)
+ * Obtiene el cargo principal de un usuario (priorizando códigos diferentes a 2)
  */
 function obtenerCargoPrincipalUsuario($codOperario)
 {
@@ -1106,7 +1115,7 @@ function obtenerCargoPrincipalUsuario($codOperario)
     $stmt->execute([$codOperario]);
     $result = $stmt->fetch();
 
-    // Si no encontrÃ³ otro cargo, buscamos cualquier cargo (incluyendo Operario)
+    // Si no encontró otro cargo, buscamos cualquier cargo (incluyendo Operario)
     if (!$result) {
         $stmt = $conn->prepare("
             SELECT nc.Nombre as cargo_nombre 
@@ -1124,7 +1133,7 @@ function obtenerCargoPrincipalUsuario($codOperario)
 }
 
 /**
- * Obtiene el cÃ³digo del cargo principal de un usuario (priorizando cÃ³digos diferentes a 2)
+ * Obtiene el código del cargo principal de un usuario (priorizando códigos diferentes a 2)
  */
 function obtenerCargoCodigoPrincipalUsuario($codOperario)
 {
@@ -1143,7 +1152,7 @@ function obtenerCargoCodigoPrincipalUsuario($codOperario)
     $stmt->execute([$codOperario]);
     $result = $stmt->fetch();
 
-    // Si no encontrÃ³ otro cargo, buscamos cualquier cargo (incluyendo Operario)
+    // Si no encontró otro cargo, buscamos cualquier cargo (incluyendo Operario)
     if (!$result) {
         $stmt = $conn->prepare("
             SELECT anc.CodNivelesCargos as cargo_codigo
@@ -1192,7 +1201,7 @@ function obtenerCargosUsuario($codOperario)
 }
 
 /**
- * Determina la quincena basada en el dÃ­a del mes (1-15: primera, 16-31: segunda)
+ * Determina la quincena basada en el día del mes (1-15: primera, 16-31: segunda)
  * @param string $fecha Fecha a evaluar (Y-m-d)
  * @return string 'primera' o 'segunda'
  */
@@ -1208,8 +1217,8 @@ function determinarQuincenaPorDiaMes($fecha)
 }
 
 /**
- * Determina la quincena basada en el dÃ­a del mes (1-15: primera, 16-31: segunda)
- * pero solo si la fecha estÃ¡ dentro del rango seleccionado
+ * Determina la quincena basada en el día del mes (1-15: primera, 16-31: segunda)
+ * pero solo si la fecha está dentro del rango seleccionado
  * @param string $fecha Fecha a evaluar (Y-m-d)
  * @param string $fechaDesde Fecha inicio del rango (Y-m-d)
  * @param string $fechaHasta Fecha fin del rango (Y-m-d)
@@ -1218,7 +1227,7 @@ function determinarQuincenaPorDiaMes($fecha)
 function determinarQuincenaPorDiaMesEnRango($fecha, $fechaDesde, $fechaHasta)
 {
     try {
-        // Primero verificar si la fecha estÃ¡ dentro del rango
+        // Primero verificar si la fecha está dentro del rango
         $fechaObj = new DateTime($fecha);
         $desdeObj = new DateTime($fechaDesde);
         $hastaObj = new DateTime($fechaHasta);
@@ -1227,7 +1236,7 @@ function determinarQuincenaPorDiaMesEnRango($fecha, $fechaDesde, $fechaHasta)
             return 'fuera_rango';
         }
 
-        // Si estÃ¡ dentro del rango, determinar quincena por dÃ­a del mes
+        // Si está dentro del rango, determinar quincena por día del mes
         $dia = (int) date('d', strtotime($fecha));
         return ($dia <= 15) ? 'primera' : 'segunda';
     } catch (Exception $e) {
@@ -1237,7 +1246,7 @@ function determinarQuincenaPorDiaMesEnRango($fecha, $fechaDesde, $fechaHasta)
 }
 
 /**
- * Obtiene todos los operarios activos del sistema con informaciÃ³n de sucursal
+ * Obtiene todos los operarios activos del sistema con información de sucursal
  * MODIFICADA: Elimina filtros restrictivos de fecha y evita duplicados
  */
 function obtenerTodosOperariosActivos11()
@@ -1272,7 +1281,7 @@ function obtenerTodosOperariosActivos11()
             WHERE anc2.CodNivelesCargos = 27
             AND (anc2.Fin IS NULL OR anc2.Fin >= CURDATE())
         )
-        -- Agrupamos por cÃ³digo de operario para evitar duplicados
+        -- Agrupamos por código de operario para evitar duplicados
         GROUP BY o.CodOperario
         ORDER BY o.Nombre, o.Apellido
     ");
@@ -1281,7 +1290,7 @@ function obtenerTodosOperariosActivos11()
 }
 
 /**
- * Obtiene operarios con cargos 2 (Operario) y 5 (LÃ­der de Sucursal) sin restricciones
+ * Obtiene operarios con cargos 2 (Operario) y 5 (Líder de Sucursal) sin restricciones
  */
 function obtenerTodosOperariosParaSelector()
 {
@@ -1321,7 +1330,7 @@ function verificarTardanzaConTolerancia($horaActual, $horaProgramada)
 }
 
 /**
- * Verifica si estÃ¡ en el minuto de gracia (no es tardanza pero sÃ­ despuÃ©s de la hora programada)
+ * Verifica si está en el minuto de gracia (no es tardanza pero sí después de la hora programada)
  */
 function verificarMinutoGracia($horaActual, $horaProgramada)
 {
@@ -1338,9 +1347,9 @@ function verificarMinutoGracia($horaActual, $horaProgramada)
 }
 
 /**
- * Obtiene los tipos de documentos configurados por pestaÃ±a desde la base de datos
+ * Obtiene los tipos de documentos configurados por pestaña desde la base de datos
  */
-function obtenerTiposDocumentosPorPestaÃ±a($pestaÃ±a)
+function obtenerTiposDocumentosPorPestaña($pestaña)
 {
     global $conn;
 
@@ -1348,10 +1357,10 @@ function obtenerTiposDocumentosPorPestaÃ±a($pestaÃ±a)
         $stmt = $conn->prepare("
             SELECT id, nombre_clave, nombre_descriptivo, es_obligatorio, tiene_vencimiento
             FROM contratos_tiposDocumentos 
-            WHERE pestaÃ±a = ? AND activo = 1 
+            WHERE pestaña = ? AND activo = 1 
             ORDER BY es_obligatorio DESC, nombre_descriptivo ASC
         ");
-        $stmt->execute([$pestaÃ±a]);
+        $stmt->execute([$pestaña]);
         $tipos = $stmt->fetchAll();
 
         $resultado = [
@@ -1375,25 +1384,25 @@ function obtenerTiposDocumentosPorPestaÃ±a($pestaÃ±a)
 
         return $resultado;
     } catch (Exception $e) {
-        error_log("Error en obtenerTiposDocumentosPorPestaÃ±a: " . $e->getMessage());
+        error_log("Error en obtenerTiposDocumentosPorPestaña: " . $e->getMessage());
         return ['obligatorios' => [], 'opcionales' => []];
     }
 }
 
 /**
- * Verifica el estado de los documentos obligatorios por pestaÃ±a
+ * Verifica el estado de los documentos obligatorios por pestaña
  */
-function verificarEstadoDocumentosObligatorios($codOperario, $pestaÃ±a)
+function verificarEstadoDocumentosObligatorios($codOperario, $pestaña)
 {
-    $tiposDocumentos = obtenerTiposDocumentosPorPestaÃ±a($pestaÃ±a);
+    $tiposDocumentos = obtenerTiposDocumentosPorPestaña($pestaña);
     $documentosObligatorios = $tiposDocumentos['obligatorios'];
 
-    if ($pestaÃ±a === 'global') {
+    if ($pestaña === 'global') {
         return verificarEstadoGlobalDocumentos($codOperario);
     }
 
     if (empty($documentosObligatorios)) {
-        return 'no_aplica'; // No hay documentos obligatorios para esta pestaÃ±a
+        return 'no_aplica'; // No hay documentos obligatorios para esta pestaña
     }
 
     global $conn;
@@ -1443,7 +1452,7 @@ function verificarEstadoDocumentosObligatorios($codOperario, $pestaÃ±a)
 }
 
 /**
- * Obtiene el Ã­cono segÃºn el estado de documentos
+ * Obtiene el ícono según el estado de documentos
  */
 function obtenerIconoEstadoDocumentos($estado)
 {
@@ -1459,8 +1468,8 @@ function obtenerIconoEstadoDocumentos($estado)
 
 /**
  * Calcula el tiempo total trabajado desde la fecha de inicio del contrato
- * MEJORADA: Si el contrato estÃ¡ activo, calcula hasta hoy. Si estÃ¡ finalizado, calcula hasta la fecha de finalizaciÃ³n.
- * MEJORADA: Siempre usa el Ãºltimo contrato del operario
+ * MEJORADA: Si el contrato está activo, calcula hasta hoy. Si está finalizado, calcula hasta la fecha de finalización.
+ * MEJORADA: Siempre usa el último contrato del operario
  */
 function calcularTiempoTrabajado($fechaInicioContrato, $fechaFinContrato = null, $fechaSalida = null, $estaActivo = true)
 {
@@ -1483,7 +1492,7 @@ function calcularTiempoTrabajado($fechaInicioContrato, $fechaFinContrato = null,
                 $fechaFin = $fechaSalidaObj;
             }
         }
-        // PRIORIDAD 2: Si no estÃ¡ activo y tiene fecha fin de contrato, usar esa fecha
+        // PRIORIDAD 2: Si no está activo y tiene fecha fin de contrato, usar esa fecha
         elseif (!$estaActivo && !empty($fechaFinContrato) && $fechaFinContrato != '0000-00-00') {
             $fechaFinContratoObj = new DateTime($fechaFinContrato);
             // Solo usar fecha fin si es anterior o igual a hoy
@@ -1491,11 +1500,11 @@ function calcularTiempoTrabajado($fechaInicioContrato, $fechaFinContrato = null,
                 $fechaFin = $fechaFinContratoObj;
             }
         }
-        // PRIORIDAD 3: Si estÃ¡ activo pero tiene fecha fin de contrato PASADA, usar fecha fin
+        // PRIORIDAD 3: Si está activo pero tiene fecha fin de contrato PASADA, usar fecha fin
         elseif ($estaActivo && !empty($fechaFinContrato) && $fechaFinContrato != '0000-00-00') {
             $fechaFinContratoObj = new DateTime($fechaFinContrato);
             if ($fechaFinContratoObj < $hoy) {
-                $fechaFin = $fechaFinContratoObj; // Usar fecha fin si ya pasÃ³
+                $fechaFin = $fechaFinContratoObj; // Usar fecha fin si ya pasó
             }
             // Si la fecha fin es futura, se mantiene $fechaFin = $hoy (calcula hasta hoy)
         }
@@ -1513,30 +1522,30 @@ function calcularTiempoTrabajado($fechaInicioContrato, $fechaFinContrato = null,
 
         $diferencia = $fechaInicio->diff($fechaFin);
 
-        $aÃ±os = $diferencia->y;
+        $años = $diferencia->y;
         $meses = $diferencia->m;
         $dias = $diferencia->d;
 
         $resultado = [];
-        if ($aÃ±os > 0) {
-            $resultado[] = $aÃ±os . ' aÃ±o' . ($aÃ±os > 1 ? 's' : '');
+        if ($años > 0) {
+            $resultado[] = $años . ' año' . ($años > 1 ? 's' : '');
         }
         if ($meses > 0) {
             $resultado[] = $meses . ' mes' . ($meses > 1 ? 'es' : '');
         }
         if ($dias > 0) {
-            $resultado[] = $dias . ' dÃ­a' . ($dias > 1 ? 's' : '');
+            $resultado[] = $dias . ' día' . ($dias > 1 ? 's' : '');
         }
 
-        return empty($resultado) ? 'Menos de 1 dÃ­a' : implode(', ', $resultado);
+        return empty($resultado) ? 'Menos de 1 día' : implode(', ', $resultado);
     } catch (Exception $e) {
         error_log("Error calculando tiempo trabajado: " . $e->getMessage());
-        return 'Error en cÃ¡lculo';
+        return 'Error en cálculo';
     }
 }
 
 /**
- * Obtiene la Ãºltima fecha laborada (Ãºltima marcaciÃ³n) de un operario
+ * Obtiene la última fecha laborada (última marcación) de un operario
  */
 function obtenerUltimaFechaLaborada($codOperario)
 {
@@ -1556,7 +1565,7 @@ function obtenerUltimaFechaLaborada($codOperario)
 }
 
 /**
- * Determina si un contrato estÃ¡ finalizado basado en fecha_salida
+ * Determina si un contrato está finalizado basado en fecha_salida
  */
 function contratoEstaFinalizado($contrato)
 {
@@ -1564,11 +1573,11 @@ function contratoEstaFinalizado($contrato)
 }
 
 /**
- * Determina si un contrato estÃ¡ activo
+ * Determina si un contrato está activo
  */
 function contratoEstaActivo($contrato)
 {
-    // Si tiene fecha_salida, no estÃ¡ activo
+    // Si tiene fecha_salida, no está activo
     if (contratoEstaFinalizado($contrato)) {
         return false;
     }
@@ -1580,17 +1589,17 @@ function contratoEstaActivo($contrato)
         return $fechaFin >= $fechaActual;
     }
 
-    // Si no tiene fecha fin o es indefinido, estÃ¡ activo
+    // Si no tiene fecha fin o es indefinido, está activo
     return true;
 }
 
 /**
- * Calcula el tiempo restante para la finalizaciÃ³n del contrato - MEJORADA
- * MEJORADA: Siempre usa el Ãºltimo contrato del operario
+ * Calcula el tiempo restante para la finalización del contrato - MEJORADA
+ * MEJORADA: Siempre usa el último contrato del operario
  */
 function calcularTiempoRestanteContrato($fechaFinContrato, $estaActivo = true, $fechaSalida = null)
 {
-    // Si hay fecha de salida en el Ãºltimo contrato, el contrato estÃ¡ finalizado
+    // Si hay fecha de salida en el último contrato, el contrato está finalizado
     if (!empty($fechaSalida) && $fechaSalida != '0000-00-00') {
         $fechaSalidaObj = new DateTime($fechaSalida);
         $hoy = new DateTime();
@@ -1611,18 +1620,18 @@ function calcularTiempoRestanteContrato($fechaFinContrato, $estaActivo = true, $
         $fechaFin = new DateTime($fechaFinContrato);
         $fechaActual = new DateTime();
 
-        // Si la fecha fin ya pasÃ³
+        // Si la fecha fin ya pasó
         if ($fechaFin < $fechaActual) {
             return '<span class="status-inactivo">Vencido</span>';
         }
 
         $diferencia = $fechaActual->diff($fechaFin);
 
-        $aÃ±os = $diferencia->y;
+        $años = $diferencia->y;
         $meses = $diferencia->m;
         $dias = $diferencia->d;
 
-        // Si queda menos de 30 dÃ­as, mostrar alerta
+        // Si queda menos de 30 días, mostrar alerta
         $diasTotales = $diferencia->days;
 
         if ($diasTotales <= 7) {
@@ -1630,32 +1639,32 @@ function calcularTiempoRestanteContrato($fechaFinContrato, $estaActivo = true, $
             if ($diasTotales == 0) {
                 return '<span class="status-inactivo">Vence hoy</span>';
             } elseif ($diasTotales == 1) {
-                return '<span class="status-inactivo">1 dÃ­a</span>';
+                return '<span class="status-inactivo">1 día</span>';
             } else {
-                return '<span class="status-inactivo">' . $diasTotales . ' dÃ­as</span>';
+                return '<span class="status-inactivo">' . $diasTotales . ' días</span>';
             }
         } elseif ($diasTotales <= 30) {
             // Menos de 1 mes - ALERTA AMARILLA
             if ($meses == 0) {
-                return '<span class="status-alerta">' . $diasTotales . ' dÃ­as</span>';
+                return '<span class="status-alerta">' . $diasTotales . ' días</span>';
             } else {
                 return '<span class="status-alerta">' . $meses . ' mes' . ($meses > 1 ? 'es' : '') . '</span>';
             }
-        } elseif ($aÃ±os == 0) {
-            // Menos de 1 aÃ±o - INFORMACIÃ“N
+        } elseif ($años == 0) {
+            // Menos de 1 año - INFORMACIÓN
             if ($meses == 0) {
-                return '<span class="status-info">' . $dias . ' dÃ­as</span>';
+                return '<span class="status-info">' . $dias . ' días</span>';
             } elseif ($dias == 0) {
                 return '<span class="status-info">' . $meses . ' mes' . ($meses > 1 ? 'es' : '') . '</span>';
             } else {
-                return '<span class="status-info">' . $meses . ' mes' . ($meses > 1 ? 'es' : '') . ', ' . $dias . ' dÃ­a' . ($dias > 1 ? 's' : '') . '</span>';
+                return '<span class="status-info">' . $meses . ' mes' . ($meses > 1 ? 'es' : '') . ', ' . $dias . ' día' . ($dias > 1 ? 's' : '') . '</span>';
             }
         } else {
-            // MÃ¡s de 1 aÃ±o - Ã‰XITO
+            // Más de 1 año - ÉXITO
             if ($meses == 0) {
-                return '<span class="status-success">' . $aÃ±os . ' aÃ±o' . ($aÃ±os > 1 ? 's' : '') . '</span>';
+                return '<span class="status-success">' . $años . ' año' . ($años > 1 ? 's' : '') . '</span>';
             } else {
-                return '<span class="status-success">' . $aÃ±os . ' aÃ±o' . ($aÃ±os > 1 ? 's' : '') . ', ' . $meses . ' mes' . ($meses > 1 ? 'es' : '') . '</span>';
+                return '<span class="status-success">' . $años . ' año' . ($años > 1 ? 's' : '') . ', ' . $meses . ' mes' . ($meses > 1 ? 'es' : '') . '</span>';
             }
         }
     } catch (Exception $e) {
@@ -1665,13 +1674,13 @@ function calcularTiempoRestanteContrato($fechaFinContrato, $estaActivo = true, $
 }
 
 /**
- * Obtiene el salario de referencia (contrato o Ãºltimo adendum)
+ * Obtiene el salario de referencia (contrato o último adendum)
  */
 function obtenerSalarioReferencia($codOperario)
 {
     global $conn;
 
-    // 1. Primero intentar obtener el Ãºltimo registro de salario en AsignacionNivelesCargos
+    // 1. Primero intentar obtener el último registro de salario en AsignacionNivelesCargos
     $stmtAsignacion = $conn->prepare("
         SELECT Salario 
         FROM AsignacionNivelesCargos 
@@ -1686,7 +1695,7 @@ function obtenerSalarioReferencia($codOperario)
         return $asignacion['Salario'];
     }
 
-    // 2. Si no hay asignaciÃ³n previa con salario, buscar el del contrato activo o Ãºltimo contrato
+    // 2. Si no hay asignación previa con salario, buscar el del contrato activo o último contrato
     $stmtContrato = $conn->prepare("
         SELECT salario_inicial 
         FROM Contratos 
@@ -1703,7 +1712,7 @@ function obtenerSalarioReferencia($codOperario)
 }
 
 /**
- * Obtiene la categorÃ­a sugerida para un cargo especÃ­fico
+ * Obtiene la categoría sugerida para un cargo específico
  */
 function obtenerCategoriaSugeridaPorCargo($codCargo)
 {
@@ -1712,18 +1721,18 @@ function obtenerCategoriaSugeridaPorCargo($codCargo)
             'idCategoria' => 5,
             'nombre' => 'Operario'
         ],
-        5 => [ // Cargo: LÃ­der de Sucursal
+        5 => [ // Cargo: Líder de Sucursal
             'idCategoria' => 1,
-            'nombre' => 'LÃ­der'
+            'nombre' => 'Líder'
         ]
-        // Agregar mÃ¡s mapeos segÃºn necesites
+        // Agregar más mapeos según necesites
     ];
 
     return $mapeo[$codCargo] ?? null;
 }
 
 /**
- * Obtiene informaciÃ³n completa de categorÃ­a por ID
+ * Obtiene información completa de categoría por ID
  */
 function obtenerCategoriaCompleta($idCategoria)
 {
@@ -1743,7 +1752,7 @@ function obtenerCategoriaCompleta($idCategoria)
 }
 
 /**
- * Obtiene las Ãºltimas N semanas del sistema
+ * Obtiene las últimas N semanas del sistema
  */
 function obtenerUltimasSemanas($cantidad = 4)
 {
@@ -1758,12 +1767,12 @@ function obtenerUltimasSemanas($cantidad = 4)
     $stmt->execute([$cantidad]);
     $semanas = $stmt->fetchAll();
 
-    // Ordenar ascendente para mostrar de mÃ¡s antigua a mÃ¡s reciente
+    // Ordenar ascendente para mostrar de más antigua a más reciente
     return array_reverse($semanas);
 }
 
 /**
- * Obtiene las sucursales permitidas para un usuario segÃºn su cargo
+ * Obtiene las sucursales permitidas para un usuario según su cargo
  */
 function obtenerSucursalesPermitidas($codOperario)
 {
@@ -1794,7 +1803,7 @@ function obtenerSucursalesPermitidas($codOperario)
         return $stmt->fetchAll();
     }
 
-    // Si no tiene cargo 14 o 35, obtener solo las sucursales donde es lÃ­der (cargo 5)
+    // Si no tiene cargo 14 o 35, obtener solo las sucursales donde es líder (cargo 5)
     $stmt = $conn->prepare("
         SELECT DISTINCT s.codigo, s.nombre 
         FROM AsignacionNivelesCargos anc
@@ -1810,7 +1819,7 @@ function obtenerSucursalesPermitidas($codOperario)
 }
 
 /**
- * Verifica si un usuario tiene acceso a una sucursal especÃ­fica
+ * Verifica si un usuario tiene acceso a una sucursal específica
  */
 function verificarAccesoSucursal($codOperario, $codSucursal)
 {
@@ -1837,7 +1846,7 @@ function verificarAccesoSucursal($codOperario, $codSucursal)
         return true;
     }
 
-    // Si no tiene cargo 14 o 35, verificar si es lÃ­der de esta sucursal
+    // Si no tiene cargo 14 o 35, verificar si es líder de esta sucursal
     $stmt = $conn->prepare("
         SELECT COUNT(*) as es_lider 
         FROM AsignacionNivelesCargos 
@@ -1853,13 +1862,13 @@ function verificarAccesoSucursal($codOperario, $codSucursal)
 }
 
 /**
- * Obtiene las faltas pendientes de revisiÃ³n (tipo "Pendiente")
+ * Obtiene las faltas pendientes de revisión (tipo "Pendiente")
  */
-function obtenerFaltasPendientesRevisiÃ³n($codSucursal = null, $fechaDesde = null, $fechaHasta = null)
+function obtenerFaltasPendientesRevisión($codSucursal = null, $fechaDesde = null, $fechaHasta = null)
 {
     global $conn;
 
-    // Si no se proporcionan fechas, calcular segÃºn lÃ³gica de dÃ­as del mes
+    // Si no se proporcionan fechas, calcular según lógica de días del mes
     if (!$fechaDesde || !$fechaHasta) {
         $fechas = calcularPeriodoRevisionFaltas();
         $fechaDesde = $fechas['desde'];
@@ -1899,8 +1908,8 @@ function obtenerFaltasPendientesRevisiÃ³n($codSucursal = null, $fechaDesde = n
 }
 
 /**
- * Calcula el periodo de revisiÃ³n segÃºn los dÃ­as del mes
- * DÃ­as 1-2: mes anterior, DÃ­as 3+: mes actual
+ * Calcula el periodo de revisión según los días del mes
+ * Días 1-2: mes anterior, Días 3+: mes actual
  */
 function calcularPeriodoRevisionFaltas()
 {
@@ -1926,7 +1935,7 @@ function calcularPeriodoRevisionFaltas()
 }
 
 /**
- * Calcula dÃ­as restantes para revisiÃ³n de faltas
+ * Calcula días restantes para revisión de faltas
  */
 function calcularDiasRestantesRevisionFaltas()
 {
@@ -1934,44 +1943,44 @@ function calcularDiasRestantesRevisionFaltas()
     $dia = (int) $hoy->format('d');
 
     if ($dia <= 2) {
-        // Si estamos en dÃ­as 1-2, la fecha lÃ­mite es el dÃ­a 2
+        // Si estamos en días 1-2, la fecha límite es el día 2
         return 2 - $dia;
     } else {
-        // Si estamos despuÃ©s del dÃ­a 2, la fecha lÃ­mite es el dÃ­a 2 del prÃ³ximo mes
+        // Si estamos después del día 2, la fecha límite es el día 2 del próximo mes
         $proximoMes = new DateTime('first day of next month');
-        $proximoMes->modify('+1 day'); // DÃ­a 2 del prÃ³ximo mes
+        $proximoMes->modify('+1 day'); // Día 2 del próximo mes
         $diferencia = $hoy->diff($proximoMes);
         return $diferencia->days;
     }
 }
 
 /**
- * Determina el color del indicador segÃºn dÃ­as restantes
+ * Determina el color del indicador según días restantes
  */
 function determinarColorIndicadorFaltas($diasRestantes)
 {
     if ($diasRestantes < 0) {
         return 'rojo'; // Vencido
     } elseif ($diasRestantes <= 1) {
-        return 'rojo'; // 1 dÃ­a o menos
+        return 'rojo'; // 1 día o menos
     } elseif ($diasRestantes <= 2) {
-        return 'amarillo'; // 2 dÃ­as
+        return 'amarillo'; // 2 días
     } else {
-        return 'verde'; // 3+ dÃ­as
+        return 'verde'; // 3+ días
     }
 }
 
 /**
  * Obtiene el total de faltas pendientes para el indicador
  */
-function obtenerTotalFaltasPendientesRevisiÃ³n()
+function obtenerTotalFaltasPendientesRevisión()
 {
-    $faltasPendientes = obtenerFaltasPendientesRevisiÃ³n();
+    $faltasPendientes = obtenerFaltasPendientesRevisión();
     return count($faltasPendientes);
 }
 
 /**
- * Verifica si el usuario es jefe de CDS (cargo 19) o ProducciÃ³n 12
+ * Verifica si el usuario es jefe de CDS (cargo 19) o Producción 12
  */
 function esJefeCDS($codOperario = null)
 {
@@ -2023,7 +2032,7 @@ function obtenerSucursalesPermitidasMantenimiento($codOperario)
         return $stmt->fetchAll();
     }
 
-    // Para lÃ­deres y otros, obtener todas las sucursales asignadas
+    // Para líderes y otros, obtener todas las sucursales asignadas
     $stmt = $conn->prepare("
         SELECT DISTINCT s.codigo, s.nombre 
         FROM AsignacionNivelesCargos anc
@@ -2038,7 +2047,7 @@ function obtenerSucursalesPermitidasMantenimiento($codOperario)
 }
 
 /**
- * Verifica si un usuario tiene acceso a una sucursal especÃ­fica para mantenimiento
+ * Verifica si un usuario tiene acceso a una sucursal específica para mantenimiento
  */
 function verificarAccesoSucursalMantenimiento($codOperario, $codSucursal)
 {
@@ -2057,7 +2066,7 @@ function verificarAccesoSucursalMantenimiento($codOperario, $codSucursal)
         return true;
     }
 
-    // Verificar si la sucursal estÃ¡ dentro de sus asignaciones vigentes
+    // Verificar si la sucursal está dentro de sus asignaciones vigentes
     $stmt = $conn->prepare("
         SELECT COUNT(*) as tiene_acceso 
         FROM AsignacionNivelesCargos 
@@ -2072,7 +2081,7 @@ function verificarAccesoSucursalMantenimiento($codOperario, $codSucursal)
 }
 
 /**
- * Obtiene el nombre del departamento por su cÃ³digo
+ * Obtiene el nombre del departamento por su código
  */
 function obtenerNombreDepartamento($codDepartamento)
 {
@@ -2136,7 +2145,7 @@ function obtenerSucursalesPorDepartamento($codDepartamento)
 }
 
 /**
- * Obtiene el monto de viÃ¡tico nocturno para un departamento
+ * Obtiene el monto de viático nocturno para un departamento
  */
 function obtenerViaticoNocturnoDepartamento($codDepartamento)
 {
@@ -2161,7 +2170,7 @@ function obtenerViaticoDiurnoDepartamento($codDepartamento)
 }
 
 /**
- * Obtiene departamentos que aplican para viÃ¡ticos nocturnos
+ * Obtiene departamentos que aplican para viáticos nocturnos
  */
 function obtenerDepartamentosConViaticos()
 {
@@ -2173,7 +2182,7 @@ function obtenerDepartamentosConViaticos()
 }
 
 /**
- * Verifica si un dÃ­a aplica para viÃ¡tico en Masaya (jueves a domingo)
+ * Verifica si un día aplica para viático en Masaya (jueves a domingo)
  */
 function aplicaViaticoMasaya($fecha)
 {
@@ -2182,27 +2191,27 @@ function aplicaViaticoMasaya($fecha)
 }
 
 /**
- * Verifica si aplica viÃ¡tico para un departamento y fecha especÃ­ficos
+ * Verifica si aplica viático para un departamento y fecha específicos
  */
 function aplicaViaticoDepartamento($codDepartamento, $fecha)
 {
-    // Convertir a string para comparaciÃ³n segura
+    // Convertir a string para comparación segura
     $codDepartamento = (string) $codDepartamento;
 
-    // HARDCODED: Las reglas de quÃ© dÃ­as de la semana aplica el viÃ¡tico por departamento
-    // estÃ¡n literalizadas en este switch. Si cambia la regla de un departamento o se agrega
-    // uno nuevo, hay que modificar este cÃ³digo PHP.
+    // HARDCODED: Las reglas de qué días de la semana aplica el viático por departamento
+    // están literalizadas en este switch. Si cambia la regla de un departamento o se agrega
+    // uno nuevo, hay que modificar este código PHP.
     // Reglas actuales:
-    //   - 1 (Managua):  aplica todos los dÃ­as (siempre retorna true)
-    //   - 3 (Masaya):   aplica todos los dÃ­as (siempre retorna true)
-    //   - 4 (Granada):  solo aplica jueves (4) a domingo (7) segÃºn ISO weekday
+    //   - 1 (Managua):  aplica todos los días (siempre retorna true)
+    //   - 3 (Masaya):   aplica todos los días (siempre retorna true)
+    //   - 4 (Granada):  solo aplica jueves (4) a domingo (7) según ISO weekday
     //   - Default:      cualquier otro departamento NO aplica (retorna false)
     // TODO: Migrar a BD con una columna en 'departamentos' tipo:
-    //   'dias_semana_viatico' VARCHAR(13) almacenando los dÃ­as ISO separados por coma,
+    //   'dias_semana_viatico' VARCHAR(13) almacenando los días ISO separados por coma,
     //   ej. '1,2,3,4,5,6,7' (todos), '4,5,6,7' (jue-dom). NULL = no aplica.
     switch ($codDepartamento) {
-        case '1': // Managua - todos los dÃ­as
-        case '3': // Masaya - todos los dÃ­as
+        case '1': // Managua - todos los días
+        case '3': // Masaya - todos los días
             return true;
         case '4': // Granada - solo jueves a domingo
             $diaSemana = date('N', strtotime($fecha)); // 1=lunes, 7=domingo
@@ -2213,7 +2222,7 @@ function aplicaViaticoDepartamento($codDepartamento, $fecha)
 }
 
 /**
- * Obtiene el monto de viÃ¡tico para una sucursal y fecha
+ * Obtiene el monto de viático para una sucursal y fecha
  */
 function obtenerMontoViaticoSucursal($codSucursal, $fecha)
 {
@@ -2222,7 +2231,7 @@ function obtenerMontoViaticoSucursal($codSucursal, $fecha)
         return 0;
     }
 
-    // Verificar si aplica viÃ¡tico para este departamento y fecha
+    // Verificar si aplica viático para este departamento y fecha
     if (!aplicaViaticoDepartamento($codDepartamento, $fecha)) {
         return 0;
     }
@@ -2255,7 +2264,7 @@ function obtenerFeriadosPorDepartamento($codDepartamento, $fecha)
 }
 
 /**
- * Verifica si una fecha es feriado para un departamento especÃ­fico
+ * Verifica si una fecha es feriado para un departamento específico
  */
 function esFeriadoDepartamento($codDepartamento, $fecha)
 {
@@ -2292,7 +2301,7 @@ function obtenerFeriadosEnRango($fechaDesde, $fechaHasta, $codDepartamento = nul
 }
 
 /**
- * Obtiene las sucursales que aplican para viÃ¡ticos nocturnos
+ * Obtiene las sucursales que aplican para viáticos nocturnos
  */
 function obtenerSucursalesConViaticos()
 {
@@ -2311,7 +2320,7 @@ function obtenerSucursalesConViaticos()
 }
 
 /**
- * Obtiene el estado detallado de las auditorÃ­as para una sucursal especÃ­fica
+ * Obtiene el estado detallado de las auditorías para una sucursal específica
  */
 function obtenerEstadoAuditoriasSucursal($codSucursal, $numeroSemana)
 {
@@ -2323,7 +2332,7 @@ function obtenerEstadoAuditoriasSucursal($codSucursal, $numeroSemana)
         return ['completadas' => 0, 'total' => 6, 'porcentaje' => 0, 'auditorias' => []];
     }
 
-    // Definir las 6 auditorÃ­as
+    // Definir las 6 auditorías
     $auditorias = [
         [
             'tipo' => 'limpieza',
@@ -2345,7 +2354,7 @@ function obtenerEstadoAuditoriasSucursal($codSucursal, $numeroSemana)
         ],
         [
             'tipo' => 'facturacion',
-            'nombre' => 'Caja FacturaciÃ³n',
+            'nombre' => 'Caja Facturación',
             'tabla' => 'auditoria_facturacion',
             'url' => '/modulos/supervision/auditorias_original/auditinternas/auditoria_caja_facturacion.php'
         ],
@@ -2370,10 +2379,10 @@ function obtenerEstadoAuditoriasSucursal($codSucursal, $numeroSemana)
         $estaCompleta = false;
 
         if (in_array($auditoria['tipo'], ['limpieza', 'personal', 'servicio'])) {
-            // AuditorÃ­as de desempeÃ±o (sin ajuste de hora)
+            // Auditorías de desempeño (sin ajuste de hora)
             $estaCompleta = verificarAuditoriaDesempenio($auditoria['tabla'], $codSucursal, $semana);
         } else {
-            // AuditorÃ­as de efectivo (con ajuste de -6 horas)
+            // Auditorías de efectivo (con ajuste de -6 horas)
             $columnaSucursal = ($auditoria['tipo'] == 'inventario') ? 'sucursal_id' : 'sucursal_id';
             $estaCompleta = verificarAuditoriaEfectivo($auditoria['tabla'], $columnaSucursal, $codSucursal, $semana);
         }
@@ -2401,11 +2410,11 @@ function obtenerEstadoAuditoriasSucursal($codSucursal, $numeroSemana)
 }
 
 /**
- * Obtiene los documentos obligatorios faltantes para una pestaÃ±a especÃ­fica
+ * Obtiene los documentos obligatorios faltantes para una pestaña específica
  */
-function obtenerDocumentosFaltantesPestana($codOperario, $pestaÃ±a)
+function obtenerDocumentosFaltantesPestana($codOperario, $pestaña)
 {
-    $tiposDocumentos = obtenerTiposDocumentosPorPestaÃ±a($pestaÃ±a);
+    $tiposDocumentos = obtenerTiposDocumentosPorPestaña($pestaña);
     $obligatorios = $tiposDocumentos['obligatorios'];
 
     if (empty($obligatorios)) {
@@ -2456,33 +2465,33 @@ function obtenerDocumentosFaltantesPestana($codOperario, $pestaÃ±a)
 
 
 /**
- * Obtiene todos los documentos faltantes organizados por pestaÃ±a
+ * Obtiene todos los documentos faltantes organizados por pestaña
  */
 function obtenerTodosDocumentosFaltantes($codOperario)
 {
     $documentosFaltantes = [];
     global $conn;
 
-    // Obtener todas las pestaÃ±as que tienen documentos configurados
+    // Obtener todas las pestañas que tienen documentos configurados
     try {
-        $stmt = $conn->query("SELECT DISTINCT pestaÃ±a FROM contratos_tiposDocumentos WHERE activo = 1");
-        $pestaÃ±as = $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $stmt = $conn->query("SELECT DISTINCT pestaña FROM contratos_tiposDocumentos WHERE activo = 1");
+        $pestañas = $stmt->fetchAll(PDO::FETCH_COLUMN);
     } catch (Exception $e) {
-        error_log("Error al obtener pestaÃ±as en obtenerTodosDocumentosFaltantes: " . $e->getMessage());
-        $pestaÃ±as = ['datos-personales', 'inss', 'contrato', 'contactos-emergencia', 'salario', 'movimientos', 'categoria', 'adendums'];
+        error_log("Error al obtener pestañas en obtenerTodosDocumentosFaltantes: " . $e->getMessage());
+        $pestañas = ['datos-personales', 'inss', 'contrato', 'contactos-emergencia', 'salario', 'movimientos', 'categoria', 'adendums'];
     }
 
 
-    foreach ($pestaÃ±as as $pestaÃ±a) {
-        $faltantesPestana = obtenerDocumentosFaltantesPestana($codOperario, $pestaÃ±a);
+    foreach ($pestañas as $pestaña) {
+        $faltantesPestana = obtenerDocumentosFaltantesPestana($codOperario, $pestaña);
 
         if (!empty($faltantesPestana)) {
-            $documentosFaltantes[$pestaÃ±a] = [];
+            $documentosFaltantes[$pestaña] = [];
 
             foreach ($faltantesPestana as $nombreDocumento) {
-                $documentosFaltantes[$pestaÃ±a][] = [
+                $documentosFaltantes[$pestaña][] = [
                     'nombre' => $nombreDocumento,
-                    'pestaÃ±a' => $pestaÃ±a
+                    'pestaña' => $pestaña
                 ];
             }
         }
@@ -2492,8 +2501,8 @@ function obtenerTodosDocumentosFaltantes($codOperario)
 }
 
 /**
- * Obtiene TODOS los operarios con horario (incluyendo adicionales histÃ³ricos)
- * MODIFICADA: Incluye filtro por fecha de liquidaciÃ³n
+ * Obtiene TODOS los operarios con horario (incluyendo adicionales históricos)
+ * MODIFICADA: Incluye filtro por fecha de liquidación
  */
 function obtenerTodosOperariosConHorario($codSucursal, $idSemana)
 {
@@ -2508,7 +2517,7 @@ function obtenerTodosOperariosConHorario($codSucursal, $idSemana)
             hs.total_horas,
             hs.cod_contrato,
             c.fecha_liquidacion,
-            -- Verificar si el operario estÃ¡ asignado actualmente a la sucursal
+            -- Verificar si el operario está asignado actualmente a la sucursal
             CASE 
                 WHEN EXISTS (
                     SELECT 1 FROM AsignacionNivelesCargos anc 
@@ -2532,7 +2541,7 @@ function obtenerTodosOperariosConHorario($codSucursal, $idSemana)
         ) c ON o.CodOperario = c.cod_operario
         WHERE hs.cod_sucursal = ?
         AND hs.id_semana_sistema = ?
-        -- FILTRO: Solo operarios activos segÃºn fecha de liquidaciÃ³n relativa a la semana
+        -- FILTRO: Solo operarios activos según fecha de liquidación relativa a la semana
         AND (
             c.fecha_liquidacion IS NULL 
             OR c.fecha_liquidacion = '0000-00-00'
@@ -2545,7 +2554,7 @@ function obtenerTodosOperariosConHorario($codSucursal, $idSemana)
 }
 
 /**
- * Obtiene la cantidad de anuncios no leÃ­dos por un usuario
+ * Obtiene la cantidad de anuncios no leídos por un usuario
  */
 function obtenerCantidadAnunciosNoLeidos($userId)
 {
@@ -2557,20 +2566,20 @@ function obtenerCantidadAnunciosNoLeidos($userId)
             FROM announcements a
             LEFT JOIN announcement_views av ON a.id = av.announcement_id AND av.user_id = ?
             WHERE av.id IS NULL
-            AND a.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) -- Solo Ãºltimos 30 dÃ­as
+            AND a.created_at >= DATE_SUB(NOW(), INTERVAL 30 DAY) -- Solo últimos 30 días
         ");
         $stmt->execute([$userId]);
         $result = $stmt->fetch();
 
         return $result['no_leidos'] ?? 0;
     } catch (PDOException $e) {
-        error_log("Error obteniendo anuncios no leÃ­dos: " . $e->getMessage());
+        error_log("Error obteniendo anuncios no leídos: " . $e->getMessage());
         return 0;
     }
 }
 
 /**
- * Marcar un anuncio como leÃ­do por un usuario
+ * Marcar un anuncio como leído por un usuario
  */
 function marcarAnuncioComoLeido($announcementId, $userId)
 {
@@ -2583,20 +2592,20 @@ function marcarAnuncioComoLeido($announcementId, $userId)
         ");
         return $stmt->execute([$announcementId, $userId]);
     } catch (PDOException $e) {
-        error_log("Error marcando anuncio como leÃ­do: " . $e->getMessage());
+        error_log("Error marcando anuncio como leído: " . $e->getMessage());
         return false;
     }
 }
 
 /**
- * Marcar todos los anuncios como leÃ­dos para un usuario
+ * Marcar todos los anuncios como leídos para un usuario
  */
 function marcarTodosAnunciosComoLeidos($userId)
 {
     global $conn;
 
     try {
-        // Primero obtener todos los anuncios no leÃ­dos
+        // Primero obtener todos los anuncios no leídos
         $stmt = $conn->prepare("
             SELECT a.id 
             FROM announcements a
@@ -2606,7 +2615,7 @@ function marcarTodosAnunciosComoLeidos($userId)
         $stmt->execute([$userId]);
         $anunciosNoLeidos = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-        // Marcar cada uno como leÃ­do
+        // Marcar cada uno como leído
         $marcados = 0;
         foreach ($anunciosNoLeidos as $anuncioId) {
             if (marcarAnuncioComoLeido($anuncioId, $userId)) {
@@ -2616,13 +2625,13 @@ function marcarTodosAnunciosComoLeidos($userId)
 
         return $marcados;
     } catch (PDOException $e) {
-        error_log("Error marcando todos los anuncios como leÃ­dos: " . $e->getMessage());
+        error_log("Error marcando todos los anuncios como leídos: " . $e->getMessage());
         return 0;
     }
 }
 
 /**
- * Obtiene el Ãºltimo cÃ³digo de contrato de un operario
+ * Obtiene el último código de contrato de un operario
  */
 function obtenerUltimoCodigoContrato($codOperario)
 {
@@ -2642,7 +2651,7 @@ function obtenerUltimoCodigoContrato($codOperario)
 }
 
 /**
- * Obtiene la fecha de inicio del Ãºltimo contrato de un operario
+ * Obtiene la fecha de inicio del último contrato de un operario
  */
 function obtenerUltimaFechaInicioContrato($codOperario)
 {
@@ -2710,19 +2719,19 @@ function obtenerRangoQuincenaActual()
 }
 
 /**
- * Calcula faltas ejecutadas para un operario en la quincena actual - VERSIÃ“N CORREGIDA
+ * Calcula faltas ejecutadas para un operario en la quincena actual - VERSIÓN CORREGIDA
  */
 function calcularFaltasEjecutadas($codOperario, $fechaInicio, $fechaFin)
 {
     global $conn;
 
-    // LIMITAR hasta la fecha actual (no incluir dÃ­as futuros)
+    // LIMITAR hasta la fecha actual (no incluir días futuros)
     $fechaHoy = date('Y-m-d');
     if ($fechaFin > $fechaHoy) {
         $fechaFin = $fechaHoy;
     }
 
-    // 1. Obtener faltas automÃ¡ticas (SOLO dÃ­as con horario programado ACTIVO y hasta hoy)
+    // 1. Obtener faltas automáticas (SOLO días con horario programado ACTIVO y hasta hoy)
     $sqlFaltasAutomaticas = "
         SELECT COUNT(DISTINCT h.fecha) as total
         FROM (
@@ -2735,14 +2744,14 @@ function calcularFaltasEjecutadas($codOperario, $fechaInicio, $fechaFin)
             WHERE DATE(?) + INTERVAL (a.a + (10 * b.a)) DAY <= ?
         ) h
         WHERE h.fecha BETWEEN ? AND ?  -- Solo hasta fecha actual
-        AND h.fecha <= ?  -- Doble verificaciÃ³n para no incluir futuros
+        AND h.fecha <= ?  -- Doble verificación para no incluir futuros
         AND EXISTS (
             SELECT 1 FROM HorariosSemanalesOperaciones hso
             JOIN SemanasSistema ss ON hso.id_semana_sistema = ss.id
             WHERE hso.cod_operario = ?
             AND h.fecha BETWEEN ss.fecha_inicio AND ss.fecha_fin
             AND (
-                -- Solo considerar dÃ­as con estado 'Activo'
+                -- Solo considerar días con estado 'Activo'
                 (DAYOFWEEK(h.fecha) = 2 AND hso.lunes_estado = 'Activo') OR
                 (DAYOFWEEK(h.fecha) = 3 AND hso.martes_estado = 'Activo') OR
                 (DAYOFWEEK(h.fecha) = 4 AND hso.miercoles_estado = 'Activo') OR
@@ -2766,7 +2775,7 @@ function calcularFaltasEjecutadas($codOperario, $fechaInicio, $fechaFin)
         $fechaFin,
         $fechaInicio,
         $fechaFin,
-        $fechaHoy, // ParÃ¡metro extra para fecha actual
+        $fechaHoy, // Parámetro extra para fecha actual
         $codOperario,
         $codOperario
     ]);
@@ -2785,7 +2794,7 @@ function calcularFaltasEjecutadas($codOperario, $fechaInicio, $fechaFin)
     $stmtJustificadas->execute([$codOperario, $fechaInicio, $fechaFin, $fechaHoy]);
     $faltasJustificadas = $stmtJustificadas->fetch()['total'] ?? 0;
 
-    // 3. Calcular faltas ejecutadas (automÃ¡ticas - justificadas)
+    // 3. Calcular faltas ejecutadas (automáticas - justificadas)
     $faltasEjecutadas = max(0, $faltasAutomaticas - $faltasJustificadas);
 
     return [
@@ -2797,7 +2806,7 @@ function calcularFaltasEjecutadas($codOperario, $fechaInicio, $fechaFin)
 }
 
 /**
- * Calcula tardanzas ejecutadas para un operario en la quincena actual - VERSIÃ“N CORREGIDA
+ * Calcula tardanzas ejecutadas para un operario en la quincena actual - VERSIÓN CORREGIDA
  */
 function calcularTardanzasEjecutadas($codOperario, $fechaInicio, $fechaFin)
 {
@@ -2809,7 +2818,7 @@ function calcularTardanzasEjecutadas($codOperario, $fechaInicio, $fechaFin)
         $fechaFin = $fechaHoy;
     }
 
-    // 1. Obtener total de tardanzas automÃ¡ticas (SOLO hasta hoy)
+    // 1. Obtener total de tardanzas automáticas (SOLO hasta hoy)
     $sqlTotalTardanzas = "
         SELECT COUNT(*) as total 
         FROM marcaciones m
@@ -2833,7 +2842,7 @@ function calcularTardanzasEjecutadas($codOperario, $fechaInicio, $fechaFin)
             END,
             m.hora_ingreso
         ) > 1
-        -- Verificar que el dÃ­a tenÃ­a estado 'Activo'
+        -- Verificar que el día tenía estado 'Activo'
         AND (
             (DAYOFWEEK(m.fecha) = 2 AND hso.lunes_estado = 'Activo') OR
             (DAYOFWEEK(m.fecha) = 3 AND hso.martes_estado = 'Activo') OR
@@ -2873,7 +2882,7 @@ function calcularTardanzasEjecutadas($codOperario, $fechaInicio, $fechaFin)
 }
 
 /**
- * Obtiene estadÃ­sticas completas de la quincena para un operario - VERSIÃ“N COMPLETA
+ * Obtiene estadísticas completas de la quincena para un operario - VERSIÓN COMPLETA
  */
 function obtenerEstadisticasQuincenaOperario($codOperario)
 {
@@ -2883,7 +2892,7 @@ function obtenerEstadisticasQuincenaOperario($codOperario)
     $tardanzas = calcularTardanzasEjecutadas($codOperario, $rangoQuincena['inicio'], $rangoQuincena['fin']);
     $sucursales = obtenerEstadisticasSucursalesQuincena($codOperario, $rangoQuincena['inicio'], $rangoQuincena['fin']);
 
-    // Calcular turnos nocturnos (marcaciones de salida despuÃ©s de 8pm)
+    // Calcular turnos nocturnos (marcaciones de salida después de 8pm)
     global $conn;
     $fechaHoy = date('Y-m-d');
     $sqlTurnosNocturnos = "
@@ -2909,7 +2918,7 @@ function obtenerEstadisticasQuincenaOperario($codOperario)
 }
 
 /**
- * Obtiene estadÃ­sticas por sucursal para un operario en la quincena actual
+ * Obtiene estadísticas por sucursal para un operario en la quincena actual
  */
 function obtenerEstadisticasSucursalesQuincena($codOperario, $fechaInicio, $fechaFin)
 {
@@ -3010,7 +3019,7 @@ function obtenerEstadisticasSucursalesQuincena($codOperario, $fechaInicio, $fech
         $stmtNocturnos->execute([$codOperario, $codSucursal, $fechaInicio, $fechaFin, $fechaHoy]);
         $nocturnosSucursal = $stmtNocturnos->fetch()['turnos_nocturnos'] ?? 0;
 
-        // Omisiones por sucursal (dÃ­as con horario activo pero sin marcaciÃ³n completa)
+        // Omisiones por sucursal (días con horario activo pero sin marcación completa)
         $sqlOmisionesSucursal = "
             SELECT COUNT(DISTINCT h.fecha) as omisiones
             FROM (
@@ -3063,7 +3072,7 @@ function obtenerEstadisticasSucursalesQuincena($codOperario, $fechaInicio, $fech
         ]);
         $omisionesSucursal = $stmtOmisiones->fetch()['omisiones'] ?? 0;
 
-        // DÃ­as fuera de horario programado
+        // Días fuera de horario programado
         $sqlFueraHorarioSucursal = "
             SELECT COUNT(DISTINCT m.fecha) as dias_fuera_horario
             FROM marcaciones m
@@ -3093,7 +3102,7 @@ function obtenerEstadisticasSucursalesQuincena($codOperario, $fechaInicio, $fech
 }
 
 /**
- * Verifica si el usuario actual estÃ¡ de cumpleaÃ±os y devuelve los datos necesarios
+ * Verifica si el usuario actual está de cumpleaños y devuelve los datos necesarios
  */
 function verificarCumpleanosUsuario($codOperario = null)
 {
@@ -3126,7 +3135,7 @@ function verificarCumpleanosUsuario($codOperario = null)
         $cumpleanos = date('m-d', strtotime($operario['Cumpleanos']));
         $hoy = date('m-d');
 
-        // Verificar si hoy es el cumpleaÃ±os
+        // Verificar si hoy es el cumpleaños
         if ($cumpleanos === $hoy) {
             return [
                 'nombre' => trim($operario['Nombre'] . ' ' . $operario['Apellido']),
@@ -3137,13 +3146,13 @@ function verificarCumpleanosUsuario($codOperario = null)
 
         return null;
     } catch (Exception $e) {
-        error_log("Error verificando cumpleaÃ±os: " . $e->getMessage());
+        error_log("Error verificando cumpleaños: " . $e->getMessage());
         return null;
     }
 }
 
 /**
- * Calcula la edad basada en la fecha de cumpleaÃ±os
+ * Calcula la edad basada en la fecha de cumpleaños
  */
 function calcularEdad($fechaNacimiento)
 {
@@ -3158,7 +3167,7 @@ function calcularEdad($fechaNacimiento)
 }
 
 /**
- * Obtiene el nombre de la sucursal por su cÃ³digo
+ * Obtiene el nombre de la sucursal por su código
  */
 function obtenerNombreSucursalPorCodigo($codSucursal)
 {
@@ -3176,7 +3185,7 @@ function obtenerNombreSucursalPorCodigo($codSucursal)
 }
 
 /**
- * Obtiene operarios que han tenido horario programado en una fecha especÃ­fica
+ * Obtiene operarios que han tenido horario programado en una fecha específica
  */
 function obtenerOperariosConHorarioEnFecha($codSucursal, $fechaFalta)
 {
@@ -3194,7 +3203,7 @@ function obtenerOperariosConHorarioEnFecha($codSucursal, $fechaFalta)
         WHERE hso.cod_sucursal = ?
         AND ? BETWEEN ss.fecha_inicio AND ss.fecha_fin
         AND o.Operativo = 1
-        -- Verificar que el operario tenga horario programado en esa fecha especÃ­fica
+        -- Verificar que el operario tenga horario programado en esa fecha específica
         AND (
             (DAYOFWEEK(?) = 2 AND hso.lunes_estado IS NOT NULL) OR
             (DAYOFWEEK(?) = 3 AND hso.martes_estado IS NOT NULL) OR
@@ -3230,7 +3239,7 @@ function obtenerOperariosConHorarioEnFecha($codSucursal, $fechaFalta)
 }
 
 /**
- * Obtiene el horario programado y marcado de un operario para una fecha especÃ­fica
+ * Obtiene el horario programado y marcado de un operario para una fecha específica
  */
 function obtenerHorarioProgramadoMarcado($codOperario, $codSucursal, $fecha)
 {
@@ -3269,7 +3278,7 @@ function obtenerHorarioProgramadoMarcado($codOperario, $codSucursal, $fecha)
     $horario = $stmt->fetch();
 
     if ($horario) {
-        // Determinar dÃ­a de la semana (1=lunes, 2=martes, etc.)
+        // Determinar día de la semana (1=lunes, 2=martes, etc.)
         $diaSemana = date('N', strtotime($fecha));
 
         // Mapear a las columnas correctas
@@ -3338,9 +3347,9 @@ function formatoHoraCorta($hora)
 }
 
 /**
- * Obtiene la cantidad de operarios activos con exclusiones especÃ­ficas
+ * Obtiene la cantidad de operarios activos con exclusiones específicas
  * (No considerar aquellos con cargo 27 y excluir ciertos IDs)
- * MODIFICADA: Filtra por fecha de liquidaciÃ³n
+ * MODIFICADA: Filtra por fecha de liquidación
  */
 function obtenerCantidadOperariosActivosFiltrados()
 {
@@ -3364,7 +3373,7 @@ function obtenerCantidadOperariosActivosFiltrados()
             WHERE anc2.CodNivelesCargos = 27
             AND (anc2.Fin IS NULL OR anc2.Fin >= CURDATE())
         )
-        -- FILTRO NUEVO: Solo operarios activos segÃºn fecha de liquidaciÃ³n
+        -- FILTRO NUEVO: Solo operarios activos según fecha de liquidación
         AND (
             c.fecha_liquidacion IS NULL 
             OR c.fecha_liquidacion = '0000-00-00'
@@ -3379,7 +3388,7 @@ function obtenerCantidadOperariosActivosFiltrados()
 }
 
 /**
- * Obtiene el cÃ³digo de sucursal por su nombre
+ * Obtiene el código de sucursal por su nombre
  */
 function obtenerCodigoSucursalPorNombre($nombreSucursal)
 {
@@ -3393,7 +3402,7 @@ function obtenerCodigoSucursalPorNombre($nombreSucursal)
 }
 
 /**
- * Obtiene los cÃ³digos de cargo que corresponden a gerencia (ReportaA es NULL o vacÃ­o)
+ * Obtiene los códigos de cargo que corresponden a gerencia (ReportaA es NULL o vacío)
  */
 function obtenerCodigosGerencia()
 {
@@ -3419,7 +3428,7 @@ function esGerente($codOperario = null)
         $codOperario = $_SESSION['usuario_id'] ?? 0;
     }
 
-    // Si es admin, se considera gerente para efectos de aprobaciÃ³n
+    // Si es admin, se considera gerente para efectos de aprobación
     if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'admin') {
         return true;
     }
@@ -3455,34 +3464,34 @@ function obtenerNombreGerente($gerenteId)
 }
 
 /**
- * Verifica si un operario estÃ¡ activo segÃºn su fecha de liquidaciÃ³n
- * Un operario estÃ¡ INACTIVO si tiene fecha_liquidacion NO NULA y es <= fecha actual
+ * Verifica si un operario está activo según su fecha de liquidación
+ * Un operario está INACTIVO si tiene fecha_liquidacion NO NULA y es <= fecha actual
  */
 function operarioEstaActivo($codOperario)
 {
     $contrato = obtenerUltimoContratoOperario($codOperario);
 
     if (!$contrato) {
-        return false; // Si no tiene contrato, no estÃ¡ activo
+        return false; // Si no tiene contrato, no está activo
     }
 
-    // Si no tiene fecha de liquidaciÃ³n, estÃ¡ activo
+    // Si no tiene fecha de liquidación, está activo
     if (empty($contrato['fecha_liquidacion']) || $contrato['fecha_liquidacion'] == '0000-00-00') {
         return true;
     }
 
-    // Si tiene fecha de liquidaciÃ³n, verificar si es futura o pasada
+    // Si tiene fecha de liquidación, verificar si es futura o pasada
     $fechaLiquidacion = new DateTime($contrato['fecha_liquidacion']);
     $hoy = new DateTime();
 
-    // Si la fecha de liquidaciÃ³n es FUTURA, sigue activo
-    // Si es PASADA o es HOY, estÃ¡ inactivo
+    // Si la fecha de liquidación es FUTURA, sigue activo
+    // Si es PASADA o es HOY, está inactivo
     return $fechaLiquidacion > $hoy;
 }
 
 /**
- * Obtiene el Ãºltimo contrato de un operario (por CodContrato mÃ¡s alto)
- * REEMPLAZA la funciÃ³n existente si ya existe
+ * Obtiene el último contrato de un operario (por CodContrato más alto)
+ * REEMPLAZA la función existente si ya existe
  */
 function obtenerUltimoContratoOperario($codOperario)
 {
@@ -3500,7 +3509,7 @@ function obtenerUltimoContratoOperario($codOperario)
 }
 
 /**
- * Verifica si un operario estÃ¡ activo segÃºn su fecha de liquidaciÃ³n
+ * Verifica si un operario está activo según su fecha de liquidación
  */
 function operarioEstaActivoPorLiquidacion($codOperario, $fechaReferencia = null)
 {
@@ -3514,7 +3523,7 @@ function operarioEstaActivoPorLiquidacion($codOperario, $fechaReferencia = null)
         return false; // No tiene contrato registrado
     }
 
-    // Si no tiene fecha de liquidaciÃ³n, estÃ¡ activo
+    // Si no tiene fecha de liquidación, está activo
     if (
         empty($contrato['fecha_liquidacion']) ||
         $contrato['fecha_liquidacion'] == '0000-00-00' ||
@@ -3523,18 +3532,18 @@ function operarioEstaActivoPorLiquidacion($codOperario, $fechaReferencia = null)
         return true;
     }
 
-    // Si tiene fecha de liquidaciÃ³n, verificar si la fecha de referencia es ANTES o igual
-    // Recordar: si liquidaciÃ³n = 2025-01-15, el operario estÃ¡ activo hasta el 15 inclusive
+    // Si tiene fecha de liquidación, verificar si la fecha de referencia es ANTES o igual
+    // Recordar: si liquidación = 2025-01-15, el operario está activo hasta el 15 inclusive
     $fechaLiquidacion = new DateTime($contrato['fecha_liquidacion']);
     $fechaRef = new DateTime($fechaReferencia);
 
-    // EstÃ¡ activo si la fecha de referencia es MENOR O IGUAL a fecha de liquidaciÃ³n
+    // Está activo si la fecha de referencia es MENOR O IGUAL a fecha de liquidación
     return $fechaRef <= $fechaLiquidacion;
 }
 
 /**
- * Verifica si una fecha es posterior a la fecha de liquidaciÃ³n del operario
- * NUEVA FUNCIÃ“N - Para validar al registrar faltas
+ * Verifica si una fecha es posterior a la fecha de liquidación del operario
+ * NUEVA FUNCIÓN - Para validar al registrar faltas
  */
 function fechaPosteriorLiquidacion($codOperario, $fecha)
 {
@@ -3546,20 +3555,20 @@ function fechaPosteriorLiquidacion($codOperario, $fecha)
         $contrato['fecha_liquidacion'] == '0000-00-00' ||
         $contrato['fecha_liquidacion'] === null
     ) {
-        return false; // No tiene fecha de liquidaciÃ³n, no hay restricciÃ³n
+        return false; // No tiene fecha de liquidación, no hay restricción
     }
 
     $fechaLiquidacion = new DateTime($contrato['fecha_liquidacion']);
     $fechaConsulta = new DateTime($fecha);
 
-    // La fecha es posterior si es MAYOR a la fecha de liquidaciÃ³n
-    // Ejemplo: liquidaciÃ³n = 2025-01-15, fecha = 2025-01-16 â†’ TRUE (es posterior)
+    // La fecha es posterior si es MAYOR a la fecha de liquidación
+    // Ejemplo: liquidación = 2025-01-15, fecha = 2025-01-16 → TRUE (es posterior)
     return $fechaConsulta > $fechaLiquidacion;
 }
 
 /**
- * Obtiene operarios de una sucursal que estaban activos en una fecha especÃ­fica
- * NUEVA FUNCIÃ“N - Considera AsignacionNivelesCargos Y fecha_liquidacion
+ * Obtiene operarios de una sucursal que estaban activos en una fecha específica
+ * NUEVA FUNCIÓN - Considera AsignacionNivelesCargos Y fecha_liquidacion
  */
 function obtenerOperariosSucursalPorFecha($codSucursal, $fechaReferencia)
 {
@@ -3577,7 +3586,7 @@ function obtenerOperariosSucursalPorFecha($codSucursal, $fechaReferencia)
         FROM Operarios o
         INNER JOIN AsignacionNivelesCargos anc ON o.CodOperario = anc.CodOperario
         LEFT JOIN (
-            -- Subquery para obtener el Ãºltimo contrato de cada operario
+            -- Subquery para obtener el último contrato de cada operario
             SELECT c1.cod_operario, c1.CodContrato, c1.fecha_liquidacion
             FROM Contratos c1
             INNER JOIN (
@@ -3598,7 +3607,7 @@ function obtenerOperariosSucursalPorFecha($codSucursal, $fechaReferencia)
             AND anc2.Fecha <= ?
             AND (anc2.Fin IS NULL OR anc2.Fin >= ?)
         )
-        -- FILTRO NUEVO: Solo operarios activos segÃºn fecha de liquidaciÃ³n
+        -- FILTRO NUEVO: Solo operarios activos según fecha de liquidación
         AND (
             c.fecha_liquidacion IS NULL 
             OR c.fecha_liquidacion = '0000-00-00'
@@ -3639,7 +3648,7 @@ function obtenerMensajeEstadoContrato($codOperario)
     if (!$contrato) {
         return [
             'tipo' => 'sin_contrato',
-            'mensaje' => 'Este colaborador no tiene registro de contrato. Por favor contactar con el Ã¡rea de RH.',
+            'mensaje' => 'Este colaborador no tiene registro de contrato. Por favor contactar con el área de RH.',
             'clase' => 'alert-warning'
         ];
     }
@@ -3668,7 +3677,7 @@ function obtenerMensajeEstadoContrato($codOperario)
     } else {
         return [
             'tipo' => 'liquidacion_futura',
-            'mensaje' => 'Colaborador con liquidaciÃ³n programada para ' . $fechaLiquidacion->format('d-m-Y'),
+            'mensaje' => 'Colaborador con liquidación programada para ' . $fechaLiquidacion->format('d-m-Y'),
             'clase' => 'alert-info'
         ];
     }
@@ -3680,11 +3689,11 @@ function obtenerMensajeEstadoContrato($codOperario)
 function obtenerOperariosPorCargoVigente($codNivelCargo)
 {
     if (!isset($_SESSION['usuario_id'])) {
-        return []; // Devuelve array vacÃ­o si no hay sesiÃ³n
+        return []; // Devuelve array vacío si no hay sesión
     }
 
     global $conn;
-    $codNivelCargo = (int) $codNivelCargo; // Aseguramos que sea un nÃºmero entero
+    $codNivelCargo = (int) $codNivelCargo; // Aseguramos que sea un número entero
 
     $stmt = $conn->prepare("
         SELECT CodOperario
@@ -3713,7 +3722,7 @@ function obtenerOperariosPorCargoVigente($codNivelCargo)
  */
 
 /**
- * FunciÃ³n para traducir meses al espaÃ±ol en formatos tipo dd-Mmm-yy
+ * Función para traducir meses al español en formatos tipo dd-Mmm-yy
  * (Migrada de modulos/supervision/auditorias_original/funciones.php)
  */
 function traducirMes($fechaFormateada)
@@ -3741,7 +3750,7 @@ function obtenerSucursalUsuarioActual()
 
     global $conn;
 
-    // Obtener la sucursal activa mÃ¡s reciente del usuario
+    // Obtener la sucursal activa más reciente del usuario
     $stmt = $conn->prepare("
         SELECT Sucursal 
         FROM AsignacionNivelesCargos 
@@ -3756,7 +3765,6 @@ function obtenerSucursalUsuarioActual()
     return $result ? $result['Sucursal'] : null;
 }
 
-
 if (!function_exists('obtenerFechaInicioContinua')) {
     /**
      * Obtiene la fecha de inicio continua (contrato más antiguo) de un operario.
@@ -3765,7 +3773,6 @@ if (!function_exists('obtenerFechaInicioContinua')) {
     function obtenerFechaInicioContinua($codOperario)
     {
         global $conn;
-
         try {
             $stmt = $conn->prepare("
                 SELECT MIN(inicio_contrato) as fecha_inicio

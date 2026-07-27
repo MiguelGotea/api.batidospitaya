@@ -441,6 +441,8 @@ function obtenerOperariosSucursalConHorario($codSucursal, $idSemana)
             o.Nombre, 
             o.Apellido, 
             o.Apellido2,
+            o.Operativo,
+            o.Fin,
             hs.total_horas,
             hs.cod_contrato
         FROM Operarios o
@@ -742,36 +744,51 @@ function verificarDispositivoAutorizado($codSucursal)
         return ['status' => false, 'msg' => 'Navegador no permitido. Favor usar Google Chrome o Microsoft Edge.'];
     }
 
-    // 2. Verificar si la sucursal tiene un token configurado
+    // 2. Verificar si la sucursal tiene algún dispositivo autorizado
     global $conn;
     try {
-        $stmt = $conn->prepare("SELECT cookie_token FROM sucursales WHERE codigo = ? LIMIT 1");
-        $stmt->execute([$codSucursal]);
-        $tokenBD = $stmt->fetchColumn();
+        // Comprobar si la sucursal tiene al menos un dispositivo registrado
+        $stmtExiste = $conn->prepare("SELECT COUNT(*) FROM dispositivos_autorizados WHERE sucursal_codigo = ?");
+        $stmtExiste->execute([$codSucursal]);
+        $totalDispositivos = (int)$stmtExiste->fetchColumn();
 
-        if (empty($tokenBD)) {
+        if ($totalDispositivos === 0) {
             return [
                 'status' => false,
-                'msg' => 'Esta sucursal todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.'
+                'msg'    => 'Esta sucursal todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.'
             ];
         }
 
-        // 3. Verificar Token de la Cookie
+        // 3. Verificar si ESTE dispositivo está autorizado para esta sucursal
         $tokenCookie = $_COOKIE['erp_device_token'] ?? null;
 
-        if ($tokenCookie && $tokenCookie === $tokenBD) {
+        if (!$tokenCookie) {
+            return [
+                'status' => false,
+                'msg'    => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
+            ];
+        }
+
+        $stmtToken = $conn->prepare(
+            "SELECT COUNT(*) FROM dispositivos_autorizados WHERE sucursal_codigo = ? AND cookie_token = ?"
+        );
+        $stmtToken->execute([$codSucursal, $tokenCookie]);
+        $esAutorizado = (int)$stmtToken->fetchColumn() > 0;
+
+        if ($esAutorizado) {
             return ['status' => true];
         }
 
         return [
             'status' => false,
-            'msg' => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
+            'msg'    => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
         ];
     } catch (Exception $e) {
         error_log("Error en validación de dispositivo: " . $e->getMessage());
         return ['status' => false, 'msg' => 'Error de sistema al validar dispositivo.'];
     }
 }
+
 
 /**
  * Obtiene las sucursales asignadas a un usuario (no necesariamente líder)

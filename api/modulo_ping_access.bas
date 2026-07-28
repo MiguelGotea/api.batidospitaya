@@ -130,7 +130,8 @@ End Sub
 Public Sub PingTimerTick()
     ' Llamar esto desde el evento Form_Timer del form principal
     ' Valida de nuevo por si cambia el contexto en caliente
-    If EsSistemaDeTienda() Then EnviarPing
+    'If EsSistemaDeTienda() Then EnviarPing
+    Call EnviarPing
 End Sub
 
 ' ════════════════════════════════════════════════════════

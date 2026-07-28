@@ -48,7 +48,7 @@ $sucursal = isset($body['sucursal']) ? (int)$body['sucursal'] : 0;
 $modo     = trim($body['modo'] ?? '');
 
 if ($sucursal < 0) kcError(400, 'Sucursal inválida.');
-if (!in_array($modo, ['limpiar_30dias', 'limpiar_total', 'insertar']))
+if (!in_array($modo, ['limpiar_30dias', 'limpiar_total', 'insertar', 'limpiar_dia']))
     kcError(400, "Modo inválido: $modo");
 
 global $conn;
@@ -57,6 +57,24 @@ $pdo = $conn;
 kcLog("INICIO | Sucursal=$sucursal | Modo=$modo");
 
 try {
+
+    // ── limpiar_dia ──────────────────────────────────────────────────────────
+    if ($modo === 'limpiar_dia') {
+        $fechaSync = !empty($body['fecha']) ? trim($body['fecha']) : '';
+        if (empty($fechaSync)) kcError(400, 'Fecha requerida para limpiar_dia.');
+
+        $stmt = $pdo->prepare(
+            "DELETE FROM `" . KC_TABLE . "`
+             WHERE Sucursal = :suc
+               AND Fecha = :fecha"
+        );
+        $stmt->execute([':suc' => $sucursal, ':fecha' => $fechaSync]);
+        $n = $stmt->rowCount();
+        kcLog("limpiar_dia OK | Eliminados=$n | Fecha=$fechaSync");
+        echo json_encode(['success' => true, 'modo' => $modo, 'afectados' => $n,
+                          'message' => "Eliminados $n registros del dia $fechaSync Sucursal=$sucursal"]);
+        exit();
+    }
 
     if ($modo === 'limpiar_30dias') {
         $stmt = $pdo->prepare(

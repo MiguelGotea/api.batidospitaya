@@ -108,6 +108,58 @@ Public Function SyncKardexTiendaCierre30Dias() As Boolean
     SyncKardexTiendaCierre30Dias = bOk
 End Function
 
+' ──────────────────────────────────────────────────────────
+' FUNCIONES PÚBLICAS — DÍA ESPECÍFICO
+' ──────────────────────────────────────────────────────────
+
+Public Function SyncKardexInventarioCotizacionDia(ByVal dFecha As Date) As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(dFecha, "yyyy-mm-dd")
+    SyncKardexInventarioCotizacionDia = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_inventario_cotizacion.php", _
+        "SELECT * FROM [Inventario Cotizacion] WHERE Fecha = #" & f & "#", _
+        "limpiar_dia", "IC", c, f)
+End Function
+
+Public Function SyncKardexAjustesInventarioDia(ByVal dFecha As Date) As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(dFecha, "yyyy-mm-dd")
+    SyncKardexAjustesInventarioDia = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_ajustes_inventario.php", _
+        "SELECT * FROM AjustesInventario WHERE Fecha = #" & f & "#", _
+        "limpiar_dia", "AI", c, f)
+End Function
+
+Public Function SyncKardexComprasDia(ByVal dFecha As Date) As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(dFecha, "yyyy-mm-dd")
+    SyncKardexComprasDia = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_compras.php", _
+        "SELECT * FROM Compras WHERE Fecha = #" & f & "#", _
+        "limpiar_dia", "C", c, f)
+End Function
+
+Public Function SyncKardexMermaCotizacionDia(ByVal dFecha As Date) As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(dFecha, "yyyy-mm-dd")
+    SyncKardexMermaCotizacionDia = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_merma_cotizacion.php", _
+        "SELECT * FROM [Merma Cotizacion] WHERE Fecha = #" & f & "#", _
+        "limpiar_dia", "MC", c, f)
+End Function
+
+Public Function SyncKardexTiendaDiaEspecifico(ByVal dFecha As Date) As Boolean
+    Dim bOk As Boolean: bOk = True
+    Dim f As String: f = Format(dFecha, "yyyy-mm-dd")
+    KdxLog "SyncDiaTienda", "Iniciando sync dia especifico (" & f & ") tienda - " & Now()
+    If Not SyncKardexInventarioCotizacionDia(dFecha) Then bOk = False
+    If Not SyncKardexAjustesInventarioDia(dFecha)    Then bOk = False
+    If Not SyncKardexComprasDia(dFecha)              Then bOk = False
+    If Not SyncKardexMermaCotizacionDia(dFecha)      Then bOk = False
+    KdxLog "SyncDiaTienda", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    SyncKardexTiendaDiaEspecifico = bOk
+End Function
+
 ' ── Master cierre CENTRAL DESPACHO ──────────────────────
 ' Tablas: PreIngresoPitaya, SubPreIngresosPitaya
 ' Llamar en el procedimiento de despacho/preingresos del sistema central.
@@ -230,13 +282,13 @@ End Function
 ' MOTOR GENÉRICO: Limpiar + Enviar en batches de 200
 ' ──────────────────────────────────────────────────────────
 Private Function KdxSyncTabla(sUrl As String, sSQL As String, _
-    sModoLimpiar As String, sTablaId As String, codSuc As String) As Boolean
+    sModoLimpiar As String, sTablaId As String, codSuc As String, Optional sFechaLimpiar As String = "") As Boolean
     On Error GoTo EH
 
     Dim sResp As String
 
     ' Paso 1: limpiar el rango en el host
-    If Not KdxLimpiar(sUrl, codSuc, sModoLimpiar, sResp) Then
+    If Not KdxLimpiar(sUrl, codSuc, sModoLimpiar, sResp, sFechaLimpiar) Then
         KdxLog sTablaId, "Limpiar fallo: " & Left(sResp, 200)
         KdxSyncTabla = False: Exit Function
     End If
@@ -411,11 +463,15 @@ End Function
 ' HTTP HELPERS
 ' ──────────────────────────────────────────────────────────
 
-' Llamada de limpieza (limpiar_30dias o limpiar_total)
+' Llamada de limpieza (limpiar_30dias o limpiar_total o limpiar_dia)
 Private Function KdxLimpiar(sUrl As String, codSuc As String, _
-    sModo As String, ByRef sRespOut As String) As Boolean
+    sModo As String, ByRef sRespOut As String, Optional sFecha As String = "") As Boolean
     Dim sPayload As String
-    sPayload = "{""sucursal"":" & codSuc & ",""modo"":""" & sModo & """}"
+    If sFecha <> "" Then
+        sPayload = "{""sucursal"":" & codSuc & ",""modo"":""" & sModo & """,""fecha"":""" & sFecha & """}"
+    Else
+        sPayload = "{""sucursal"":" & codSuc & ",""modo"":""" & sModo & """}"
+    End If
     KdxLimpiar = KdxHttpPost(sUrl, sPayload, sRespOut)
 End Function
 

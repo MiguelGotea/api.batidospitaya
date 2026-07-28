@@ -59,10 +59,6 @@ graph TD
 
 ## 🛠️ Comandos de Mantenimiento
 
-<<<<<<< Updated upstream
-- **Empuje Global**: `./.scripts/gitpush_*.ps1` (ej: `gitpush_talento.ps1`, `gitpush_erp.ps1`, `gitpush_pos.ps1`)
-=======
-- **Empuje Global**: `./.scripts/gitpush_erp.ps1` (o `gitpush_talento.ps1`, `gitpush_pos.ps1` según el repo)
->>>>>>> Stashed changes
+- **Empuje Global**: `./.scripts/gitpush_pos.ps1` (o `gitpush_erp.ps1`, `gitpush_talento.ps1` según el repo)
 - **Sincronización Local**: `./gitsync-local.ps1`
 - **Revisión de Logs**: Pestaña **Actions** en GitHub (PitayaCore).

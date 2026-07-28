@@ -1,3 +1,4 @@
+Option Explicit
 ' =============================================================
 ' Módulo: modSyncVentas
 ' Propósito: Enviar los registros de un pedido a MySQL en tiempo real.
@@ -14,7 +15,6 @@
 '   Alt+F11 → Archivo → Importar archivo → modulo_sync_ventas.bas
 ' =============================================================
 
-Option Explicit
 
 ' ══════════════════════════════════════════════════════════
 '  FUNCIÓN PÚBLICA PRINCIPAL

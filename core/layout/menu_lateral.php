@@ -155,7 +155,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Colaboradores',
                 'url' => 'rh/colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 42]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
             ],
             [
                 'nombre' => 'Agenda Colaboradores',
@@ -415,7 +415,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Plan Despachos',
                 'url' => 'despacho/historial_despachos.php',
-                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43, 42]
+                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43]
             ],
             [
                 'nombre' => 'Compras Locales Configuracion',
@@ -568,11 +568,6 @@ $menuGlobal = [
                 'url' => 'productos/accessantiguo_diccionario_productos.php',
                 'cargos_permitidos' => [55, 49]
             ],
-            [
-                'nombre' => 'Costos Unitarios',
-                'url' => 'contabilidad/costo_unitario_productos.php',
-                'cargos_permitidos' => [42, 16, 8, 49]
-            ],
         ]
     ],
     [
@@ -583,7 +578,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Conteo Cíclico',
                 'url' => 'inventario/conteo_ciclico.php',
-                'cargos_permitidos' => [27, 16, 49, 55, 33]
+                'cargos_permitidos' => [27, 16, 49, 55]
             ],
         ]
     ],
@@ -797,7 +792,7 @@ function renderMenuLateral($cargoOperario)
     $moduloActual = detectarModuloActual();
 
     ob_start();
-?>
+    ?>
 
     <!-- Font Awesome Universal -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -1282,13 +1277,13 @@ function renderMenuLateral($cargoOperario)
 
     <!-- JavaScript del menú -->
     <script>
-        (function() {
+        (function () {
             'use strict';
 
             let activeGroupIndex = null;
 
             // Función para toggle de grupo (acordeón)
-            window.toggleMenuGroup = function(index) {
+            window.toggleMenuGroup = function (index) {
                 const grupo = document.getElementById('grupo-' + index);
                 const allGroups = document.querySelectorAll('.menu-group');
                 const titulo = grupo.querySelector('.menu-group-title');
@@ -1309,7 +1304,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para abrir sidebar en móvil
-            window.toggleSidebarMobile = function() {
+            window.toggleSidebarMobile = function () {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1326,7 +1321,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para cerrar sidebar en móvil
-            window.closeSidebarMobile = function() {
+            window.closeSidebarMobile = function () {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1348,7 +1343,7 @@ function renderMenuLateral($cargoOperario)
 
             // Cerrar menú en móvil al hacer clic en un enlace
             document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function () {
                     if (window.innerWidth <= 768) {
                         closeSidebarMobile();
                     }
@@ -1356,7 +1351,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Marcar grupo activo si hay una página activa
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const activeItem = document.querySelector('.menu-item.active');
                 if (activeItem) {
                     const parentGroup = activeItem.closest('.menu-group');
@@ -1387,8 +1382,8 @@ function renderMenuLateral($cargoOperario)
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
 
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
                     if (mutation.attributeName === 'class') {
                         if (sidebar.classList.contains('show')) {
                             document.body.style.overflow = 'hidden';
@@ -1404,7 +1399,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Soporte para teclado (accesibilidad)
-            document.addEventListener('keydown', function(e) {
+            document.addEventListener('keydown', function (e) {
                 // ESC para cerrar menú en móvil
                 if (e.key === 'Escape' && window.innerWidth <= 768) {
                     closeSidebarMobile();
@@ -1414,6 +1409,6 @@ function renderMenuLateral($cargoOperario)
         })();
     </script>
 
-<?php
+    <?php
     return ob_get_clean();
 }

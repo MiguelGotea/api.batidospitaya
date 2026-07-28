@@ -11,15 +11,25 @@ $url = $ind['url'] ?? '#';
 ?>
 
 <!-- Indicador: <?= htmlspecialchars($ind['nombre'] ?? 'Sin nombre') ?> -->
+<?php 
+$codigoIndicador = $ind['codigo'] ?? '';
+$esDiferido = !empty($codigoIndicador);
+$claseLoading = $esDiferido ? ' indicator-loading' : '';
+?>
+
 <?php if ($tieneModal): ?>
     <!-- Indicador con modal -->
-    <div class="indicator-container" onclick="mostrarModal<?= ucfirst(str_replace('modal', '', $modalId)) ?>()"
-        style="cursor: pointer;">
-    <?php else: ?>
-        <!-- Indicador con enlace directo -->
-        <a href="<?= htmlspecialchars($url) ?>" style="text-decoration: none; display: block;">
-            <div class="indicator-container" style="cursor: pointer;">
-            <?php endif; ?>
+    <div class="indicator-container<?= $claseLoading ?>" 
+         <?php if ($esDiferido): ?>data-indicator-codigo="<?= htmlspecialchars($codigoIndicador) ?>"<?php endif; ?>
+         onclick="mostrarModal<?= ucfirst(str_replace('modal', '', $modalId)) ?>()"
+         style="cursor: pointer;">
+<?php else: ?>
+    <!-- Indicador con enlace directo -->
+    <a href="<?= htmlspecialchars($url) ?>" style="text-decoration: none; display: block;">
+        <div class="indicator-container<?= $claseLoading ?>" 
+             <?php if ($esDiferido): ?>data-indicator-codigo="<?= htmlspecialchars($codigoIndicador) ?>"<?php endif; ?>
+             style="cursor: pointer;">
+<?php endif; ?>
 
             <div class="indicator-header">
                 <div class="indicator-icon">
@@ -28,7 +38,11 @@ $url = $ind['url'] ?? '#';
             </div>
 
             <div class="indicator-count">
-                <?= htmlspecialchars($ind['valor'] ?? '0') ?>
+                <?php if ($esDiferido): ?>
+                    <span class="shimmer-text">...</span>
+                <?php else: ?>
+                    <?= htmlspecialchars($ind['valor'] ?? '0') ?>
+                <?php endif; ?>
             </div>
 
             <div class="indicator-info">
@@ -37,27 +51,30 @@ $url = $ind['url'] ?? '#';
                 </div>
 
                 <div class="indicator-meta">
-                    <span
-                        class="indicator-status <?= htmlspecialchars($ind['codigo'] ?? '') ?>-indicador <?= htmlspecialchars($ind['color'] ?? 'gris') ?>">
-                        <?php
-                        // Mostrar estado según días restantes
-                        if (isset($ind['dias_restantes'])) {
-                            $diasRestantes = $ind['dias_restantes'];
-                            $total = $ind['valor'] ?? 0;
+                    <span class="indicator-status <?= htmlspecialchars($ind['codigo'] ?? '') ?>-indicador <?= $esDiferido ? 'gris' : htmlspecialchars($ind['color'] ?? 'gris') ?>">
+                        <?php if ($esDiferido): ?>
+                            <i class="fas fa-sync-alt fa-spin"></i> Cargando...
+                        <?php else: ?>
+                            <?php
+                            // Mostrar estado según días restantes
+                            if (isset($ind['dias_restantes'])) {
+                                $diasRestantes = $ind['dias_restantes'];
+                                $total = $ind['valor'] ?? 0;
 
-                            if ($total == 0) {
-                                echo 'Al día';
-                            } elseif ($diasRestantes < 0) {
-                                echo 'Vencido hace ' . abs($diasRestantes) . ' días';
-                            } elseif ($diasRestantes === 0) {
-                                echo 'Vence hoy';
+                                if ($total == 0) {
+                                    echo 'Al día';
+                                } elseif ($diasRestantes < 0) {
+                                    echo 'Vencido hace ' . abs($diasRestantes) . ' días';
+                                } elseif ($diasRestantes === 0) {
+                                    echo 'Vence hoy';
+                                } else {
+                                    echo $diasRestantes . ' días restantes';
+                                }
                             } else {
-                                echo $diasRestantes . ' días restantes';
+                                echo htmlspecialchars($ind['fecha_limite'] ?? 'Sin fecha');
                             }
-                        } else {
-                            echo htmlspecialchars($ind['fecha_limite'] ?? 'Sin fecha');
-                        }
-                        ?>
+                            ?>
+                        <?php endif; ?>
                     </span>
                     <span class="indicator-action">
                         <i class="fas fa-arrow-right"></i>

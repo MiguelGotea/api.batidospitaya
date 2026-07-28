@@ -16,11 +16,12 @@ if (!$codigo) {
 }
 
 $usuario = obtenerUsuarioActual();
-$cargoId = $usuario['cargo_id'];
+$cargoId = $usuario['CodNivelesCargos'];
+$userId = $usuario['CodOperario'];
 
 try {
     $registry = new Core\Components\ComponentRegistry($conn);
-    $indicator = $registry->getIndicator($codigo, $usuario['id']);
+    $indicator = $registry->getIndicator($codigo, $userId);
 
     if (!$indicator) {
         echo json_encode(['success' => false, 'message' => 'Indicador no encontrado']);
@@ -28,13 +29,13 @@ try {
     }
 
     // Verificar permiso
-    if (!$indicator->hasPermission($usuario['id'], $cargoId)) {
+    if (!$indicator->hasPermission($userId, $cargoId)) {
         echo json_encode(['success' => false, 'message' => 'Sin permisos']);
         exit;
     }
 
     // Obtener datos actualizados
-    $data = $indicator->render($usuario['id']);
+    $data = $indicator->render($userId);
 
     echo json_encode([
         'success' => true,

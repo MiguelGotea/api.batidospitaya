@@ -86,9 +86,9 @@ class ComponentRegistry
     /**
      * Cargar indicadores para un cargo específico usando el sistema de permisos
      */
-    public function getIndicatorsForCargo($userId, $codNivelesCargos)
+    public function getIndicatorsForCargo($userId, $codNivelesCargos, $deferred = true)
     {
-        error_log("DEBUG ComponentRegistry: Cargando indicadores para usuario $userId, cargo $codNivelesCargos");
+        error_log("DEBUG ComponentRegistry: Cargando indicadores para usuario $userId, cargo $codNivelesCargos (deferred: " . ($deferred ? 'true' : 'false') . ")");
 
         // Obtener todos los indicadores activos
         $stmt = $this->conn->prepare("
@@ -126,7 +126,21 @@ class ComponentRegistry
 
             try {
                 $indicator = new $className($this->conn, $row['config_json']);
-                $indicatorData = $indicator->render($userId);
+                
+                if ($deferred) {
+                    // Carga diferida ligera: no ejecuta queries SQL pesadas en la carga inicial PHP
+                    $indicatorData = [
+                        'codigo' => $row['class_name'],
+                        'nombre' => $row['nombre'],
+                        'icono' => $row['icono'] ?? 'fa-chart-line',
+                        'valor' => '...',
+                        'color' => 'gris',
+                        'fecha_limite' => 'Cargando...',
+                        'url' => '#'
+                    ];
+                } else {
+                    $indicatorData = $indicator->render($userId);
+                }
 
                 // Agregar metadata del registro
                 $indicatorData['id'] = $row['id'];

@@ -77,6 +77,57 @@ ErrorHandler:
 End Function
 
 ' ══════════════════════════════════════════════════════════
+'  FUNCIÓN DE DIAGNÓSTICO: Enviar ping con alertas
+' ══════════════════════════════════════════════════════════
+Public Function TestEnviarPing() As Boolean
+    On Error GoTo ErrorHandler
+    
+    Dim http      As Object
+    Dim postData  As String
+    Dim ipLocal   As String
+    Dim modulo    As String
+    Dim codSuc    As String
+    
+    ' Obtener código de sucursal desde la función del sistema
+    codSuc  = CStr(codigoLocal())
+    ipLocal = ObtenerIPLocal()
+    modulo  = ObtenerModuloActivo()
+    
+    ' Construir parámetros POST
+    postData = "sucursal="    & URLEncode(codSuc) & _
+               "&pc_nombre="  & URLEncode(Environ("COMPUTERNAME")) & _
+               "&pc_usuario=" & URLEncode(Environ("USERNAME")) & _
+               "&ip_local="   & URLEncode(ipLocal) & _
+               "&version="    & URLEncode(VERSION_SISTEMA) & _
+               "&modulo="     & URLEncode(modulo)
+    
+    ' Crear objeto HTTP
+    Set http = CreateObject("MSXML2.ServerXMLHTTP.6.0")
+    
+    http.Open "POST", PING_URL, False
+    http.setRequestHeader "Content-Type", "application/x-www-form-urlencoded"
+    http.setRequestHeader "User-Agent", "PitayaAccess/" & VERSION_SISTEMA
+    http.setTimeouts 5000, 5000, 10000, 10000  ' 5s conexión, 10s respuesta
+    
+    http.Send postData
+    
+    If http.Status = 200 Then
+        TestEnviarPing = True
+    Else
+        TestEnviarPing = False
+        MsgBox "Error del servidor. Código HTTP: " & http.Status & vbCrLf & "Respuesta: " & http.responseText, vbCritical, "Diagnóstico Ping"
+    End If
+    
+    Set http = Nothing
+    Exit Function
+
+ErrorHandler:
+    TestEnviarPing = False
+    MsgBox "Error VBA en EnviarPing: " & Err.Number & " - " & Err.Description, vbCritical, "Diagnóstico Ping"
+    Set http = Nothing
+End Function
+
+' ══════════════════════════════════════════════════════════
 '  Timer automático — llama a la función OnTimer del form
 ' ══════════════════════════════════════════════════════════
 '
@@ -254,7 +305,7 @@ Public Sub ProbarPing()
     c1 = (esModuloOpitayaRaiz() = 0)
     c2 = TieneTablaVinculada("DatosSistema")
     
-    If EnviarPing() Then
+    If TestEnviarPing() Then
         MsgBox "OK - Conexión exitosa." & vbCrLf & _
                "Sucursal: " & codSuc & vbCrLf & _
                "1. Raiz=0: " & IIf(c1, "✅", "❌ (" & esModuloOpitayaRaiz() & ")") & vbCrLf & _

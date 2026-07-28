@@ -11,6 +11,20 @@
  *   ip_local   : IP local del equipo - opcional
  *   version    : Versión del sistema Access - opcional
  *   modulo     : Módulo activo al momento del ping - opcional
+ *
+ * ───────────────────────────────────────────────────────────
+ * GUÍA DE SOLUCIÓN DE PROBLEMAS (TROUBLESHOOTING)
+ * ───────────────────────────────────────────────────────────
+ * Si el cliente (Access) reporta el error -2147012867 
+ * (ERROR_INTERNET_CANNOT_CONNECT) o el navegador muestra 
+ * ERR_CONNECTION_REFUSED, significa que el VPS está encendido 
+ * pero el servidor web NGINX se ha caído (ej. por error DNS o RAM).
+ * 
+ * SOLUCIÓN:
+ * 1. Entrar por SSH al VPS (ej: ssh root@198.211.97.243)
+ * 2. Verificar estado: systemctl status nginx
+ * 3. Reiniciar Nginx: systemctl restart nginx
+ * ───────────────────────────────────────────────────────────
  */
 
 header('Content-Type: application/json');

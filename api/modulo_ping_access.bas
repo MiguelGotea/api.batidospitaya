@@ -73,6 +73,9 @@ Public Function EnviarPing() As Boolean
 ErrorHandler:
     mPingsFallidos = mPingsFallidos + 1
     EnviarPing = False
+    If Err.Number = -2147012867 Then
+        Debug.Print "Ping Falló: Servidor Nginx parece estar caído (-2147012867). Requiere systemctl restart nginx en VPS."
+    End If
     Set http = Nothing
 End Function
 
@@ -123,7 +126,14 @@ Public Function TestEnviarPing() As Boolean
 
 ErrorHandler:
     TestEnviarPing = False
-    MsgBox "Error VBA en EnviarPing: " & Err.Number & " - " & Err.Description, vbCritical, "Diagnóstico Ping"
+    If Err.Number = -2147012867 Then
+        MsgBox "¡ATENCIÓN! El servidor web VPS (Nginx) está caído." & vbCrLf & vbCrLf & _
+               "SOLUCIÓN:" & vbCrLf & _
+               "1. Entra por SSH al servidor (ej. root@198.211.97.243)" & vbCrLf & _
+               "2. Ejecuta el comando: systemctl restart nginx", vbCritical, "Servidor Nginx Caído"
+    Else
+        MsgBox "Error VBA en EnviarPing: " & Err.Number & " - " & Err.Description, vbCritical, "Diagnóstico Ping"
+    End If
     Set http = Nothing
 End Function
 
@@ -308,9 +318,9 @@ Public Sub ProbarPing()
     If TestEnviarPing() Then
         MsgBox "OK - Conexión exitosa." & vbCrLf & _
                "Sucursal: " & codSuc & vbCrLf & _
-               "1. Raiz=0: " & IIf(c1, "✅", "❌ (" & esModuloOpitayaRaiz() & ")") & vbCrLf & _
-               "2. Tabla DatosSistema: " & IIf(c2, "✅", "❌ No existe") & vbCrLf & _
-               "Modo Tienda: " & IIf(c1 And c2, "SÍ ✅", "NO ❌") & vbCrLf & _
+               "1. Raiz=0: " & IIf(c1, "[OK]", "[ERROR] (" & esModuloOpitayaRaiz() & ")") & vbCrLf & _
+               "2. Tabla DatosSistema: " & IIf(c2, "[OK]", "[ERROR] No existe") & vbCrLf & _
+               "Modo Tienda: " & IIf(c1 And c2, "SI [OK]", "NO [ERROR]") & vbCrLf & _
                "URL: " & PING_URL, _
                vbInformation, "Monitor Pitaya"
     Else

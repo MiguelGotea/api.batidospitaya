@@ -137,7 +137,7 @@ End Sub
 ' ════════════════════════════════════════════════════════
 '  Verificar que el Access está en modo Sistema de Tienda
 ' ════════════════════════════════════════════════════════
-Private Function EsSistemaDeTienda() As Boolean
+Function EsSistemaDeTienda() As Boolean
     Dim c1 As Boolean, c2 As Boolean
     
     ' Condición 1: esModuloOpitayaRaiz() = 0

@@ -234,7 +234,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Depósitos',
                 'url' => 'contabilidad/masivo_depositos.php',
-                'cargos_permitidos' => [33, 8, 42, 52, 21, 49]
+                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 43]
             ],
             [
                 'nombre' => 'Mermas',

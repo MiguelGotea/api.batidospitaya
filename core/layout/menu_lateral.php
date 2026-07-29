@@ -524,7 +524,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
+                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 53, 50, 26]
             ],
             [
                 'nombre' => 'Balance Inventario Access',

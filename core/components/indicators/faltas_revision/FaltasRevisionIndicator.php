@@ -50,8 +50,8 @@ class FaltasRevisionIndicator extends BaseIndicator
         if (!$cargo)
             return 'default';
 
-        // Códigos de cargo: 13=RH, 39, 30, 37, 28
-        if (in_array($cargo['cargo_codigo'], [13, 39, 30, 37, 28]))
+        // Verificar permiso dinámicamente desde la tabla de permisos del ERP
+        if (tienePermiso('index_rh', 'vista', $cargo['cargo_codigo']))
             return 'rh';
 
         return 'default';

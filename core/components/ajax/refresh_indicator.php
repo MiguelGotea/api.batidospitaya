@@ -16,6 +16,10 @@ if (!$codigo) {
 }
 
 $usuario = obtenerUsuarioActual();
+if (!$usuario) {
+    echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+    exit;
+}
 $cargoId = $usuario['CodNivelesCargos'];
 $userId = $usuario['CodOperario'];
 
@@ -38,12 +42,14 @@ try {
     $data = $indicator->render($userId);
 
     echo json_encode([
-        'success' => true,
-        'codigo' => $data['codigo'],
-        'valor' => $data['valor'],
-        'color' => $data['color'],
-        'fecha_limite' => $data['fecha_limite'],
-        'detalles' => $data['detalles']
+        'success'        => true,
+        'codigo'         => $data['codigo'],
+        'valor'          => $data['valor'],
+        'color'          => $data['color'],
+        'fecha_limite'   => $data['fecha_limite'] ?? null,
+        'dias_restantes' => $data['dias_restantes'] ?? null,
+        'url'            => $data['url'] ?? '#',
+        'detalles'       => $data['detalles'] ?? []
     ]);
 
 } catch (Exception $e) {

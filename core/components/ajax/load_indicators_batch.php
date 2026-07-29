@@ -18,6 +18,10 @@ if (empty($codigos) || !is_array($codigos)) {
 }
 
 $usuario = obtenerUsuarioActual();
+if (!$usuario) {
+    echo json_encode(['success' => false, 'message' => 'Usuario no autenticado']);
+    exit;
+}
 $cargoId = $usuario['CodNivelesCargos'];
 $userId = $usuario['CodOperario'];
 

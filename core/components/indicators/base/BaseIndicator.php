@@ -111,17 +111,26 @@ abstract class BaseIndicator
     {
         global $conn;
 
-        $stmt = $conn->prepare("
-            SELECT p.vista 
-            FROM permissions p
-            INNER JOIN tools_erp t ON p.tool_id = t.id
-            WHERE t.codigo = ? 
-            AND t.tipo_componente = 'indicador'
-            AND p.cargo_id = ? 
-            AND p.vista = 1
-        ");
-        $stmt->execute([$this->codigo, $cargoId]);
-        return $stmt->rowCount() > 0;
+        try {
+            // Usar la estructura real de permisos del sistema: permisos_tools_erp y acciones_tools_erp
+            $sql = "
+                SELECT p.permiso
+                FROM tools_erp t
+                INNER JOIN acciones_tools_erp a ON t.id = a.tool_erp_id
+                INNER JOIN permisos_tools_erp p ON a.id = p.accion_tool_erp_id
+                WHERE t.nombre = ? 
+                AND a.nombre_accion = 'vista'
+                AND p.CodNivelesCargos = ?
+                AND p.permiso = 'allow'
+                LIMIT 1
+            ";
+            $stmt = $conn->prepare($sql);
+            $stmt->execute([$this->codigo, $cargoId]);
+            return $stmt->rowCount() > 0;
+        } catch (Exception $e) {
+            error_log("Error en BaseIndicator::hasPermission: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**

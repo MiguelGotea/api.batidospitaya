@@ -244,6 +244,21 @@ function renderPOSSidebar($activeModule = 'inicio')
         .pos-sidebar:hover .pos-version {
             opacity: 1;
         }
+
+        /* ==================== CONTENEDOR PRINCIPAL ==================== */
+        /* Este estilo es global: aplica a todos los módulos que usen pos-sidebar */
+        .pos-main-container {
+            margin-left: var(--sidebar-width); /* 70px */
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            min-height: 100vh;
+            background: #F6F6F6;
+        }
+
+        .pos-content {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
     </style>
 
     <div class="pos-sidebar" id="posSidebar">

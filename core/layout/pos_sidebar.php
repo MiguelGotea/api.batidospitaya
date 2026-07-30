@@ -9,65 +9,54 @@ function renderPOSSidebar($activeModule = 'inicio')
 {
     $menu = [
         [
-            'id' => 'inicio',
+            'id'    => 'inicio',
             'titulo' => 'Inicio',
-            'icon' => 'fas fa-home',
-            'url' => '/index.php',
-            'sub' => []
+            'icon'  => 'fas fa-home',
+            'url'   => '/index.php',
+            'sub'   => []
         ],
         [
-            'id' => 'ventas',
+            'id'    => 'ventas',
             'titulo' => 'Ventas',
-            'icon' => 'fas fa-cash-register',
-            'url' => '#',
-            'sub' => [
-                ['titulo' => 'Nueva Venta', 'url' => '/modulos/facturacion/'],
-                ['titulo' => 'Historial Ventas', 'url' => '/modulos/facturacion/historial.php'],
+            'icon'  => 'fas fa-cash-register',
+            'url'   => '#',
+            'sub'   => [
+                ['titulo' => 'Nueva Venta',      'url' => '/modulos/pos/facturas_nueva.php'],
+                ['titulo' => 'Historial Ventas', 'url' => '/modulos/pos/facturas_historial.php'],
             ]
         ],
         [
-            'id' => 'caja',
+            'id'    => 'caja',
             'titulo' => 'Caja',
-            'icon' => 'fas fa-vault',
-            'url' => '#',
-            'sub' => [
+            'icon'  => 'fas fa-vault',
+            'url'   => '#',
+            'sub'   => [
                 ['titulo' => 'Caja Inicial', 'url' => '/modulos/inicial/'],
-                ['titulo' => 'Corte de Caja', 'url' => '/modulos/caja/corte.php'],
             ]
         ],
         [
-            'id' => 'inventario',
-            'titulo' => 'Inventario',
-            'icon' => 'fas fa-boxes-stacked',
-            'url' => '#',
-            'sub' => [
-                ['titulo' => 'Productos', 'url' => '/modulos/productos/'],
-                ['titulo' => 'Ajustes', 'url' => '/modulos/inventario/'],
-                ['titulo' => 'Promociones', 'url' => '/modulos/promociones/'],
-            ]
-        ],
-        [
-            'id' => 'clientes',
+            'id'    => 'clientes',
             'titulo' => 'Clientes',
-            'icon' => 'fas fa-users',
-            'url' => '/modulos/clientes/',
-            'sub' => []
+            'icon'  => 'fas fa-users',
+            'url'   => '/modulos/clientes/',
+            'sub'   => []
         ],
         [
-            'id' => 'config',
+            'id'    => 'config',
             'titulo' => 'Sistemas',
-            'icon' => 'fas fa-cog',
-            'url' => '/modulos/sistemas/',
-            'sub' => []
+            'icon'  => 'fas fa-cog',
+            'url'   => '/modulos/sistemas/',
+            'sub'   => []
         ],
         [
-            'id' => 'logout',
+            'id'    => 'logout',
             'titulo' => 'Cerrar Sesión',
-            'icon' => 'fas fa-sign-out-alt',
-            'url' => '/logout.php?type=colaborador',
-            'sub' => []
+            'icon'  => 'fas fa-sign-out-alt',
+            'url'   => '/logout.php?type=colaborador',
+            'sub'   => []
         ]
     ];
+
 
     ob_start();
 ?>

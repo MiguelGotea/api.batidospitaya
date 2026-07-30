@@ -42,13 +42,6 @@ function renderPOSSidebar($activeModule = 'inicio')
             'sub'   => []
         ],
         [
-            'id'    => 'config',
-            'titulo' => 'Sistemas',
-            'icon'  => 'fas fa-cog',
-            'url'   => '/modulos/sistemas/',
-            'sub'   => []
-        ],
-        [
             'id'    => 'logout',
             'titulo' => 'Cerrar Sesión',
             'icon'  => 'fas fa-sign-out-alt',

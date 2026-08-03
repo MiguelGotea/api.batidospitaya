@@ -583,12 +583,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Costo para Descuentos',
                 'url' => 'contabilidad/costo_descuento_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 11, 21, 42]
+                'cargos_permitidos' => [49, 8, 16, 42, 33]
             ],
             [
                 'nombre' => 'Costo de Existencias',
                 'url' => 'contabilidad/costo_existencias_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 11, 21, 42]
+                'cargos_permitidos' => [49, 8, 16, 42, 33]
             ],
         ]
     ],

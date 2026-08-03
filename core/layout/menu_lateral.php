@@ -580,6 +580,16 @@ $menuGlobal = [
                 'url' => 'inventario/historial_conteo_existencias.php',
                 'cargos_permitidos' => [27, 16, 49, 55, 52, 5, 43, 21, 16, 42, 33]
             ],
+            [
+                'nombre' => 'Costo para Descuentos',
+                'url' => 'contabilidad/costo_descuento_productos.php',
+                'cargos_permitidos' => [49, 8, 16, 11, 21, 42]
+            ],
+            [
+                'nombre' => 'Costo de Existencias',
+                'url' => 'contabilidad/costo_existencias_productos.php',
+                'cargos_permitidos' => [49, 8, 16, 11, 21, 42]
+            ],
         ]
     ],
     [

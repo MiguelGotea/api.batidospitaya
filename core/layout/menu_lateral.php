@@ -581,6 +581,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [27, 16, 49, 55, 52, 5, 43, 21, 16, 42, 33]
             ],
             [
+                'nombre' => 'Kardex de Insumos',
+                'url' => 'inventario/kardex_insumo.php',
+                'cargos_permitidos' => [49, 12, 16, 55, 11, 21, 42, 33, 52, 27]
+            ],
+            [
                 'nombre' => 'Costo para Descuentos',
                 'url' => 'contabilidad/costo_descuento_productos.php',
                 'cargos_permitidos' => [49, 8, 16, 42, 33]

@@ -578,7 +578,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Conteo Cíclico',
                 'url' => 'inventario/historial_conteo_existencias.php',
-                'cargos_permitidos' => [27, 16, 49, 55, 52, 5, 43, 21, 16, 42, 33, 27, 47, 46, 47]
+                'cargos_permitidos' => [27, 16, 49, 55, 52, 5, 43, 21, 16, 42, 33, 27, 47, 46, 45]
             ],
             [
                 'nombre' => 'Kardex de Insumos',

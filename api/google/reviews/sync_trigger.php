@@ -3,6 +3,7 @@
  * sync_trigger.php — Dispara el sync manual en el worker VPS
  * POST /api/google/reviews/sync_trigger.php
  * Header: X-WSP-Token
+ * Body JSON opcional: { locationId?, dateFrom?, dateTo? }
  *
  * Actúa como proxy: llama a http://VPS_IP:3009/sync/trigger
  * El ERP llama a este endpoint (que tiene CORS/sesión), no al VPS directamente.
@@ -16,12 +17,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     hikErr('Método no permitido. Usar POST.', 405);
 }
 
+// Leer y redirigir el body JSON al worker (locationId, dateFrom, dateTo opcionales)
+$rawBody   = file_get_contents('php://input');
+$params    = json_decode($rawBody, true) ?: [];
+$workerBody = json_encode([
+    'locationId' => $params['locationId'] ?? null,
+    'dateFrom'   => $params['dateFrom']   ?? null,
+    'dateTo'     => $params['dateTo']     ?? null,
+]);
+
 $workerUrl = 'http://' . GMB_VPS_IP . ':' . GMB_VPS_PORT . '/sync/trigger';
 
 $ch = curl_init($workerUrl);
 curl_setopt_array($ch, [
     CURLOPT_POST           => true,
-    CURLOPT_POSTFIELDS     => '',
+    CURLOPT_POSTFIELDS     => $workerBody,
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 10,
     CURLOPT_CONNECTTIMEOUT => 5,

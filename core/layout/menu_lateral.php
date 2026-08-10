@@ -396,6 +396,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 15]
             ],
             [
+                'nombre' => 'Catálogo de Herramientas',
+                'url' => 'sistemas/catalogo_herramientas.php',
+                'cargos_permitidos' => [49, 15]
+            ],
+            [
                 'nombre' => 'Configuración de Tiendas',
                 'url' => 'sistemas/configuracion_sucursales.php',
                 'cargos_permitidos' => [49]

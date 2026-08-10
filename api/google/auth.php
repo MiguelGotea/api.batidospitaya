@@ -7,12 +7,9 @@
  * Header requerido: X-WSP-Token: <token>
  *
  * Expone también hikOk() / hikErr() para respuestas estandarizadas.
- *
- * NOTA: conexion.php NO se carga aquí para evitar que un fallo de DB
- * cause HTTP 500 en endpoints que no necesitan base de datos
- * (sync_trigger.php, sync_status.php). Los endpoints que sí usan $conn
- * (locations.php, list.php, upsert.php) lo incluyen directamente.
  */
+
+require_once __DIR__ . '/../../../core/database/conexion.php';
 
 header('Content-Type: application/json; charset=utf-8');
 

@@ -17,13 +17,16 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     hikErr('Método no permitido. Usar POST.', 405);
 }
 
-// Leer y redirigir el body JSON al worker (locationId, dateFrom, dateTo opcionales)
-$rawBody   = file_get_contents('php://input');
-$params    = json_decode($rawBody, true) ?: [];
+// Leer parámetros opcionales desde POST (enviados como form fields por el ERP)
+$locationId = isset($_POST['locationId']) && $_POST['locationId'] !== '' ? trim($_POST['locationId']) : null;
+$dateFrom   = isset($_POST['dateFrom'])   && $_POST['dateFrom']   !== '' ? trim($_POST['dateFrom'])   : null;
+$dateTo     = isset($_POST['dateTo'])     && $_POST['dateTo']     !== '' ? trim($_POST['dateTo'])     : null;
+
+// Construir body JSON para el worker
 $workerBody = json_encode([
-    'locationId' => $params['locationId'] ?? null,
-    'dateFrom'   => $params['dateFrom']   ?? null,
-    'dateTo'     => $params['dateTo']     ?? null,
+    'locationId' => $locationId,
+    'dateFrom'   => $dateFrom,
+    'dateTo'     => $dateTo,
 ]);
 
 $workerUrl = 'http://' . GMB_VPS_IP . ':' . GMB_VPS_PORT . '/sync/trigger';

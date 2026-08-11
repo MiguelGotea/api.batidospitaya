@@ -78,22 +78,22 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52]
+                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52, 65]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52]
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65]
             ],
             [
                 'nombre' => 'Viaticos',
                 'url' => 'operaciones/viaticos.php',
-                'cargos_permitidos' => [49, 16, 8, 52]
+                'cargos_permitidos' => [49, 16, 8, 52, 65]
             ],
             [
                 'nombre' => 'Vacaciones',
                 'url' => 'lideres/vacaciones.php',
-                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52]
+                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65]
             ],
             [
                 'nombre' => 'Horas Extras',
@@ -118,12 +118,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62]
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65]
             ],
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16, 61, 63]
+                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16, 61, 63, 65]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
@@ -150,17 +150,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Colaboradores',
                 'url' => 'rh/colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
             ],
             [
                 'nombre' => 'Agenda Colaboradores',
                 'url' => 'rh/contactos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
             ],
             [
                 'nombre' => 'Cumpleaños Colaboradores',
                 'url' => 'rh/cumpleanos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
             ],
         ]
     ],

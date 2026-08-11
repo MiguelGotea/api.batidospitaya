@@ -36,11 +36,6 @@ $menuGlobal = [
                 'nombre' => 'Reclamos',
                 'url' => 'supervision/auditorias_original/index_reclamos_publico.php',
                 'cargos_permitidos' => []
-            ],
-            [
-                'nombre' => 'Registrar KPIs',
-                'url' => 'supervision/auditorias_original/kpi.php',
-                'cargos_permitidos' => [49, 11]
             ]
         ]
     ],

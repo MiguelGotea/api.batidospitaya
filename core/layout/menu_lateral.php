@@ -27,7 +27,7 @@ $menuGlobal = [
                 'cargos_permitidos' => []
             ],
             [
-                'nombre' => 'Auditorías',
+                'nombre' => 'Auditorías de Desempeño',
                 'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
                 'cargos_permitidos' => []
             ],

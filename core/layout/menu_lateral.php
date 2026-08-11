@@ -344,11 +344,6 @@ $menuGlobal = [
                 'nombre' => 'Calendario',
                 'url' => 'mantenimiento/programacion_solicitudes.php',
                 'cargos_permitidos' => [49, 21, 16, 35, 33, 52, 63]
-            ],
-            [
-                'nombre' => 'Planificacion',
-                'url' => 'mantenimiento/planificacion_mantenimiento.php',
-                'cargos_permitidos' => [49, 35, 63]
             ]
         ]
 

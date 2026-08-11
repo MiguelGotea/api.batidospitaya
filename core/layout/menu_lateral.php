@@ -181,6 +181,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52]
             ],
             [
+                'nombre' => 'Auditorías de Desempeño',
+                'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
+                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49]
+            ],
+            [
                 'nombre' => 'Deducciones',
                 'url' => 'supervision/auditorias_original/auditinternas/deducciones_total.php',
                 'cargos_permitidos' => [49, 8, 11, 16, 13]

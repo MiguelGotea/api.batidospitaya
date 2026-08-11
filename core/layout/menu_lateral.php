@@ -111,11 +111,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33, 52]
             ],
             [
-                'nombre' => 'Reportes de Personal',
-                'url' => 'rrhh/reportes.php',
-                'cargos_permitidos' => [49, 16, 21, 33]
-            ],
-            [
                 'nombre' => 'Generar Horarios',
                 'url' => 'lideres/programar_horarios_lider2.php',
                 'cargos_permitidos' => [49, 5, 43]

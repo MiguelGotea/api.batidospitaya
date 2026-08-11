@@ -43,16 +43,6 @@ $menuGlobal = [
                 'url' => 'supervision/auditorias_original/kpi.php',
                 'cargos_permitidos' => [49, 11]
             ],
-            [
-                'nombre' => 'Nuevo Aviso',
-                'url' => 'supervision/auditorias_original/agregarAviso.php',
-                'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26, 54, 53]
-            ],
-            [
-                'nombre' => 'Editar Avisos',
-                'url' => 'supervision/auditorias_original/index_avisos.php',
-                'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26, 54, 53]
-            ]
         ]
     ],
     [

@@ -88,7 +88,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Viaticos',
                 'url' => 'operaciones/viaticos.php',
-                'cargos_permitidos' => [49, 16, 8, 52, 65]
+                'cargos_permitidos' => [49, 16, 8, 52]
             ],
             [
                 'nombre' => 'Vacaciones',

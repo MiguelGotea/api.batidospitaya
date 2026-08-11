@@ -250,7 +250,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21]
             ],
             [
-                'nombre' => 'Reseñas Google',
+                'nombre' => 'KPI Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
                 'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42, 33, 52]
             ],

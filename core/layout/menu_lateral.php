@@ -316,11 +316,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52, 61]
             ],
             [
-                'nombre' => 'Agenda Diaria',
-                'url' => 'mantenimiento/agenda_colaborador.php',
-                'cargos_permitidos' => [49, 14, 56, 63, 16, 35]
-            ],
-            [
                 'nombre' => 'Informe Diario',
                 'url' => 'mantenimiento/historial_informes.php',
                 'cargos_permitidos' => [49, 14, 56, 16, 35, 63]

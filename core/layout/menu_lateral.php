@@ -207,11 +207,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 8, 11, 16, 13]
             ],
             [
-                'nombre' => 'Control de Inventario',
-                'url' => 'supervision/inventario.php',
-                'cargos_permitidos' => [49, 21, 16, 33, 52]
-            ],
-            [
                 'nombre' => 'Faltantes de Caja',
                 'url' => 'supervision/auditorias_original/auditinternas/faltante_caja.php',
                 'cargos_permitidos' => [49, 8, 16]

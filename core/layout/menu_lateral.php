@@ -506,11 +506,6 @@ $menuGlobal = [
                 'url' => 'marketing/dashboard_rfm.php',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 53, 50, 26]
             ],
-            [
-                'nombre' => 'Balance Inventario Access',
-                'url' => 'productos/balance_inventario_access_host.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 52]
-            ],
         ]
     ],
     [

@@ -22,7 +22,7 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Avisos Internos',
+                'nombre' => 'Avisos',
                 'url' => 'supervision/auditorias_original/index_avisos.php',
                 'cargos_permitidos' => []
             ],

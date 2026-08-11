@@ -353,12 +353,12 @@ $menuGlobal = [
         'items' => [
             [
                 'nombre' => 'Avisos Internos', 
-                'url' => 'supervision/auditorias_original/index_avisos_publico.php',
+                'url' => 'supervision/auditorias_original/index_avisos.php',
                 'cargos_permitidos' => []
             ],
             [ //exclusivo para atencion cliente y auxilir 
                 'nombre' => 'Avisos Sucursales', 
-                'url' => 'marketing/auditorias_original/index_avisos_publico.php',
+                'url' => 'supervision/auditorias_original/index_avisos.php',
                 'cargos_permitidos' => [49, 13,  22, 26, 28, 42, 36]
             ],
             [
@@ -1967,7 +1967,7 @@ function renderHeader($usuario, $esAdmin = false, $titulo = '') {
                 const marcarLeidosUrl = baseUrl + '/modulos/supervision/auditorias_original/marcar_anuncios_leidos.php';
                 
                 // URL para ir a anuncios
-                const anunciosUrl = baseUrl + '/modulos/supervision/auditorias_original/index_avisos_publico.php';
+                const anunciosUrl = baseUrl + '/modulos/supervision/auditorias_original/index_avisos.php';
                 
                 // Marcar anuncios como leídos
                 fetch(marcarLeidosUrl)

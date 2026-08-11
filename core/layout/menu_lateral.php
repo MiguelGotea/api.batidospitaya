@@ -23,12 +23,12 @@ $menuGlobal = [
         'items' => [
             [
                 'nombre' => 'Avisos Internos',
-                'url' => 'supervision/auditorias_original/index_avisos_publico.php',
+                'url' => 'supervision/auditorias_original/index_avisos.php',
                 'cargos_permitidos' => []
             ],
             [ //exclusivo para atencion cliente y auxilir 
                 'nombre' => 'Avisos Tiendas',
-                'url' => 'marketing/auditorias_original/index_avisos_publico.php',
+                'url' => 'supervision/auditorias_original/index_avisos.php',
                 'cargos_permitidos' => [49, 13, 22, 26, 28, 42, 36, 53]
             ],
             [

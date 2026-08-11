@@ -188,11 +188,6 @@ $menuGlobal = [
                 'nombre' => 'Requisición de Personal',
                 'url' => 'reclutamiento/postulacion_requisicion.php',
                 'cargos_permitidos' => [13, 28, 29, 30, 31, 37, 38, 39, 40, 54, 49]
-            ],
-            [
-                'nombre' => 'Calendario de Entrevistas',
-                'url' => 'reclutamiento/postulacion_calendario.php',
-                'cargos_permitidos' => [13, 28, 29, 30, 31, 37, 38, 39, 40, 54, 49]
             ]
         ]
     ],

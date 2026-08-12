@@ -32,17 +32,6 @@ $menuGlobal = [
                 'nombre' => 'Avisos',
                 'url' => 'supervision/auditorias_original/index_avisos.php',
                 'cargos_permitidos' => []
-            ],
-            [
-                'nombre' => 'Auditorías de Desempeño',
-                'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
-                'cargos_permitidos' => []
-            ],
-
-            [
-                'nombre' => 'Reclamos de Clientes',
-                'url' => 'supervision/auditorias_original/index_reclamos.php',
-                'cargos_permitidos' => []
             ]
         ]
     ],

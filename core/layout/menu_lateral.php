@@ -33,7 +33,7 @@ $menuGlobal = [
             ],
 
             [
-                'nombre' => 'Reclamos',
+                'nombre' => 'Reclamos de Clientes',
                 'url' => 'supervision/auditorias_original/index_reclamos.php',
                 'cargos_permitidos' => []
             ]
@@ -229,7 +229,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 28, 50, 33]
             ],
             [
-                'nombre' => 'Procesar Reclamos',
+                'nombre' => 'Reclamos de Clientes',
                 'url' => 'supervision/auditorias_original/index_reclamos.php',
                 'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21]
             ],

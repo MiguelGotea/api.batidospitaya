@@ -61,7 +61,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65, 41]
             ],
             [
-                'nombre' => 'Viaticos',
+                'nombre' => 'Viaticos Nocturnos',
                 'url' => 'operaciones/viaticos.php',
                 'cargos_permitidos' => [49, 16, 8, 52]
             ],

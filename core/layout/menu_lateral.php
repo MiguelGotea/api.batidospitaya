@@ -56,14 +56,14 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65]
             ],
             [
-                'nombre' => 'Viaticos',
-                'url' => 'operaciones/viaticos.php',
-                'cargos_permitidos' => [49, 16, 8, 52]
-            ],
-            [
                 'nombre' => 'Vacaciones',
                 'url' => 'lideres/vacaciones.php',
                 'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65]
+            ],
+            [
+                'nombre' => 'Viaticos',
+                'url' => 'operaciones/viaticos.php',
+                'cargos_permitidos' => [49, 16, 8, 52]
             ],
             [
                 'nombre' => 'Horas Extras',

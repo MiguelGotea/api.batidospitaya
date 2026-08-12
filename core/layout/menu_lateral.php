@@ -48,17 +48,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52, 65]
+                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52, 65, 41]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65]
+                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65, 41]
             ],
             [
                 'nombre' => 'Vacaciones/Subsidios',
                 'url' => 'lideres/vacaciones.php',
-                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65]
+                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65, 41]
             ],
             [
                 'nombre' => 'Viaticos',
@@ -88,17 +88,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65]
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65, 41]
             ],
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16, 61, 63, 65]
+                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16, 61, 63, 65, 41]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21, 30]
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21, 30, 41]
             ],
             [
                 'nombre' => 'Gestion de Feriados',

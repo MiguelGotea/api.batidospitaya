@@ -82,14 +82,14 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]
             ],
             [
-                'nombre' => 'Confirmar Horarios',
-                'url' => 'supervision/programar_horarios_operaciones.php',
-                'cargos_permitidos' => [16, 21, 36, 11, 33]
-            ],
-            [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33, 52]
+            ],
+            [
+                'nombre' => 'Confirmar Horarios',
+                'url' => 'supervision/programar_horarios_operaciones.php',
+                'cargos_permitidos' => [16, 21, 36, 11, 33]
             ],
             [
                 'nombre' => 'Generar Horarios',

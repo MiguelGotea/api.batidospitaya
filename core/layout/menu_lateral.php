@@ -17,6 +17,13 @@ $menuGlobal = [
         'items' => [] // Vacía el array de items
     ],
     [
+        'nombre' => 'Marcacion',
+        'icon' => 'fas fa-fingerprint',
+        'cargos_permitidos' => [49, 27, 16],
+        'url' => 'sucursales/marcacion.php',
+        'items' => []
+    ],
+    [
         'nombre' => 'Comunicación Interna',
         'icon' => 'fas fa-comments',
         'cargos_permitidos' => [],
@@ -44,11 +51,6 @@ $menuGlobal = [
         'icon' => 'fas fa-users',
         'cargos_permitidos' => [],
         'items' => [
-            [
-                'nombre' => 'Marcacion',
-                'url' => 'sucursales/marcacion.php',
-                'cargos_permitidos' => [49, 27, 16]
-            ],
             [
                 'nombre' => 'Historial Marcaciones',
                 'url' => 'sucursales/historial_marcaciones_sucursales.php',

@@ -373,7 +373,7 @@ $menuGlobal = [
             ],
             [
                 'nombre' => 'Reclamos', 
-                'url' => 'supervision/auditorias_original/index_reclamos_publico.php',
+                'url' => 'supervision/auditorias_original/index_reclamos.php',
                 'cargos_permitidos' => []
             ],
             [

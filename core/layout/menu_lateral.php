@@ -61,11 +61,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65]
             ],
             [
-                'nombre' => 'Horas Extras',
-                'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]
-            ],
-            [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33, 52]
@@ -160,6 +155,11 @@ $menuGlobal = [
                 'nombre' => 'Viaticos',
                 'url' => 'operaciones/viaticos.php',
                 'cargos_permitidos' => [49, 16, 8, 52]
+            ],
+            [
+                'nombre' => 'Horas Extras',
+                'url' => 'operaciones/horas_extras_manual.php',
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]
             ],
         ]
     ],

@@ -96,7 +96,7 @@ class ReclamosPendientesIndicator extends BaseIndicator
                 'icono' => $this->icono,
                 'valor' => $total,
                 'color' => $color,
-                'url' => '../supervision/auditorias_original/reclamospend.php',
+                'url' => '../supervision/auditorias_original/index_reclamos.php',
                 'modo' => 'operaciones'
             ];
 

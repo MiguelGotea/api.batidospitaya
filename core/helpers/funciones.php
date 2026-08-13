@@ -2830,7 +2830,7 @@ function calcularTardanzasEjecutadas($codOperario, $fechaInicio, $fechaFin)
         AND m.fecha <= ?  -- Solo hasta hoy
         AND m.fecha BETWEEN ss.fecha_inicio AND ss.fecha_fin
         AND m.hora_ingreso IS NOT NULL
-        AND TIMESTAMPDIFF(SECOND, 
+        AND TIMESTAMPDIFF(MINUTE, 
             CASE DAYOFWEEK(m.fecha)
                 WHEN 2 THEN hso.lunes_entrada
                 WHEN 3 THEN hso.martes_entrada
@@ -2841,7 +2841,7 @@ function calcularTardanzasEjecutadas($codOperario, $fechaInicio, $fechaFin)
                 WHEN 1 THEN hso.domingo_entrada
             END,
             m.hora_ingreso
-        ) > 60
+        ) > 1
         -- Verificar que el día tenía estado 'Activo'
         AND (
             (DAYOFWEEK(m.fecha) = 2 AND hso.lunes_estado = 'Activo') OR

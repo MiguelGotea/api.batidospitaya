@@ -2961,7 +2961,7 @@ function obtenerEstadisticasSucursalesQuincena($codOperario, $fechaInicio, $fech
             AND m.fecha <= ?
             AND m.fecha BETWEEN ss.fecha_inicio AND ss.fecha_fin
             AND m.hora_ingreso IS NOT NULL
-            AND TIMESTAMPDIFF(SECOND, 
+            AND TIMESTAMPDIFF(MINUTE, 
                 CASE DAYOFWEEK(m.fecha)
                     WHEN 2 THEN hso.lunes_entrada
                     WHEN 3 THEN hso.martes_entrada
@@ -2972,7 +2972,7 @@ function obtenerEstadisticasSucursalesQuincena($codOperario, $fechaInicio, $fech
                     WHEN 1 THEN hso.domingo_entrada
                 END,
                 m.hora_ingreso
-            ) > 60
+            ) > 1
             AND (
                 (DAYOFWEEK(m.fecha) = 2 AND hso.lunes_estado = 'Activo') OR
                 (DAYOFWEEK(m.fecha) = 3 AND hso.martes_estado = 'Activo') OR

@@ -954,7 +954,7 @@ function obtenerOperariosSucursalParaFaltas($codSucursal, $codUsuario = null)
         $result = $stmt->fetch();
 
         // Si no es líder y no es RH, devolver array vacío
-        if ((!$result || $result['es_lider'] == 0) && !verificarAccesoCargo([13, 39, 30, 37, 28])) {
+        if ((!$result || $result['es_lider'] == 0) && !verificarAccesoCargo([13, 39, 30, 37, 28, 64, 65])) {
             return [];
         }
     }
@@ -2191,34 +2191,40 @@ function aplicaViaticoMasaya($fecha)
 }
 
 /**
- * Verifica si aplica viático para un departamento y fecha específicos
+ * Verifica si aplica viático para un departamento y fecha específicos.
+ * Lee la columna dias_semana_viatico de la tabla departamentos (formato: '1,2,3,4,5,6,7').
+ * Usa caché estática para no repetir la misma consulta múltiples veces por request.
  */
 function aplicaViaticoDepartamento($codDepartamento, $fecha)
 {
-    // Convertir a string para comparación segura
+    global $conn;
+
+    // Caché estática en memoria: evita consultas repetidas al mismo departamento
+    static $cacheDias = [];
+
     $codDepartamento = (string) $codDepartamento;
 
-    // HARDCODED: Las reglas de qué días de la semana aplica el viático por departamento
-    // están literalizadas en este switch. Si cambia la regla de un departamento o se agrega
-    // uno nuevo, hay que modificar este código PHP.
-    // Reglas actuales:
-    //   - 1 (Managua):  aplica todos los días (siempre retorna true)
-    //   - 3 (Masaya):   aplica todos los días (siempre retorna true)
-    //   - 4 (Granada):  solo aplica jueves (4) a domingo (7) según ISO weekday
-    //   - Default:      cualquier otro departamento NO aplica (retorna false)
-    // TODO: Migrar a BD con una columna en 'departamentos' tipo:
-    //   'dias_semana_viatico' VARCHAR(13) almacenando los días ISO separados por coma,
-    //   ej. '1,2,3,4,5,6,7' (todos), '4,5,6,7' (jue-dom). NULL = no aplica.
-    switch ($codDepartamento) {
-        case '1': // Managua - todos los días
-        case '3': // Masaya - todos los días
-            return true;
-        case '4': // Granada - solo jueves a domingo
-            $diaSemana = date('N', strtotime($fecha)); // 1=lunes, 7=domingo
-            return $diaSemana >= 4 && $diaSemana <= 7; // Jueves=4 a Domingo=7
-        default:
+    if (!isset($cacheDias[$codDepartamento])) {
+        try {
+            $stmt = $conn->prepare("SELECT dias_semana_viatico FROM departamentos WHERE codigo = ? LIMIT 1");
+            $stmt->execute([$codDepartamento]);
+            $result = $stmt->fetch();
+            // Guardar en caché: string con días separados por coma, o '' si NULL/no encontrado
+            $cacheDias[$codDepartamento] = $result['dias_semana_viatico'] ?? '';
+        } catch (Exception $e) {
+            error_log("aplicaViaticoDepartamento: error leyendo BD para departamento $codDepartamento: " . $e->getMessage());
             return false;
+        }
     }
+
+    // Si la columna es NULL o vacía, el departamento no aplica viático nocturno
+    if (empty($cacheDias[$codDepartamento])) {
+        return false;
+    }
+
+    $diasPermitidos = explode(',', $cacheDias[$codDepartamento]);
+    $diaSemana = date('N', strtotime($fecha)); // ISO: 1=lunes, 7=domingo
+    return in_array((string)$diaSemana, $diasPermitidos);
 }
 
 /**

@@ -149,4 +149,41 @@ function existeAccionHerramienta($nombreHerramienta, $nombreAccion)
         return false;
     }
 }
+
+/**
+ * Obtiene la lista de CodNivelesCargos que tienen permiso 'allow' para una acción dada.
+ * Útil para construir dinámicamente filtros SQL sin hardcodear IDs de cargos.
+ *
+ * @param string $nombreHerramienta Nombre de la herramienta (campo 'nombre' de tools_erp)
+ * @param string $nombreAccion Nombre de la acción (ej: 'cargosvercds')
+ * @return array Array de enteros con los CodNivelesCargos que tienen 'allow'. Vacío si no hay ninguno.
+ */
+function obtenerCargosPermitidosAccion($nombreHerramienta, $nombreAccion)
+{
+    global $conn;
+
+    try {
+        $sql = "
+            SELECT p.CodNivelesCargos
+            FROM tools_erp t
+            INNER JOIN acciones_tools_erp a ON t.id = a.tool_erp_id
+            INNER JOIN permisos_tools_erp p ON a.id = p.accion_tool_erp_id
+            WHERE t.nombre = :nombreHerramienta
+              AND a.nombre_accion = :nombreAccion
+              AND p.permiso = 'allow'
+        ";
+
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            ':nombreHerramienta' => $nombreHerramienta,
+            ':nombreAccion'      => $nombreAccion,
+        ]);
+
+        return array_column($stmt->fetchAll(PDO::FETCH_ASSOC), 'CodNivelesCargos');
+
+    } catch (PDOException $e) {
+        error_log("Error en obtenerCargosPermitidosAccion: " . $e->getMessage());
+        return [];
+    }
+}
 ?>

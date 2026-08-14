@@ -50,8 +50,8 @@ class AusenciasColaboradoresIndicator extends BaseIndicator
         if (!$cargo)
             return 'default';
 
-        // Códigos de cargo: 13=RH, 39, 30, 37, 28
-        if (in_array($cargo['cargo_codigo'], [13, 39, 30, 37, 28]))
+        // Códigos de cargo: 13=RH, 39, 30, 37, 28, 64, 65
+        if (in_array($cargo['cargo_codigo'], [13, 39, 30, 37, 28, 64, 65]))
             return 'rh';
 
         return 'default';

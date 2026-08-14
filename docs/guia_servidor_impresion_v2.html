@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía del Servidor de Impresión - Batidos Pitaya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0E544C;
+      --primary-light: #51B8AC;
+      --primary-xlight: rgba(81, 184, 172, 0.1);
+      --bg: #F4F6F8;
+      --surface: #FFFFFF;
+      --text: #2C3E50;
+      --text-muted: #7F8C8D;
+      --border: #E2E8F0;
+      --code-bg: #1E293B;
+      --code-text: #F8FAFC;
+      
+      /* Alerts */
+      --note-border: #3182CE;
+      --note-bg: #EBF8FF;
+      --tip-border: #38A169;
+      --tip-bg: #F0FFF4;
+      --important-border: #805AD5;
+      --important-bg: #FAF5FF;
+      --warning-border: #DD6B20;
+      --warning-bg: #FFFAF0;
+      --caution-border: #E53E3E;
+      --caution-bg: #FFF5F5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: var(--surface);
+      max-width: 900px;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      padding: 50px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+      border-radius: 20px 20px 0 0;
+    }
+
+    /* Typography */
+    h1, h2, h3, h4 {
+      color: var(--primary);
+      margin-top: 1.8em;
+      margin-bottom: 0.6em;
+      font-weight: 700;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-top: 0;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 15px;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+    }
+
+    h5 {
+      font-size: 1.05rem;
+      color: var(--primary-light);
+      margin-top: 1.4em;
+      margin-bottom: 0.4em;
+      font-weight: 600;
+    }
+
+    p {
+      margin-bottom: 1.2em;
+      font-size: 1.05rem;
+      color: #34495E;
+    }
+
+    /* Lists */
+    ul, ol {
+      margin-bottom: 1.2em;
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 0.5em;
+      font-size: 1.05rem;
+    }
+
+    /* Code blocks */
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      border-radius: 12px;
+      padding: 18px;
+      overflow-x: auto;
+      margin-bottom: 1.4em;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+      border: 1px solid #0F172A;
+    }
+
+    code {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9em;
+    }
+
+    p > code, li > code {
+      background-color: rgba(0,0,0,0.05);
+      color: #E11D48;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.6em;
+      font-size: 0.95rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 12px 15px;
+      text-align: left;
+    }
+
+    th {
+      background-color: var(--primary-xlight);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background-color: #F8FAFC;
+    }
+
+    /* Alerts styling */
+    .alert-box {
+      border-left: 5px solid;
+      border-radius: 0 8px 8px 0;
+      padding: 15px 20px;
+      margin: 1.5em 0;
+      font-size: 1rem;
+    }
+
+    .alert-note {
+      border-color: var(--note-border);
+      background-color: var(--note-bg);
+      color: #2B6CB0;
+    }
+
+    .alert-tip {
+      border-color: var(--tip-border);
+      background-color: var(--tip-bg);
+      color: #2F855A;
+    }
+
+    .alert-important {
+      border-color: var(--important-border);
+      background-color: var(--important-bg);
+      color: #6B46C1;
+    }
+
+    .alert-warning {
+      border-color: var(--warning-border);
+      background-color: var(--warning-bg);
+      color: #C05621;
+    }
+
+    .alert-caution {
+      border-color: var(--caution-border);
+      background-color: var(--caution-bg);
+      color: #C53030;
+    }
+
+    .alert-box strong {
+      text-transform: uppercase;
+      font-size: 0.9em;
+      display: inline-block;
+      margin-right: 5px;
+    }
+
+    /* Horizontal Line */
+    hr {
+      border: 0;
+      height: 1px;
+      background: var(--border);
+      margin: 2.5em 0;
+    }
+
+    /* Footer styling */
+    .doc-footer {
+      margin-top: 3em;
+      padding-top: 1.5em;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .doc-footer a {
+      color: var(--primary-light);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Guía Completa de Instalación — Servidor de Impresión Local Node.js</h1>
+<p>Esta guía paso a paso te permitirá instalar, configurar y replicar el servidor de impresión para la ticketera <strong>Epson TM-T20II</strong> (o cualquier ticketera térmica USB) en cualquier computadora con Windows en la empresa desde cero.</p>
+<hr>
+<h2>PASO 0 — Instalar Node.js (Si la PC no lo tiene)</h2>
+<p>Para ejecutar el servidor, la computadora debe tener Node.js instalado.</p>
+<ol>
+<li>Descarga la versión <strong>LTS</strong> (Recomendada para la mayoría) desde la página oficial: <strong><a href="https://nodejs.org/">nodejs.org</a></strong>.</li>
+<li>Ejecuta el instalador descargado. Sigue el asistente pulsando <strong>Siguiente → Siguiente → Instalar → Finalizar</strong> (deja marcadas las opciones por defecto).</li>
+<li>Abre una terminal (<strong>CMD</strong> o <strong>PowerShell</strong>) y verifica que se haya instalado correctamente escribiendo:<pre><code class="language-cmd">node -v
+npm -v
+</code></pre>
+<em>(Debería mostrarte los números de versión de Node y npm sin errores).</em></li>
+</ol>
+<hr>
+<h2>PASO 1 — Compartir la Impresora en Windows (Crucial)</h2>
+<p>Como usaremos un puerto de Windows Spooler sin dependencias nativas de compilación (C++), el sistema necesita que la impresora esté compartida en la red local.</p>
+<ol>
+<li>Abre el <strong>Panel de Control</strong> &gt; <strong>Dispositivos e impresoras</strong> (o busca &quot;Impresoras y escáneres&quot; en la configuración de Windows).</li>
+<li>Haz clic derecho sobre tu impresora Epson y selecciona <strong>Propiedades de la impresora</strong> (no &quot;Propiedades&quot;).</li>
+<li>Ve a la pestaña <strong>Compartir</strong>.</li>
+<li>Marca la casilla <strong>&quot;Compartir esta impresora&quot;</strong>.</li>
+<li>En el nombre del recurso compartido escribe exactamente:<br><code>Impresora TM Tienda</code></li>
+<li>Haz clic en <strong>Aplicar</strong> y <strong>Aceptar</strong>.</li>
+</ol>
+<hr>
+<h2>PASO 2 — Crear la Carpeta y Preparar el Proyecto</h2>
+<p>Abre la terminal (<strong>CMD</strong> o <strong>PowerShell</strong>) y ejecuta los siguientes comandos para crear la carpeta del servidor e instalar las librerías necesarias:</p>
+<pre><code class="language-powershell"># 1. Crear e ingresar a la carpeta del servidor
+mkdir C:\ServidorImpresora
+cd C:\ServidorImpresora
+
+# 2. Inicializar el proyecto Node.js
+npm init -y
+
+# 3. Instalar dependencias necesarias
+npm install express node-thermal-printer cors
+</code></pre>
+<div class="alert-box alert-note"><strong>NOTE:</strong> Al ejecutar `npm init -y` es totalmente normal y esperado que veas una línea que dice `"test": "echo \"Error: no test specified\" && exit 1"`. No te preocupes, esto **NO** es un error real del sistema. Simplemente es una plantilla por defecto que Node.js genera para scripts de testing que no usaremos. Puedes continuar al Paso 3 con total tranquilidad.
+</div><div class="alert-box alert-note"><strong>NOTE:</strong> Al ejecutar `npm install`, verás mensajes como `X packages are looking for funding` y al final `found 0 vulnerabilities`. Ambos son **normales y esperados**:
+- **"looking for funding"** → Solo es un aviso de que los autores de algunas librerías aceptan donaciones voluntarias. No tienes que hacer nada.
+- **"found 0 vulnerabilities"** → ✅ Significa que la instalación fue exitosa y sin problemas de seguridad. Puedes continuar.
+</div><hr>
+<h2>PASO 3 — Crear los Archivos del Servidor</h2>
+<p>Dentro de <code>C:\ServidorImpresora\</code>, crea los siguientes archivos con sus respectivos códigos:</p>
+<h3>1. <code>C:\ServidorImpresora\package.json</code></h3>
+<p>Asegúrate de que tu <code>package.json</code> tenga esta estructura (puedes sobrescribirlo):</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;servidor-impresora&quot;,
+  &quot;version&quot;: &quot;1.0.0&quot;,
+  &quot;description&quot;: &quot;Servidor de impresion local para Batidos Pitaya&quot;,
+  &quot;main&quot;: &quot;servidor.js&quot;,
+  &quot;scripts&quot;: {
+    &quot;start&quot;: &quot;node servidor.js&quot;
+  },
+  &quot;dependencies&quot;: {
+    &quot;cors&quot;: &quot;^2.8.5&quot;,
+    &quot;express&quot;: &quot;^4.21.2&quot;,
+    &quot;node-thermal-printer&quot;: &quot;^4.4.3&quot;
+  }
+}
+</code></pre>
+<h3>2. <code>C:\ServidorImpresora\servidor.js</code></h3>
+<p>Este archivo contiene la lógica del servidor de Express y el controlador de impresión personalizado para Windows:</p>
+<pre><code class="language-javascript">const express = require(&#39;express&#39;);
+const cors = require(&#39;cors&#39;);
+const path = require(&#39;path&#39;);
+const fs = require(&#39;fs&#39;);
+const { exec } = require(&#39;child_process&#39;);
+const { ThermalPrinter, PrinterTypes } = require(&#39;node-thermal-printer&#39;);
+
+const app = express();
+app.use((req, res, next) =&gt; {
+  res.setHeader(&#39;Access-Control-Allow-Private-Network&#39;, &#39;true&#39;);
+  if (req.method === &#39;OPTIONS&#39;) {
+    res.setHeader(&#39;Access-Control-Allow-Headers&#39;, &#39;Content-Type, Access-Control-Allow-Private-Network&#39;);
+  }
+  next();
+});
+app.use(cors());
+app.use(express.json());
+
+// Nombre del recurso compartido en Windows tal como lo configuraste en el Paso 1
+const NOMBRE_IMPRESORA = &#39;Impresora TM Tienda&#39;;
+
+// Interfaz de impresión personalizada para Windows Spooler
+// Evita instalar drivers nativos C++ que fallan al compilar en Windows
+const windowsSpoolerInterface = {
+  isPrinterConnected: async () =&gt; {
+    return true; // Asumimos conectada; el spooler de Windows se encargará de encolarla
+  },
+  execute: async (buffer) =&gt; {
+    const tempFile = path.join(__dirname, `print_job_${Date.now()}.bin`);
+    
+    // 1. Guardar el buffer ESC/POS en un archivo temporal
+    await fs.promises.writeFile(tempFile, buffer);
+    
+    return new Promise((resolve, reject) =&gt; {
+      // Ruta UNC para mandar al spooler compartido localmente
+      const printerPath = `\\\\localhost\\${NOMBRE_IMPRESORA}`;
+      
+      // 2. Usar copy /b para copiar los bytes directamente a la cola de la impresora sin alterarlos
+      exec(`copy /b &quot;${tempFile}&quot; &quot;${printerPath}&quot;`, (err, stdout, stderr) =&gt; {
+        // Borrar siempre el archivo temporal inmediatamente después
+        try { fs.unlinkSync(tempFile); } catch (e) {}
+        
+        if (err) {
+          console.error(&quot;Error de impresión en Spooler:&quot;, err);
+          reject(new Error(`No se pudo enviar a la impresora. ¿Está compartida como &quot;${NOMBRE_IMPRESORA}&quot;?`));
+        } else {
+          console.log(&quot;Trabajo de impresión enviado correctamente a la cola.&quot;);
+          resolve(&#39;Printed successfully&#39;);
+        }
+      });
+    });
+  }
+};
+
+// Servir la carpeta de control estática
+app.use(express.static(path.join(__dirname, &#39;public&#39;)));
+
+// Estado del Servidor
+app.get(&#39;/estado&#39;, (req, res) =&gt; {
+  res.json({ 
+    estado: &#39;Servidor de impresión activo&#39;, 
+    impresora: NOMBRE_IMPRESORA 
+  });
+});
+
+// Endpoint para imprimir
+app.post(&#39;/imprimir&#39;, async (req, res) =&gt; {
+  const { lineas } = req.body;
+
+  if (!lineas || !Array.isArray(lineas)) {
+    return res.status(400).json({ error: &#39;Se esperaba un array de líneas: { lineas: [&quot;texto1&quot;, &quot;texto2&quot;] }&#39; });
+  }
+
+  try {
+    const printer = new ThermalPrinter({
+      type: PrinterTypes.EPSON,
+      interface: windowsSpoolerInterface, // Usamos nuestra interfaz robusta sin módulos nativos
+      characterSet: &#39;SLOVENIA&#39;,
+      removeSpecialCharacters: false,
+      lineCharacter: &#39;-&#39;,
+    });
+
+    printer.alignCenter();
+    printer.println(&quot;================================&quot;);
+    printer.println(&quot;       BATIDOS PITAYA&quot;);
+    printer.println(&quot;================================&quot;);
+    printer.alignLeft();
+
+    for (const linea of lineas) {
+      printer.println(linea);
+    }
+
+    printer.alignCenter();
+    printer.println(&quot;================================&quot;);
+    printer.println(&quot;  Gracias por preferirnos!&quot;);
+    printer.println(&quot;\n\n&quot;);
+    printer.cut();
+
+    await printer.execute();
+    res.json({ ok: true, mensaje: &#39;Ticket enviado a la impresora correctamente&#39; });
+  } catch (err) {
+    console.error(&#39;Error procesando la impresión:&#39;, err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+const PUERTO = 3000;
+app.listen(PUERTO, () =&gt; {
+  console.log(`Servidor de impresión corriendo localmente en el puerto ${PUERTO}`);
+  console.log(`Prueba en tu navegador: http://localhost:${PUERTO}/`);
+});
+</code></pre>
+<h3>3. Crear el Panel Web Interactiva de Pruebas</h3>
+<p>Crea una carpeta llamada <code>public</code> dentro de <code>C:\ServidorImpresora\</code>:</p>
+<pre><code class="language-powershell">mkdir C:\ServidorImpresora\public
+</code></pre>
+<p>Y dentro crea el archivo <code>C:\ServidorImpresora\public\index.html</code>:</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;es&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;&gt;
+  &lt;title&gt;Pitaya Print Center&lt;/title&gt;
+  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;
+  &lt;style&gt;
+    :root {
+      --primary: #51B8AC;
+      --primary-dark: #0E544C;
+      --bg: #0B0F19;
+      --surface: #151D30;
+      --surface2: #1C2540;
+      --text: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --border: #24324F;
+      --success: #10B981;
+      --error: #EF4444;
+      --warning: #F59E0B;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: &#39;Outfit&#39;, sans-serif; }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: &#39;&#39;;
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    }
+
+    .page-title {
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      font-size: 13px;
+      margin-bottom: 20px;
+    }
+
+    /* ── Status bar ── */
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+    }
+
+    .status-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--warning);
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+    .status-dot.online  { background: var(--success); animation: pulse 1.5s infinite; }
+    .status-dot.offline { background: var(--error); }
+
+    @keyframes pulse {
+      0%,100% { transform: scale(.9); opacity:.6; }
+      50%      { transform: scale(1.2); opacity:1; }
+    }
+
+    #status-text { flex: 1; color: var(--text-muted); }
+    #printer-name { font-weight: 600; color: var(--primary); }
+
+    .btn-check {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-check:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 4px; margin-bottom: 18px; background: var(--surface2); border-radius: 10px; padding: 4px; }
+    .tab-btn {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      border-radius: 7px;
+      padding: 8px 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .tab-btn.active { background: var(--primary-dark); color: #fff; }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Fields ── */
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 10px 13px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+      margin-bottom: 14px;
+      font-family: &#39;Outfit&#39;, sans-serif;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--primary); }
+    textarea { resize: vertical; height: 120px; font-family: &#39;Courier New&#39;, monospace; font-size: 13px; }
+    select { cursor: pointer; }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    /* ── Ticket preview ── */
+    .ticket-preview {
+      background: #fff;
+      color: #000;
+      border-radius: 8px;
+      padding: 14px 12px;
+      font-family: &#39;Courier New&#39;, monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      white-space: pre;
+      overflow-x: auto;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.2);
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    /* ── Buttons ── */
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      transition: filter .2s, transform .15s;
+      margin-bottom: 8px;
+    }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .btn:hover:not(:disabled) { filter: brightness(1.1); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(81,184,172,.3);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444, #b91c1c);
+      color: #fff;
+    }
+
+    /* ── Log ── */
+    .log {
+      margin-top: 8px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 12px;
+      font-family: &#39;Courier New&#39;, monospace;
+    }
+
+    .log-entry { margin-bottom: 5px; color: var(--text-muted); }
+    .log-entry.ok  { color: var(--success); }
+    .log-entry.err { color: var(--error); }
+    .log-entry.inf { color: var(--primary); }
+
+    /* ── IP pill ── */
+    .ip-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(81,184,172,.12);
+      border: 1px solid rgba(81,184,172,.25);
+      border-radius: 50px;
+      padding: 4px 12px;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 18px;
+      cursor: pointer;
+    }
+    .ip-pill:hover { background: rgba(81,184,172,.2); }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+
+  &lt;div class=&quot;card&quot;&gt;
+    &lt;div class=&quot;page-title&quot;&gt;🍹 Pitaya Print Center&lt;/div&gt;
+    &lt;div class=&quot;page-subtitle&quot;&gt;Panel de prueba del servidor de impresión local&lt;/div&gt;
+
+    &lt;!-- Status --&gt;
+    &lt;div class=&quot;status-bar&quot;&gt;
+      &lt;div class=&quot;status-dot&quot; id=&quot;status-dot&quot;&gt;&lt;/div&gt;
+      &lt;span id=&quot;status-text&quot;&gt;Verificando servidor...&lt;/span&gt;
+      &lt;button class=&quot;btn-check&quot; onclick=&quot;checkStatus()&quot;&gt;↻ Verificar&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Tabs --&gt;
+    &lt;div class=&quot;tabs&quot;&gt;
+      &lt;button class=&quot;tab-btn active&quot; onclick=&quot;switchTab(&#39;tab-simple&#39;, this)&quot;&gt;🚀 Rápida&lt;/button&gt;
+      &lt;button class=&quot;tab-btn&quot; onclick=&quot;switchTab(&#39;tab-vacacion&#39;, this)&quot;&gt;🌴 Boleta&lt;/button&gt;
+      &lt;button class=&quot;tab-btn&quot; onclick=&quot;switchTab(&#39;tab-libre&#39;, this)&quot;&gt;✏️ Libre&lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- TAB: Prueba rápida --&gt;
+    &lt;div class=&quot;tab-panel active&quot; id=&quot;tab-simple&quot;&gt;
+      &lt;p style=&quot;color:var(--text-muted);font-size:13px;margin-bottom:14px;&quot;&gt;
+        Envía un ticket de prueba a la impresora para verificar que todo funciona correctamente.
+      &lt;/p&gt;
+      &lt;button class=&quot;btn btn-primary&quot; onclick=&quot;enviarPrueba()&quot;&gt;
+        🖨️ Imprimir Ticket de Prueba
+      &lt;/button&gt;
+      &lt;button class=&quot;btn btn-secondary&quot; onclick=&quot;enviarCorte()&quot;&gt;
+        ✂️ Solo Cortar Papel
+      &lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- TAB: Boleta vacaciones --&gt;
+    &lt;div class=&quot;tab-panel&quot; id=&quot;tab-vacacion&quot;&gt;
+      &lt;div class=&quot;row-2&quot;&gt;
+        &lt;div&gt;
+          &lt;label&gt;Nombre Colaborador&lt;/label&gt;
+          &lt;input id=&quot;v_nombre&quot; type=&quot;text&quot; placeholder=&quot;Juan Pérez&quot;&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label&gt;Tienda&lt;/label&gt;
+          &lt;input id=&quot;v_tienda&quot; type=&quot;text&quot; placeholder=&quot;Sucursal Centro&quot;&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class=&quot;row-2&quot;&gt;
+        &lt;div&gt;
+          &lt;label&gt;Fecha Inicio&lt;/label&gt;
+          &lt;input id=&quot;v_inicio&quot; type=&quot;date&quot;&gt;
+        &lt;/div&gt;
+        &lt;div&gt;
+          &lt;label&gt;Fecha Fin&lt;/label&gt;
+          &lt;input id=&quot;v_fin&quot; type=&quot;date&quot;&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;label&gt;Jefe / Líder&lt;/label&gt;
+      &lt;input id=&quot;v_jefe&quot; type=&quot;text&quot; placeholder=&quot;María García&quot;&gt;
+
+      &lt;label&gt;Vista previa del ticket&lt;/label&gt;
+      &lt;div class=&quot;ticket-preview&quot; id=&quot;v_preview&quot;&gt;— Llena los campos para ver la vista previa —&lt;/div&gt;
+
+      &lt;button class=&quot;btn btn-primary&quot; onclick=&quot;enviarBoleta()&quot;&gt;
+        🖨️ Imprimir Boleta de Vacaciones
+      &lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- TAB: Texto libre --&gt;
+    &lt;div class=&quot;tab-panel&quot; id=&quot;tab-libre&quot;&gt;
+      &lt;label&gt;Líneas a imprimir (una por línea)&lt;/label&gt;
+      &lt;textarea id=&quot;libre_texto&quot;&gt;Mesa: Terraza 4
+Atendido por: Juan M.
+--------------------------------
+1x Batido Fresa        C$ 85.00
+1x Batido Pitaya       C$ 90.00
+--------------------------------
+TOTAL:                C$ 175.00&lt;/textarea&gt;
+      &lt;button class=&quot;btn btn-primary&quot; onclick=&quot;enviarLibre()&quot;&gt;
+        🖨️ Imprimir Texto
+      &lt;/button&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Log --&gt;
+    &lt;div class=&quot;log&quot; id=&quot;log&quot;&gt;
+      &lt;div class=&quot;log-entry&quot;&gt;Listo para imprimir...&lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- Card de configuración --&gt;
+  &lt;div class=&quot;card&quot;&gt;
+    &lt;div style=&quot;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-muted);margin-bottom:12px;&quot;&gt;
+      ⚙️ Configuración
+    &lt;/div&gt;
+    &lt;label&gt;IP del servidor de impresión&lt;/label&gt;
+    &lt;input id=&quot;cfg_ip&quot; type=&quot;text&quot; value=&quot;192.168.0.67&quot; placeholder=&quot;192.168.X.X&quot; style=&quot;margin-bottom:8px;&quot;&gt;
+    &lt;label&gt;Puerto&lt;/label&gt;
+    &lt;input id=&quot;cfg_port&quot; type=&quot;number&quot; value=&quot;3000&quot; style=&quot;margin-bottom:8px;&quot;&gt;
+    &lt;button class=&quot;btn btn-secondary&quot; onclick=&quot;checkStatus()&quot; style=&quot;margin-top:4px;&quot;&gt;
+      🔍 Probar conexión con esta IP
+    &lt;/button&gt;
+    &lt;p style=&quot;font-size:11px;color:var(--text-muted);margin-top:10px;line-height:1.5;&quot;&gt;
+      💡 La IP &lt;strong style=&quot;color:var(--primary)&quot;&gt;192.168.0.67&lt;/strong&gt; es la que muestra el &lt;code&gt;ipconfig&lt;/code&gt; de la PC con la impresora.&lt;br&gt;
+      Ambos dispositivos deben estar en la &lt;strong&gt;misma red WiFi&lt;/strong&gt;.
+    &lt;/p&gt;
+  &lt;/div&gt;
+
+&lt;script&gt;
+  // ── Config helpers ──────────────────────────────────────────
+  const getIP   = () =&gt; document.getElementById(&#39;cfg_ip&#39;).value.trim() || &#39;192.168.0.67&#39;;
+  const getPort = () =&gt; document.getElementById(&#39;cfg_port&#39;).value.trim() || &#39;3000&#39;;
+  const baseUrl = () =&gt; `http://${getIP()}:${getPort()}`;
+
+  // ── Log helper ──────────────────────────────────────────────
+  function log(msg, type = &#39;&#39;) {
+    const box = document.getElementById(&#39;log&#39;);
+    const ts  = new Date().toLocaleTimeString(&#39;es&#39;, { hour12: false });
+    const div = document.createElement(&#39;div&#39;);
+    div.className = `log-entry ${type}`;
+    div.textContent = `[${ts}] ${msg}`;
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  // ── Status check ────────────────────────────────────────────
+  async function checkStatus() {
+    const dot  = document.getElementById(&#39;status-dot&#39;);
+    const text = document.getElementById(&#39;status-text&#39;);
+
+    dot.className = &#39;status-dot&#39;;
+    text.textContent = &#39;Verificando...&#39;;
+    log(`Conectando a ${baseUrl()}/estado ...`, &#39;inf&#39;);
+
+    try {
+      const res  = await fetch(`${baseUrl()}/estado`, { signal: AbortSignal.timeout(4000) });
+      const data = await res.json();
+
+      dot.className = &#39;status-dot online&#39;;
+      text.innerHTML = `Servidor activo · &lt;span id=&quot;printer-name&quot;&gt;${data.impresora || &#39;?&#39;}&lt;/span&gt;`;
+      log(`✅ Servidor OK. Impresora: &quot;${data.impresora}&quot;`, &#39;ok&#39;);
+    } catch (err) {
+      dot.className = &#39;status-dot offline&#39;;
+      text.textContent = &#39;Servidor desconectado&#39;;
+      log(`❌ Sin conexión al servidor: ${err.message}`, &#39;err&#39;);
+    }
+  }
+
+  // ── Fetch de impresión ──────────────────────────────────────
+  async function enviar(lineas) {
+    log(`Enviando ${lineas.length} línea(s) a imprimir...`, &#39;inf&#39;);
+    try {
+      const res  = await fetch(`${baseUrl()}/imprimir`, {
+        method: &#39;POST&#39;,
+        headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+        body: JSON.stringify({ lineas }),
+        signal: AbortSignal.timeout(8000)
+      });
+      const data = await res.json();
+      if (data.ok) {
+        log(&#39;✅ ¡Ticket enviado correctamente a la impresora!&#39;, &#39;ok&#39;);
+        return true;
+      } else {
+        log(`❌ Error del servidor: ${data.error}`, &#39;err&#39;);
+        return false;
+      }
+    } catch (err) {
+      log(`❌ Error de conexión: ${err.message}`, &#39;err&#39;);
+      return false;
+    }
+  }
+
+  // ── Tab: Prueba rápida ──────────────────────────────────────
+  async function enviarPrueba() {
+    const ahora = new Date().toLocaleString(&#39;es&#39;, { dateStyle: &#39;short&#39;, timeStyle: &#39;short&#39; });
+    await enviar([
+      &#39;================================&#39;,
+      &#39;        BATIDOS PITAYA&#39;,
+      &#39;   Servidor de Impresion OK!&#39;,
+      &#39;================================&#39;,
+      &#39;&#39;,
+      `Fecha: ${ahora}`,
+      `IP servidor: ${getIP()}`,
+      &#39;&#39;,
+      &#39;Si ves este ticket impreso,&#39;,
+      &#39;el servidor funciona correctamente.&#39;,
+      &#39;&#39;,
+      &#39;   www.batidospitaya.com&#39;,
+      &#39;&#39;,
+    ]);
+  }
+
+  async function enviarCorte() {
+    await enviar([&#39;&#39;]);
+    log(&#39;Corte de papel enviado.&#39;, &#39;inf&#39;);
+  }
+
+  // ── Tab: Boleta vacaciones ──────────────────────────────────
+  function calcDias(ini, fin) {
+    if (!ini || !fin) return &#39;&#39;;
+    const d1 = new Date(ini + &#39;T00:00:00&#39;);
+    const d2 = new Date(fin + &#39;T00:00:00&#39;);
+    if (d2 &lt; d1) return &#39;Rango inválido&#39;;
+    const diff = Math.round((d2 - d1) / 86400000) + 1;
+    return diff + (diff === 1 ? &#39; día&#39; : &#39; días&#39;);
+  }
+
+  function fmtFecha(iso) {
+    if (!iso) return &#39;—&#39;;
+    const [y, m, d] = iso.split(&#39;-&#39;);
+    return `${d}/${m}/${y}`;
+  }
+
+  function buildLineasBoleta() {
+    const nombre = document.getElementById(&#39;v_nombre&#39;).value.trim() || &#39;_______________&#39;;
+    const tienda = document.getElementById(&#39;v_tienda&#39;).value.trim() || &#39;_______________&#39;;
+    const ini    = document.getElementById(&#39;v_inicio&#39;).value;
+    const fin    = document.getElementById(&#39;v_fin&#39;).value;
+    const jefe   = document.getElementById(&#39;v_jefe&#39;).value.trim() || &#39;_______________&#39;;
+    const dias   = calcDias(ini, fin);
+    const ahora  = new Date();
+    const emisión = `${String(ahora.getDate()).padStart(2,&#39;0&#39;)}/${String(ahora.getMonth()+1).padStart(2,&#39;0&#39;)}/${ahora.getFullYear()}`;
+
+    return [
+      &#39;================================&#39;,
+      &#39;  SOLICITUD DE VACACIONES&#39;,
+      &#39;      BATIDOS PITAYA&#39;,
+      &#39;================================&#39;,
+      `Tienda: ${tienda}`,
+      `Jefe:   ${jefe}`,
+      `Emision:${emisión}`,
+      &#39;--------------------------------&#39;,
+      &#39;DATOS DEL COLABORADOR&#39;,
+      &#39;--------------------------------&#39;,
+      `Nombre: ${nombre}`,
+      &#39;&#39;,
+      `Desde:  ${fmtFecha(ini)}`,
+      `Hasta:  ${fmtFecha(fin)}`,
+      `Total:  ${dias}`,
+      &#39;&#39;,
+      &#39;================================&#39;,
+      &#39;Firma del colaborador:&#39;,
+      &#39;&#39;,
+      &#39;&#39;,
+      &#39;_______________________________&#39;,
+      &#39;&#39;,
+      &#39;Firma del jefe directo:&#39;,
+      &#39;&#39;,
+      &#39;&#39;,
+      &#39;_______________________________&#39;,
+      &#39;&#39;,
+    ];
+  }
+
+  // Actualizar preview en tiempo real
+  [&#39;v_nombre&#39;,&#39;v_tienda&#39;,&#39;v_inicio&#39;,&#39;v_fin&#39;,&#39;v_jefe&#39;].forEach(id =&gt; {
+    document.getElementById(id).addEventListener(&#39;input&#39;, actualizarPreview);
+    document.getElementById(id).addEventListener(&#39;change&#39;, actualizarPreview);
+  });
+
+  function actualizarPreview() {
+    document.getElementById(&#39;v_preview&#39;).textContent = buildLineasBoleta().join(&#39;\n&#39;);
+  }
+
+  // Poner fecha de hoy por defecto
+  const hoyISO = new Date().toISOString().split(&#39;T&#39;)[0];
+  document.getElementById(&#39;v_inicio&#39;).value = hoyISO;
+  document.getElementById(&#39;v_fin&#39;).value    = hoyISO;
+  actualizarPreview();
+
+  async function enviarBoleta() {
+    await enviar(buildLineasBoleta());
+  }
+
+  // ── Tab: Texto libre ────────────────────────────────────────
+  async function enviarLibre() {
+    const texto  = document.getElementById(&#39;libre_texto&#39;).value;
+    const lineas = texto.split(&#39;\n&#39;);
+    await enviar(lineas);
+  }
+
+  // ── Tabs ────────────────────────────────────────────────────
+  function switchTab(panelId, btnEl) {
+    document.querySelectorAll(&#39;.tab-panel&#39;).forEach(p =&gt; p.classList.remove(&#39;active&#39;));
+    document.querySelectorAll(&#39;.tab-btn&#39;).forEach(b =&gt; b.classList.remove(&#39;active&#39;));
+    document.getElementById(panelId).classList.add(&#39;active&#39;);
+    btnEl.classList.add(&#39;active&#39;);
+  }
+
+  // ── Auto-check al cargar ────────────────────────────────────
+  window.addEventListener(&#39;DOMContentLoaded&#39;, () =&gt; {
+    checkStatus();
+    setInterval(checkStatus, 15000);
+  });
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<hr>
+<h2>PASO 4 — Iniciar el Servidor Manualmente (Para Probar por Primera Vez)</h2>
+<p>Antes de configurar el inicio automático, prueba que todo funciona iniciando el servidor manualmente desde el CMD. Esto también sirve para cuando quieras probar cambios rápidamente.</p>
+<ol>
+<li>Abre <strong>CMD</strong> (Símbolo del sistema).</li>
+<li>Escribe los siguientes comandos:</li>
+</ol>
+<pre><code class="language-cmd">cd C:\ServidorImpresora
+node servidor.js
+</code></pre>
+<p>Si todo está correcto, verás este mensaje en el CMD y <strong>la ventana debe quedar abierta</strong> mientras usas el servidor:</p>
+<pre><code>Servidor de impresión HTTPS corriendo localmente en el puerto 3000
+Prueba en tu navegador: https://localhost:3000/estado
+</code></pre>
+<ol start="3">
+<li>Abre el navegador en la misma PC y entra a <code>https://localhost:3000/</code> para ver el panel de pruebas.</li>
+<li>Si entrás desde otro dispositivo en la misma red (por ejemplo, tu celular), usá la IP de la PC: <code>https://192.168.0.67:3000/</code></li>
+</ol>
+<div class="alert-box alert-important"><strong>IMPORTANT:</strong> Al entrar por primera vez a la dirección `https://<IP>:3000`, el navegador mostrará una advertencia de seguridad ("La conexión no es privada") porque el certificado SSL está auto-firmado de forma local.<p><strong>Debes hacer esto una sola vez en cada dispositivo (celular o PC) desde el que vayas a imprimir:</strong></p>
+<ol>
+<li>Haz clic en <strong>Configuración Avanzada</strong> (o <em>Detalles</em>).</li>
+<li>Haz clic en <strong>Acceder a <IP> (no seguro)</strong> o <em>Continuar</em>.</li>
+<li>Una vez que cargue la interfaz, el navegador recordará que confías en este servidor local y los envíos de tickets desde el ERP (que es HTTPS) funcionarán de forma directa sin bloqueos de seguridad.</div></li>
+</ol>
+<div class="alert-box alert-note"><strong>NOTE:</strong> El servidor solo funciona mientras esa ventana CMD esté abierta. Si la cierras, el servidor se detiene. Por eso en el **Paso 5** configuramos el inicio automático para que no sea necesario hacer esto cada vez.
+</div><hr>
+<h2>PASO 5 — Inicio Automático del Servidor (Sin CMD, Para Producción)</h2>
+<p>Para que el personal de la tienda no tenga que hacer nada técnico, configura el servidor para que <strong>arranque solo al encender la PC</strong>. Elige la opción que prefieras:</p>
+<hr>
+<h3>Opción A — Carpeta de Inicio de Windows (La más rápida de configurar)</h3>
+<p>Crea un archivo <code>.vbs</code> que inicia el servidor <strong>sin mostrar ninguna ventana CMD</strong>:</p>
+<p><strong>Paso A.1</strong> — Crea el archivo <code>C:\ServidorImpresora\iniciar_servidor.vbs</code> con este contenido:</p>
+<pre><code class="language-vbscript">Set WshShell = CreateObject(&quot;WScript.Shell&quot;)
+WshShell.Run &quot;cmd /c node C:\ServidorImpresora\servidor.js&quot;, 0, False
+</code></pre>
+<p><strong>Paso A.2</strong> — Crea un acceso directo a ese archivo <code>.vbs</code>:</p>
+<ul>
+<li>Clic derecho sobre <code>iniciar_servidor.vbs</code> → <strong>Crear acceso directo</strong></li>
+</ul>
+<p><strong>Paso A.3</strong> — Copia ese acceso directo a la carpeta de inicio automático de Windows:</p>
+<ul>
+<li>Presiona <strong>Win + R</strong>, escribe <code>shell:startup</code> y presiona Enter</li>
+<li>Pega el acceso directo dentro de esa carpeta</li>
+</ul>
+<p><strong>Resultado:</strong> La próxima vez que el usuario inicie sesión en Windows, el servidor arrancará automáticamente en segundo plano. El personal de la tienda no verá nada, el servidor simplemente funciona.</p>
+<div class="alert-box alert-note"><strong>NOTE:</strong> Con esta opción, si el servidor falla por algún error, no se reinicia solo. Para una solución más robusta, usa la Opción B o C.
+</div><hr>
+<h3>Opción B — Tarea Programada de Windows (Recomendada para producción)</h3>
+<p>Más robusta que la Opción A porque puede ejecutarse <strong>antes de que el usuario inicie sesión</strong> y con permisos del sistema. Ejecuta este comando <strong>una sola vez en CMD como Administrador</strong>:</p>
+<pre><code class="language-cmd">schtasks /create /tn &quot;ServidorImpresora&quot; /tr &quot;\&quot;C:\Program Files\nodejs\node.exe\&quot; C:\ServidorImpresora\servidor.js&quot; /sc ONSTART /ru SYSTEM /rl HIGHEST /f
+</code></pre>
+<p>Para verificar que quedó registrado:</p>
+<pre><code class="language-cmd">schtasks /query /tn &quot;ServidorImpresora&quot;
+</code></pre>
+<p>Para iniciarlo manualmente sin reiniciar la PC:</p>
+<pre><code class="language-cmd">schtasks /run /tn &quot;ServidorImpresora&quot;
+</code></pre>
+<p>Para detenerlo:</p>
+<pre><code class="language-cmd">schtasks /end /tn &quot;ServidorImpresora&quot;
+</code></pre>
+<p>Para eliminarlo si ya no lo necesitas:</p>
+<pre><code class="language-cmd">schtasks /delete /tn &quot;ServidorImpresora&quot; /f
+</code></pre>
+<p><strong>Resultado:</strong> El servidor arranca con Windows incluso antes de que alguien inicie sesión. Si la PC está siempre encendida en la tienda, el servidor siempre estará disponible.</p>
+<hr>
+<h3>Opción C — NSSM: Servicio de Windows Real (La más profesional)</h3>
+<p>Convierte Node.js en un <strong>Servicio de Windows</strong> real (como el antivirus o el servicio de impresión de Windows). Se reinicia automáticamente si falla.</p>
+<p><strong>Paso C.1</strong> — Descarga NSSM desde <a href="https://nssm.cc/download">nssm.cc/download</a>. Es un solo archivo <code>.exe</code> de ~300KB, no necesita instalación.</p>
+<p><strong>Paso C.2</strong> — Copia <code>nssm.exe</code> a <code>C:\nssm.exe</code> (o donde prefieras).</p>
+<p><strong>Paso C.3</strong> — Ejecuta estos comandos <strong>en CMD como Administrador</strong> (una sola vez):</p>
+<pre><code class="language-cmd">C:\nssm.exe install ServidorImpresora &quot;C:\Program Files\nodejs\node.exe&quot; &quot;C:\ServidorImpresora\servidor.js&quot;
+C:\nssm.exe set ServidorImpresora AppDirectory C:\ServidorImpresora
+C:\nssm.exe set ServidorImpresora Start SERVICE_AUTO_START
+C:\nssm.exe start ServidorImpresora
+</code></pre>
+<p>Para ver el estado del servicio:</p>
+<pre><code class="language-cmd">C:\nssm.exe status ServidorImpresora
+</code></pre>
+<p>También lo puedes ver y controlar desde <code>services.msc</code> (Servicios de Windows) buscando &quot;ServidorImpresora&quot;.</p>
+<p>Para detenerlo:</p>
+<pre><code class="language-cmd">C:\nssm.exe stop ServidorImpresora
+</code></pre>
+<p>Para desinstalarlo completamente:</p>
+<pre><code class="language-cmd">C:\nssm.exe remove ServidorImpresora confirm
+</code></pre>
+<p><strong>Resultado:</strong> El servidor funciona como un servicio del sistema. Se inicia solo al encender la PC, se reinicia solo si falla, y no depende de que ningún usuario haya iniciado sesión.</p>
+<hr>
+<h3>Tabla de Comparación de Opciones</h3>
+<table>
+<thead>
+<tr>
+<th>Característica</th>
+<th align="center">Opción A (VBS)</th>
+<th align="center">Opción B (Tarea)</th>
+<th align="center">Opción C (NSSM)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Dificultad de instalación</td>
+<td align="center">⭐ Fácil</td>
+<td align="center">⭐⭐ Media</td>
+<td align="center">⭐⭐ Media</td>
+</tr>
+<tr>
+<td>Software extra necesario</td>
+<td align="center">Ninguno</td>
+<td align="center">Ninguno</td>
+<td align="center">NSSM (.exe)</td>
+</tr>
+<tr>
+<td>Inicia antes de iniciar sesión</td>
+<td align="center">❌ No</td>
+<td align="center">✅ Sí</td>
+<td align="center">✅ Sí</td>
+</tr>
+<tr>
+<td>Se reinicia si falla</td>
+<td align="center">❌ No</td>
+<td align="center">❌ No</td>
+<td align="center">✅ Sí</td>
+</tr>
+<tr>
+<td>Visible en Servicios de Windows</td>
+<td align="center">❌ No</td>
+<td align="center">❌ No</td>
+<td align="center">✅ Sí</td>
+</tr>
+<tr>
+<td><strong>Recomendado para</strong></td>
+<td align="center">Pruebas rápidas</td>
+<td align="center">Producción estándar</td>
+<td align="center">Instalación profesional</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>PASO 6 — Abrir el Puerto 3000 en el Firewall de Windows</h2>
+<p>Después de iniciar el servidor por primera vez, puede que Windows pregunte si permitir la conexión. Si no aparece ese aviso, o si desde el celular no puedes conectarte aunque el servidor esté corriendo, abre el puerto manualmente:</p>
+<p>Ejecuta en <strong>CMD como Administrador</strong>:</p>
+<pre><code class="language-cmd">netsh advfirewall firewall add rule name=&quot;ServidorImpresora Node&quot; dir=in action=allow protocol=TCP localport=3000
+</code></pre>
+<p>Para verificar que la regla quedó creada:</p>
+<pre><code class="language-cmd">netsh advfirewall firewall show rule name=&quot;ServidorImpresora Node&quot;
+</code></pre>
+<div class="alert-box alert-tip"><strong>TIP:</strong> Si en algún momento necesitas eliminar esta regla del firewall: `netsh advfirewall firewall delete rule name="ServidorImpresora Node"`
+</div><hr>
+<h2>PASO 7 — Integrar con el ERP/POS (Desde el Navegador del Empleado)</h2>
+<h3>7.1 — Encontrar la IP de la PC con la Impresora</h3>
+<p>En la PC donde está el servidor Node.js, abre <strong>CMD</strong> y escribe:</p>
+<pre><code class="language-cmd">ipconfig
+</code></pre>
+<p>Busca la sección de tu conexión activa (WiFi o Ethernet) y anota el valor de <strong>&quot;Dirección IPv4&quot;</strong>. Se verá algo así:</p>
+<pre><code>Dirección IPv4. . . . . . . . . . . : 192.168.1.5
+</code></pre>
+<p>Esa es la IP que necesitas para el siguiente paso.</p>
+<hr>
+<h3>7.2 — ¿Qué es una IP fija y cuándo la necesito?</h3>
+<p>Por defecto, el router asigna una IP diferente a cada PC cada vez que se reinicia (IP dinámica). Esto significa que si hoy la IP es <code>192.168.1.5</code>, mañana podría ser <code>192.168.1.8</code> y el ERP perdería la conexión con la impresora.</p>
+<p>Para fijar la IP y asegurar el correcto funcionamiento, tienes dos alternativas:</p>
+<hr>
+<h4>Opción A — Desde el Router (La más robusta y recomendada)</h4>
+<p>Consiste en dejar la configuración de red de la PC en <strong>&quot;IP Automática&quot; (DHCP)</strong> y reservar la IP desde la administración del router.</p>
+<ul>
+<li><strong>Ventaja:</strong> Si se corta la energía o se daña el internet de la tienda y necesitas <strong>compartir datos móviles desde un celular</strong> a la PC, la PC tendrá internet al instante porque su configuración de red sigue en modo &quot;Automático&quot;. Cuando se vuelva a conectar al WiFi de la tienda, el router le volverá a entregar la misma IP asignada.</li>
+</ul>
+<div class="alert-box alert-note"><strong>NOTA:</strong> El menú exacto cambia según la marca del router (TP-Link, ARRIS, Huawei, etc.), pero el procedimiento general es siempre el mismo. Abajo está el paso a paso documentado sobre un router <strong>ARRIS</strong>, a modo de ejemplo real.</div>
+
+<h5>Paso 1 — Identifica la puerta de enlace (la IP del router)</h5>
+<p>En la PC, abre <strong>CMD</strong> y ejecuta <code>ipconfig</code>. Busca el campo <strong>&quot;Puerta de enlace predeterminada&quot;</strong>, esa es la IP del router (normalmente <code>192.168.0.1</code> o <code>192.168.1.1</code>). No confundir con la IP de otros dispositivos de la red (cámaras, NVR, etc.) que también tienen su propia página de administración pero no son el router.</p>
+
+<h5>Paso 2 — Entra a la administración del router</h5>
+<p>Abre un navegador y entra a esa IP (ej: <code>http://192.168.0.1</code>). Inicia sesión con el usuario y contraseña del router (suelen venir en una etiqueta pegada al equipo).</p>
+
+<h5>Paso 3 — Ve a la sección LAN</h5>
+<p>Dentro del panel del router, busca la pestaña <strong>&quot;LAN&quot;</strong> (no &quot;WAN&quot;, esa es la conexión hacia Internet del proveedor). Dentro de LAN, busca una sub-sección llamada <strong>&quot;Lista de Clientes&quot;</strong> <em>(Client List)</em>.</p>
+
+<h5>Paso 4 — Encuentra la MAC de tu PC</h5>
+<p>En la tabla <strong>&quot;Lista de clientes Attached&quot;</strong>, busca la fila que coincida con la IP actual de tu PC (la que viste en el <code>ipconfig</code> del Paso 1, ej: <code>192.168.0.30</code>) y anota su <strong>Dirección MAC</strong> (ej: <code>44:FA:66:C4:62:B9</code>).</p>
+
+<h5>Paso 5 — Crea la reserva DHCP</h5>
+<p>Sube hasta la sección <strong>&quot;Lista de clientes con IP reservada&quot;</strong> y haz clic en <strong>&quot;Agregar&quot;</strong>. Llena:</p>
+<ul>
+<li><strong>Nombre:</strong> algo identificable, ej. <code>PC-Impresora</code></li>
+<li><strong>Dirección MAC:</strong> la que anotaste en el Paso 4</li>
+<li><strong>Dirección IP:</strong> una IP <strong>alta</strong> y libre dentro del rango DHCP (ej: <code>192.168.0.201</code>), para evitar que choque con otros dispositivos fijos de la red (cámaras, NVR, etc.)</li>
+</ul>
+
+<h5>Paso 6 — Aplica los cambios</h5>
+<div class="alert-box alert-warning"><strong>WARNING:</strong> Después de hacer clic en &quot;Agregar&quot;, la entrada queda en la tabla pero <strong>no se guarda de verdad</strong> hasta que hagas clic también en el botón <strong>&quot;Aplicar&quot;</strong> (separado del botón Agregar). Si no lo haces, el Status se queda en <code>Offline</code> y la reserva no surte efecto.</div>
+
+<h5>Paso 7 — Confirma el cambio en la PC</h5>
+<p>Reinicia la PC (o desactiva/activa el WiFi) para que tome la nueva IP. Luego corre <code>ipconfig</code> de nuevo y verifica que la <strong>&quot;Dirección IPv4&quot;</strong> ahora sea la IP fija que asignaste en el Paso 5.</p>
+<hr>
+<h4>Opción B — Desde la PC (Configuración en Windows)</h4>
+<p>Configura manualmente la IP fija directamente en la configuración de la tarjeta de red de Windows.</p>
+<ul>
+<li><strong>Cómo hacerlo:</strong><ol>
+<li>Ve a <strong>Configuración de red</strong> → Propiedades de tu adaptador WiFi/Ethernet → <strong>Protocolo de Internet versión 4 (TCP/IPv4) → Propiedades</strong>.</li>
+<li>Selecciona <strong>&quot;Usar la siguiente dirección IP&quot;</strong> y rellena los datos correspondientes.</li>
+</ol>
+</li>
+<li><strong>Reglas muy importantes para evitar fallos con esta opción:</strong><ul>
+<li><div class="alert-box alert-warning"><strong>WARNING:</strong> </div>
+> **Usa una IP alta para evitar conflictos:** Los routers asignan IPs automáticas bajas a los clientes que se conectan (ej: del `.2` al `.100`). Si dejas tu PC con una IP baja como la `.27` o `.28`, cuando la PC esté apagada el router podría darle esa misma IP al celular de un cliente. Al encender la PC habrá un conflicto de red. Elige una IP alta, como **`192.168.0.200`** o **`192.168.0.250`**.</li>
+<li><div class="alert-box alert-important"><strong>IMPORTANT:</strong> </div>
+> **Al compartir datos móviles:** Si compartes internet de un celular por WiFi a la PC, perderá la conexión porque el celular maneja un rango de red diferente. Deberás cambiar temporalmente la configuración de TCP/IPv4 de Windows a **"Obtener una dirección IP automáticamente"** para poder tener internet y navegar. Una vez regrese el WiFi de la tienda, deberás volver a escribir la IP fija asignada.</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3>7.3 — Por qué el PHP en Hostinger NO funciona para esto</h3>
+<div class="alert-box alert-warning"><strong>WARNING:</strong> El código PHP del ejemplo original que mandó Claude **NO funciona si lo ejecutas desde Hostinger**. El motivo es sencillo: Hostinger es un servidor en internet y las IPs locales como `192.168.1.X` son privadas, solo existen dentro de la red WiFi de la tienda. Hostinger no tiene forma de "alcanzar" esa IP.
+</div><p>El flujo que <strong>sí funciona</strong> es este:</p>
+<pre><code>Empleado abre el ERP en su navegador (mismo WiFi que la impresora)
+    → Hace clic en &quot;Imprimir&quot;
+    → JavaScript del navegador hace fetch a https://192.168.1.X:3000/imprimir
+    → El servidor Node.js recibe la petición
+    → La impresora imprime el ticket
+</code></pre>
+<p>La clave está en que el <strong>navegador del empleado SÍ está en la misma red</strong> que la impresora, aunque el ERP esté alojado en Hostinger. Entonces el fetch lo hace el navegador, no Hostinger.</p>
+<hr>
+<h3>7.4 — Código de integración con el ERP (JavaScript en el navegador)</h3>
+<p>Este es el fragmento JavaScript que debes agregar en el botón de imprimir del ERP. Funciona desde el navegador del empleado que está en la misma red que la impresora:</p>
+<pre><code class="language-javascript">// Llama a esta función cuando el empleado haga clic en &quot;Imprimir Ticket&quot;
+async function imprimirTicketERP(pedido) {
+  // 1. Construir las líneas del ticket con los datos del pedido
+  const lineas = [
+    `Pedido #: ${pedido.codigo}`,
+    `Fecha: ${pedido.fecha}`,
+    `Sucursal: ${pedido.sucursal}`,
+    `Atendido por: ${pedido.empleado}`,
+    `--------------------------------`,
+    ...pedido.productos.map(p =&gt; `${p.cantidad}x ${p.nombre.padEnd(15)} C$ ${p.precio}`),
+    `--------------------------------`,
+    `TOTAL:          C$ ${pedido.total}`,
+  ];
+
+  // 2. IP de la PC con la impresora en esta sucursal
+  // Idealmente esta IP la guardas en la base de datos por sucursal
+  const IP_IMPRESORA = &#39;192.168.1.5&#39;; // Cambiar por la IP real
+
+  try {
+    const respuesta = await fetch(`https://${IP_IMPRESORA}:3000/imprimir`, {
+      method: &#39;POST&#39;,
+      headers: { &#39;Content-Type&#39;: &#39;application/json&#39; },
+      body: JSON.stringify({ lineas })
+    });
+
+    const resultado = await respuesta.json();
+
+    if (resultado.ok) {
+      console.log(&#39;Ticket impreso correctamente&#39;);
+    } else {
+      alert(&#39;Error al imprimir: &#39; + resultado.error);
+    }
+  } catch (err) {
+    alert(&#39;No se pudo conectar con la impresora. ¿Está encendida la PC del servidor?&#39;);
+    console.error(err);
+  }
+}
+</code></pre>
+<hr>
+<h3>7.5 — Resumen del flujo completo de integración</h3>
+<pre><code>[ERP en Hostinger]  ←→  [Navegador del Empleado en la Tienda]
+                                        ↓
+                         fetch(&#39;https://192.168.1.5:3000/imprimir&#39;)
+                                        ↓
+                         [PC de la Tienda — Node.js puerto 3000]
+                                        ↓
+                         [Impresora Epson TM-T20II conectada por USB]
+</code></pre>
+<div class="alert-box alert-tip"><strong>TIP:</strong> Para manejar múltiples sucursales con impresoras en diferentes IPs, lo más ordenado es guardar la IP del servidor de impresión en la base de datos junto a cada sucursal, y que el PHP del ERP la pase como variable JavaScript al cargar la página. Así el mismo código funciona en todas las tiendas sin modificaciones.
+</div><hr>
+<h2>PASO 8 — Solución de Problemas (Troubleshooting)</h2>
+<h3>8.1 — Error &quot;No se pudo conectar&quot; o <code>ERR_CONNECTION_REFUSED</code> / <code>ERR_CERT_AUTHORITY_INVALID</code></h3>
+<p>Este error ocurre principalmente en dos escenarios:</p>
+<ol>
+<li><p><strong>Nueva PC o celular utilizado para imprimir:</strong><br>Cualquier dispositivo nuevo debe &quot;aprobar&quot; el certificado auto-firmado de la PC impresora antes de poder conectarse desde el ERP.</p>
+<ul>
+<li><strong>Solución:</strong> Abre el navegador en ese dispositivo, entra a <code>https://&lt;IP_DE_LA_PC&gt;:3000/estado</code>, haz clic en <strong>Configuración avanzada</strong> y selecciona <strong>Acceder/Continuar (no seguro)</strong>.</li>
+</ul>
+</li>
+<li><p><strong>Cambio de dirección IP de la PC de la impresora:</strong><br>Si la IP fija de la PC cambió (por ejemplo, de <code>192.168.0.27</code> a <code>192.168.0.28</code>), la aprobación del certificado hecha anteriormente deja de ser válida para el navegador.</p>
+<ul>
+<li><strong>Solución:</strong> Debes volver a entrar a la nueva dirección <code>https://&lt;NUEVA_IP&gt;:3000/estado</code> desde cada dispositivo y repetir el proceso de <strong>Configuración avanzada → Acceder/Continuar (no seguro)</strong>. Además, asegúrate de actualizar la IP en la base de datos del ERP para esa sucursal.</li>
+</ul>
+</li>
+</ol>
+<hr>
+<h3>8.2 — El servicio NSSM no inicia y se queda en <code>SERVICE_PAUSED</code></h3>
+<p>Ocurre si el puerto <code>3000</code> ya está tomado por otro proceso de Node.js (por ejemplo, si tenías una ventana de CMD abierta corriendo <code>node servidor.js</code> de forma manual).</p>
+<ul>
+<li><strong>Solución:</strong><ol>
+<li>Cierra todas las consolas CMD de pruebas.</li>
+<li>Abre CMD como Administrador y cierra a la fuerza cualquier proceso fantasma corriendo:<pre><code class="language-cmd">taskkill /F /IM node.exe
+</code></pre>
+</li>
+<li>Inicia o reinicia el servicio NSSM:<pre><code class="language-cmd">C:\nssm.exe start ServidorImpresora
+</code></pre>
+</li>
+</ol>
+</li>
+</ul>
+<hr>
+<h3>8.3 — Error de Spooler: &quot;No se pudo enviar a la impresora&quot;</h3>
+<p>Ocurre si el nombre compartido de la impresora en Windows no coincide con la constante <code>NOMBRE_IMPRESORA</code> definida en <code>servidor.js</code>.</p>
+<ul>
+<li><strong>Solución:</strong><ol>
+<li>Ve a Panel de Control → Dispositivos e Impresoras → Propiedades de Impresora → pestaña <strong>Compartir</strong>.</li>
+<li>Asegúrate de que el nombre del recurso compartido sea exactamente <code>Impresora TM Tienda</code> (o edita el código en <code>servidor.js</code> para que coincida).</li>
+</ol>
+</li>
+</ul>
+
+
+<hr>
+<h2>ANEXO — Inventario de Redes, Routers e IPs de Tiendas</h2>
+<div class="alert-box alert-note">
+  <strong>Soporte Claro Empresarial:</strong><br>
+  • Desde celular Claro: <strong>*2677</strong><br>
+  • Desde otra compañía: <strong>22987987</strong><br>
+  • Teléfono convencional: <strong>111</strong>
+</div>
+
+<p>Listado de credenciales, contratos y configuraciones de red de cada sucursal (Actualizado al 06 de Agosto 2026). Utiliza esta referencia para acceder a la administración de los routers y configurar las IPs estáticas o DHCP Reservations:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Sucursal</th>
+      <th>Contrato / Servicio</th>
+      <th>WiFi (SSID &amp; Contraseña)</th>
+      <th>Router (IP / Acceso)</th>
+      <th>IP Impresora / MAC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- León -->
+    <tr>
+      <td><strong>León</strong></td>
+      <td>Claro: <code>2788829</code></td>
+      <td>
+        <strong>Actual:</strong> <code>Batidos Pitaya Leon</code> / <code>Leon 5G</code> (80mb - 150mb)<br>
+        <strong>Pass:</strong> <code>DinamitaBowl</code> <em style="font-size:0.8em;color:var(--text-muted);">(anterior: tubatidofavorito)</em>
+      </td>
+      <td>
+        <strong>KAON</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span><br>
+        <strong>MAC:</strong> <code>98:48:27:E9:14:EB</code>
+      </td>
+    </tr>
+
+    <!-- Villa Fontana -->
+    <tr>
+      <td><strong>Villa Fontana</strong></td>
+      <td>Claro: <code>2442707</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO1_823FF4 / CLARO2_823FF4</code> (Pass: <code>069U0WPOFC</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya villa Fontana / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>BatidosConAmor</code> <em style="font-size:0.8em;color:var(--text-muted);">(anterior: superbowlacai)</em>
+      </td>
+      <td>
+        <strong>KAON</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Altamira -->
+    <tr>
+      <td><strong>Altamira</strong></td>
+      <td>Claro: <code>2389999</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO1_F58D1 / CLARO2_F58D1</code> (Pass: <code>p0631OREFH</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Altamira / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>BowlAcai</code>
+      </td>
+      <td>
+        <strong>KAON</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Matagalpa -->
+    <tr>
+      <td><strong>Matagalpa</strong></td>
+      <td>Claro: <code>2368704</code></td>
+      <td>
+        <strong>Defecto:</strong> PEND<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Matagalpa / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>superbowlacai</code>
+      </td>
+      <td>
+        <strong>KAON</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Granada -->
+    <tr>
+      <td><strong>Granada</strong></td>
+      <td>Claro: <code>2494462</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO_3nEut7 / CLARO_BW7mz3</code> (Pass: <code>15B29CE50D</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Granada / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>superbowlfachento</code>
+      </td>
+      <td>
+        <strong>Huawei</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>root</code> / <strong>Pass:</strong> <code>@m3r!c@m0v!L</code>
+      </td>
+      <td>
+        <strong>✅ IP: <code>192.168.1.145</code></strong>
+      </td>
+    </tr>
+
+    <!-- Las Colinas -->
+    <tr>
+      <td><strong>Las Colinas</strong></td>
+      <td>Claro: <code>2499934</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO_Sj8xMN / CLARO_DVpq5p</code> (Pass: <code>2762B949CF</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Las Colinas / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>superbowlacai</code>
+      </td>
+      <td>
+        <strong>Huawei</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>root</code> / <strong>Pass:</strong> <code>adminHW</code>
+      </td>
+      <td>
+        <strong>✅ IP: <code>192.168.1.2</code></strong><br>
+        <strong>MAC:</strong> <code>00:13:ef:30:47:3a</code>
+      </td>
+    </tr>
+
+    <!-- Masaya -->
+    <tr>
+      <td><strong>Masaya</strong></td>
+      <td>Claro: <code>2568453</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO1_82342F / CLARO2_82342F</code> (Pass: <code>274B5WVKF0</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Masaya / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>mibatidofavorito</code>
+      </td>
+      <td>
+        <strong>KAON</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Ticuantepe -->
+    <tr>
+      <td><strong>Ticuantepe</strong></td>
+      <td>Claro: <code>2714930</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO1_95FC40 / CLARO2_95FC40</code> (Pass: <code>DYRHNZ46KS</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Ticuantepe / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>tubatidofavorito</code>
+      </td>
+      <td>
+        <strong>Hitron</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span><br>
+        <strong>MAC:</strong> <code>E0:AD:47:40:AD:08</code>
+      </td>
+    </tr>
+
+    <!-- UNICA -->
+    <tr>
+      <td><strong>UNICA</strong></td>
+      <td>Claro: <code>2706197</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO1_0FE068 / CLARO2_0FE068</code> (Pass: <code>U861L15I4N</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Unica / 5G</code> (80mb)<br>
+        <strong>Pass:</strong> <code>tubatidofavorito</code>
+      </td>
+      <td>
+        <strong>Hitron</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>Cl@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Calli -->
+    <tr>
+      <td><strong>Calli</strong></td>
+      <td>Claro: <code>2775237</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO_2.4GHz_8B2F66 / CLARO_5GHz_8B2F66</code> (Pass: <code>c8Wwx89fd85%zM5</code>)<br>
+        <strong>Actual:</strong> <code>CLARO_2.4GHz_8B2F66</code> / PEND WIFI 5G (80mb)<br>
+        <strong>Pass:</strong> <code>c8Wwx89fd8S%zMS</code>
+      </td>
+      <td>
+        <strong>Huawei</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> PEND / <strong>Pass:</strong> PEND
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Natura -->
+    <tr>
+      <td><strong>Natura</strong></td>
+      <td>Claro: <code>2678240</code></td>
+      <td>
+        <strong>Defecto:</strong> PEND<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Natura / 5G</code><br>
+        <strong>Pass:</strong> <code>tubatidofavorito</code>
+      </td>
+      <td>
+        <strong>Huawei</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>admin</code> / <strong>Pass:</strong> <code>c1@r0</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Las Brisas -->
+    <tr>
+      <td><strong>Las Brisas</strong></td>
+      <td>Tigo: <code>209088</code></td>
+      <td>
+        <strong>Defecto:</strong> (Consultar Tigo)<br>
+        <strong>Actual:</strong> <code>Batidos PItaya Las Brisas / 5G</code><br>
+        <strong>Pass:</strong> <code>tubowlfavorito</code>
+      </td>
+      <td>
+        <strong>Hitron</strong> (<code>192.168.0.1</code>)<br>
+        <strong>User:</strong> <code>cusadmin</code> / <strong>Pass:</strong> <code>password</code>
+      </td>
+      <td>
+        <span style="color:var(--warning-border);">⏳ Pendiente de fijar IP</span>
+      </td>
+    </tr>
+
+    <!-- Estelí -->
+    <tr>
+      <td><strong>Estelí</strong></td>
+      <td>Claro: <code>2340191</code></td>
+      <td>
+        <strong>Defecto:</strong> <code>CLARO_5MBTp4 / CLARO_wt5weV</code> (Pass: <code>F5142B16E4</code>)<br>
+        <strong>Actual:</strong> <code>Batidos Pitaya Esteli / 5G</code><br>
+        <strong>Pass:</strong> <code>SoyPitayero</code>
+      </td>
+      <td>
+        <strong>Huawei</strong> (<code>192.168.1.1</code>)<br>
+        <strong>User:</strong> <code>root</code> / <strong>Pass:</strong> <code>adminHW</code>
+      </td>
+      <td>
+        <strong>✅ IP: <code>192.168.1.82</code></strong>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+    <div class="doc-footer">
+      Documentación Técnica · Batidos Pitaya © 2026 · <a href="https://www.batidospitaya.com" target="_blank">www.batidospitaya.com</a>
+    </div>
+  </div>
+</body>
+</html>

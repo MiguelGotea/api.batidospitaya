@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuración de Impresión en Dispositivos - Batidos Pitaya</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0E544C;
+      --primary-light: #51B8AC;
+      --bg: #0B0F19;
+      --surface: #151D30;
+      --surface2: #1C2540;
+      --text: #F3F4F6;
+      --text-muted: #9CA3AF;
+      --border: #24324F;
+      --success: #10B981;
+      --error: #EF4444;
+      --warning: #F59E0B;
+      --note-border: #3182CE;
+      --note-bg: rgba(49, 130, 206, 0.1);
+      --important-border: #805AD5;
+      --important-bg: rgba(128, 90, 213, 0.1);
+      --warning-border: #DD6B20;
+      --warning-bg: rgba(221, 107, 32, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      background: var(--surface);
+      max-width: 850px;
+      width: 100%;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      padding: 40px;
+      border: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, var(--primary-light), var(--primary));
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      margin: 0 0 8px 0;
+      font-weight: 700;
+      text-align: center;
+      background: linear-gradient(90deg, #FFF, var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 30px;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary-light);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin: 30px 0 15px 0;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 1em;
+    }
+
+    /* ── Paso cards ── */
+    .step-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 22px 18px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .step-badge {
+      position: absolute;
+      top: -14px;
+      left: 18px;
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      color: #FFF;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.85rem;
+      box-shadow: 0 4px 10px rgba(81,184,172,0.35);
+    }
+
+    .step-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #FFF;
+      margin: 6px 0 12px 0;
+    }
+
+    /* ── Search / Filter ── */
+    .search-wrap {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .search-wrap input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 10px 14px 10px 38px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-wrap input:focus { border-color: var(--primary-light); }
+
+    .search-wrap .ico {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 1rem;
+      pointer-events: none;
+    }
+
+    /* ── Branch grid ── */
+    .branch-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    @media (min-width: 580px) { .branch-grid { grid-template-columns: 1fr 1fr; } }
+
+    .branch-card {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: border-color 0.2s, transform 0.15s;
+      justify-content: space-between;
+    }
+
+    .branch-card:hover { border-color: var(--primary-light); transform: translateY(-2px); }
+    .branch-card.pending { opacity: 0.8; }
+
+    .branch-top { display: flex; align-items: center; gap: 8px; }
+
+    .branch-emoji { font-size: 1.3rem; flex-shrink: 0; }
+
+    .branch-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #FFF;
+      line-height: 1.2;
+    }
+
+    .branch-wifi-details {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 10px;
+    }
+
+    .wifi-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      gap: 6px;
+    }
+    .wifi-row:last-child { margin-bottom: 0; }
+    
+    .wifi-label {
+      color: var(--primary-light);
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+
+    .wifi-val {
+      font-family: 'Fira Code', monospace;
+      color: var(--text);
+      word-break: break-all;
+      text-align: right;
+    }
+
+    .branch-ip {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      color: var(--primary-light);
+      font-weight: 600;
+    }
+
+    .branch-ip.pending { color: var(--warning); }
+
+    .btn-connect {
+      background: linear-gradient(135deg, var(--primary-light), var(--primary));
+      border: none;
+      color: #FFF;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: filter 0.2s, transform 0.1s;
+      display: block;
+      box-shadow: 0 3px 10px rgba(81,184,172,0.25);
+    }
+
+    .btn-connect:hover { filter: brightness(1.15); transform: scale(1.01); }
+    .btn-connect:active { transform: scale(0.98); }
+
+    .btn-pending {
+      background: rgba(245,158,11,0.06);
+      border: 1px dashed var(--warning);
+      color: var(--warning);
+      padding: 9px 12px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-align: center;
+      display: block;
+    }
+
+    /* ── Alerts ── */
+    .alert-box {
+      border-left: 5px solid;
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin: 14px 0;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    .alert-note   { border-color: var(--note-border); background-color: var(--note-bg); color: #90CDF4; }
+    .alert-important { border-color: var(--important-border); background-color: var(--important-bg); color: #D6BCFA; }
+    .alert-warning { border-color: var(--warning-border); background-color: var(--warning-bg); color: #FBD38D; }
+
+    .alert-box strong {
+      text-transform: uppercase;
+      font-size: 0.85em;
+      margin-right: 4px;
+    }
+
+    /* ── SSL Steps ── */
+    .ssl-steps { list-style: none; padding: 0; margin: 12px 0; }
+    .ssl-steps li {
+      margin-bottom: 10px;
+      display: flex; align-items: flex-start; gap: 10px;
+      color: var(--text-muted); font-size: 0.97rem;
+    }
+    .ssl-steps li::before { content: '➔'; color: var(--primary-light); font-weight: bold; flex-shrink: 0; }
+
+    .status-preview {
+      background: #0F172A;
+      color: #38BDF8;
+      font-family: 'Fira Code', monospace;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      border: 1px solid #1E293B;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    /* ── Troubleshoot ── */
+    .trouble-list { list-style: none; padding: 0; margin-top: 10px; }
+    .trouble-list li {
+      border: 1px solid var(--border);
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .trouble-list li strong { color: #FFF; display: block; margin-bottom: 5px; }
+
+    /* ── Footer ── */
+    .doc-footer {
+      margin-top: 3em;
+      padding-top: 1.5em;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .doc-footer a { color: var(--primary-light); text-decoration: none; }
+
+    /* ── Filter hidden ── */
+    .branch-card[data-hidden="true"] { display: none; }
+
+    /* ── Updated badge ── */
+    .updated-tag {
+      background: rgba(81,184,172,0.12);
+      border: 1px solid rgba(81,184,172,0.3);
+      color: var(--primary-light);
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍹 Configuración de Impresión en Dispositivos</h1>
+    <p class="subtitle">Sigue estos pasos en tu celular o tablet para habilitar la impresión de tickets de vacaciones y otros documentos.</p>
+    <div style="text-align: center;">
+      <div class="updated-tag">📅 Actualizado al 06 de Agosto 2026</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         PASO 1: WiFi
+    ═══════════════════════════════════════════════ -->
+    <div class="step-card">
+      <div class="step-badge">1</div>
+      <div class="step-title">Conectarse al WiFi de tu Tienda</div>
+      <p style="margin-bottom: 10px;">Antes de todo, asegúrate de que tu celular esté conectado al <strong>WiFi de la tienda</strong> (NO tus datos móviles). Busca tu sucursal en la lista de abajo para ver el nombre de red y contraseña:</p>
+
+      <div class="search-wrap">
+        <span class="ico">🔍</span>
+        <input type="text" id="searchWifi" placeholder="Escribe el nombre de tu tienda..." oninput="filtrarTiendas(this.value)">
+      </div>
+
+      <div class="branch-grid" id="branch-grid">
+
+        <!-- León -->
+        <div class="branch-card pending" data-name="leon león">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🦁</span>
+              <span class="branch-name">León</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Leon / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">DinamitaBowl</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Villa Fontana -->
+        <div class="branch-card pending" data-name="villa fontana">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🌳</span>
+              <span class="branch-name">Villa Fontana</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya villa Fontana / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">BatidosConAmor</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Altamira -->
+        <div class="branch-card pending" data-name="altamira">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🏙️</span>
+              <span class="branch-name">Altamira</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Altamira / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">BowlAcai</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Matagalpa -->
+        <div class="branch-card pending" data-name="matagalpa">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">⛰️</span>
+              <span class="branch-name">Matagalpa</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Matagalpa / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">superbowlacai</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Estelí ✅ IP confirmada -->
+        <div class="branch-card" data-name="esteli estelí">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🌵</span>
+              <span class="branch-name">Estelí</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Esteli / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">SoyPitayero</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip" style="margin: 8px 0;">✅ IP: 192.168.1.82</div>
+            <a href="https://192.168.1.82:3000/estado" target="_blank" class="btn-connect">Conectar &amp; Aprobar ➔</a>
+          </div>
+        </div>
+
+        <!-- Granada ✅ IP confirmada -->
+        <div class="branch-card" data-name="granada">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🏛️</span>
+              <span class="branch-name">Granada</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Granada / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">superbowlfachento</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip" style="margin: 8px 0;">✅ IP: 192.168.1.145</div>
+            <a href="https://192.168.1.145:3000/estado" target="_blank" class="btn-connect">Conectar &amp; Aprobar ➔</a>
+          </div>
+        </div>
+
+        <!-- Las Colinas ✅ IP confirmada -->
+        <div class="branch-card" data-name="las colinas colinas">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🏘️</span>
+              <span class="branch-name">Las Colinas</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Las Colinas / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">superbowlacai</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip" style="margin: 8px 0;">✅ IP: 192.168.1.2</div>
+            <a href="https://192.168.1.2:3000/estado" target="_blank" class="btn-connect">Conectar &amp; Aprobar ➔</a>
+          </div>
+        </div>
+
+        <!-- Masaya -->
+        <div class="branch-card pending" data-name="masaya">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🦅</span>
+              <span class="branch-name">Masaya</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Masaya / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">mibatidofavorito</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Ticuantepe -->
+        <div class="branch-card pending" data-name="ticuantepe">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🌄</span>
+              <span class="branch-name">Ticuantepe</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Ticuantepe / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">tubatidofavorito</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- UNICA -->
+        <div class="branch-card pending" data-name="unica">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🏢</span>
+              <span class="branch-name">UNICA</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Unica / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">tubatidofavorito</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Calli -->
+        <div class="branch-card pending" data-name="calli">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🌺</span>
+              <span class="branch-name">Calli</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">CLARO_2.4GHz_8B2F66</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">c8Wwx89fd8S%zMS</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Natura -->
+        <div class="branch-card pending" data-name="natura">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🌿</span>
+              <span class="branch-name">Natura</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos Pitaya Natura / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">tubatidofavorito</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+        <!-- Las Brisas -->
+        <div class="branch-card pending" data-name="las brisas brisas">
+          <div>
+            <div class="branch-top">
+              <span class="branch-emoji">🌬️</span>
+              <span class="branch-name">Las Brisas</span>
+            </div>
+            <div class="branch-wifi-details" style="margin-top:8px;">
+              <div class="wifi-row"><span class="wifi-label">WiFi:</span><span class="wifi-val">Batidos PItaya Las Brisas / 5G</span></div>
+              <div class="wifi-row"><span class="wifi-label">Contraseña:</span><span class="wifi-val">tubowlfavorito</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="branch-ip pending" style="margin: 8px 0;">⏳ IP: Pendiente de fijar</div>
+            <span class="btn-pending">⏳ Sin IP asignada aún</span>
+          </div>
+        </div>
+
+      </div><!-- /branch-grid -->
+
+      <div class="alert-box alert-note" style="margin-top: 16px;">
+        <strong>NOTA:</strong> Los botones verdes "<strong>Conectar &amp; Aprobar ➔</strong>" solo aparecen en tiendas que ya tienen su IP de impresora configurada. Las demás mostrarán el estado "Pendiente" hasta que se fije la IP y se actualice esta guía.
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         PASO 2: Aprobar SSL
+    ═══════════════════════════════════════════════ -->
+    <div class="step-card">
+      <div class="step-badge">2</div>
+      <div class="step-title">Aprobar la Advertencia de Seguridad (Solo la Primera Vez)</div>
+      <p>Al hacer clic en el botón de tu sucursal y abrirse la pestaña nueva, el navegador mostrará una pantalla de advertencia que dice <strong>"La conexión no es privada"</strong> o similar. Esto es <strong>completamente normal</strong> — ocurre porque el servidor de impresión usa un certificado local, no de internet.</p>
+
+      <div class="alert-box alert-important">
+        <strong>¡Importante!</strong> Si no realizas este paso, el sistema de impresión desde el ERP no funcionará en tu celular o tablet. Solo hay que hacerlo <strong>una vez por dispositivo</strong>.
+      </div>
+
+      <ul class="ssl-steps">
+        <li>En la pantalla de advertencia, busca y toca el botón <strong>"Configuración avanzada"</strong> (Chrome/Android) o <strong>"Detalles"</strong> (Safari/iOS).</li>
+        <li>Toca el enlace que dice <strong>"Acceder a [la IP] (sitio no seguro)"</strong> o <strong>"Visitar este sitio web"</strong> (iOS).</li>
+        <li>
+          Si funcionó correctamente, verás una pantalla con texto así (puede tardar 2–3 segundos):
+          <div class="status-preview">{"estado":"Servidor de impresión activo","impresora":"Impresora TM Tienda"}</div>
+        </li>
+        <li>Ya puedes <strong>cerrar esa pestaña</strong>. Tu celular recordará el permiso y la impresión funcionará directamente desde el ERP.</li>
+      </ul>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════
+         SOLUCIÓN DE PROBLEMAS
+    ═══════════════════════════════════════════════ -->
+    <h2>¿Hay algún problema? Soluciones rápidas</h2>
+
+    <ul class="trouble-list">
+      <li>
+        <strong>🔴 La página se quedó cargando eternamente o dice "No se puede acceder al sitio"</strong>
+        Revisa que estés conectado al WiFi de la tienda y no a datos móviles. Verifica también que la computadora principal de la tienda esté encendida y con el servidor de impresión corriendo.
+      </li>
+      <li>
+        <strong>🔴 Funcionaba antes y de repente dejó de imprimir</strong>
+        Es posible que la IP de la PC haya cambiado (puede ocurrir si la PC se reinició). Avisa a administración para que verifiquen la IP desde el Panel de Control → Configuración de Tiendas.
+      </li>
+      <li>
+        <strong>🟡 Aparece otra vez la advertencia "La conexión no es privada" aunque ya la acepté</strong>
+        Esto ocurre si la IP de la PC cambió. Repite el Paso 2 con la nueva dirección. Si el botón en esta guía no abre, escribe en tu navegador:
+        <div class="status-preview" style="margin-top:8px; color: #94A3B8;">https://&lt;IP_DE_LA_PC_DE_TU_TIENDA&gt;:3000/estado</div>
+      </li>
+      <li>
+        <strong>🟢 ¿En cuál WiFi me conecto si hay red de 2.4GHz y 5GHz?</strong>
+        Cualquiera de las dos funciona, mientras sea la red de la tienda. La red de 5GHz suele ser más rápida pero tiene menos alcance. Usa la que tenga mejor señal donde te encuentres.
+      </li>
+    </ul>
+
+    <div class="doc-footer">
+      Documentación Técnica Interna · Batidos Pitaya © 2026 ·
+      <a href="https://www.batidospitaya.com" target="_blank">www.batidospitaya.com</a>
+    </div>
+  </div>
+
+  <script>
+    function filtrarTiendas(texto) {
+      const q = texto.toLowerCase().trim();
+      document.querySelectorAll('#branch-grid .branch-card').forEach(card => {
+        const nombre = (card.dataset.name || '').toLowerCase();
+        card.dataset.hidden = (q && !nombre.includes(q)) ? 'true' : 'false';
+      });
+    }
+  </script>
+</body>
+</html>

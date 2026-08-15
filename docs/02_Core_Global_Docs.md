@@ -366,11 +366,7 @@ $menuGlobal = [
                 'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
                 'cargos_permitidos' => []
             ],
-            [
-                'nombre' => 'Promedios', 
-                'url' => 'supervision/auditorias_original/promedio.php',
-                'cargos_permitidos' => []
-            ],
+
             [
                 'nombre' => 'Reclamos', 
                 'url' => 'supervision/auditorias_original/index_reclamos.php',

@@ -378,11 +378,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 5, 43, 11, 27, 26, 42]
             ],
             [
-                'nombre' => 'Registrar KPIs', 
-                'url' => 'supervision/auditorias_original/kpi.php',
-                'cargos_permitidos' => [49, 11]
-            ],
-            [
                 'nombre' => 'Nuevo Aviso', 
                 'url' => 'supervision/auditorias_original/agregarAviso.php',
                 'cargos_permitidos' => [49, 11, 13, 39, 30, 37, 42, 26]

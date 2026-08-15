@@ -41,6 +41,11 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
+                'nombre' => 'Boleta de Pago',
+                'url' => 'contabilidad/boleta_pago.php',
+                'cargos_permitidos' => []
+            ],
+            [
                 'nombre' => 'Historial Marcaciones',
                 'url' => 'sucursales/historial_marcaciones_sucursales.php',
                 'cargos_permitidos' => [49, 27, 16]

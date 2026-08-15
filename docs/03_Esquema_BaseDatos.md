@@ -110,7 +110,6 @@ CREATE TABLE `sucursales` (
   `departamento` text DEFAULT NULL,
   `cod_departamento` int(11) NOT NULL,
   `email` varchar(255) DEFAULT NULL COMMENT 'Correo de sucursal',
-  `cod_odoo` int(11) DEFAULT NULL COMMENT 'Prueba odoo, partner_id',
   `activa` tinyint(1) DEFAULT 1,
   `sucursal` tinyint(1) NOT NULL DEFAULT 1 COMMENT '¿Es sucursal? 1=Si 0=No',
   `viatico_nocturno` int(11) DEFAULT 0,

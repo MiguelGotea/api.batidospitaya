@@ -665,7 +665,7 @@ function renderHeader($usuario, $titulo = '')
             const baseUrl = getBaseUrl();
 
             // URL para marcar anuncios como leídos
-            const marcarLeidosUrl = baseUrl + '/modulos/supervision/auditorias_original/marcar_anuncios_leidos.php';
+            const marcarLeidosUrl = baseUrl + '/modulos/supervision/auditorias_original/ajax/marcar_anuncios_leidos.php';
 
             // URL para ir a anuncios
             const anunciosUrl = baseUrl + '/modulos/supervision/auditorias_original/index_avisos.php';

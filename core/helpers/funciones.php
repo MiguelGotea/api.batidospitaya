@@ -2555,7 +2555,7 @@ function obtenerTodosOperariosConHorario($codSucursal, $idSemana)
         )
         ORDER BY o.Nombre, o.Apellido
     ");
-    $stmt->execute([$codSucursal, $idSemana]);
+    $stmt->execute([$codSucursal, $codSucursal, $idSemana]);
     return $stmt->fetchAll();
 }
 

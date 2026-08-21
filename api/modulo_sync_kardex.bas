@@ -1,16 +1,16 @@
 ' =============================================================
 ' Módulo: modSyncKardex
-' Propósito: Sincronización unidireccional Access ? Host MySQL
+' Propósito: Sincronización unidireccional Access → Host MySQL
 '            de las tablas del Kardex de Productos.
 '
 ' FLUJO DIARIO (cierre de caja):
 '   SyncKardexCierre30Dias()
-'     ? Por cada tabla: elimina últimos 30 días del host
+'     → Por cada tabla: elimina últimos 30 días del host
 '       y re-sube todos los registros locales de ese período.
 '
 ' FLUJO MASIVO (historial completo, botón panel admin):
 '   SyncKardexMasivoCompleto()
-'     ? Por cada tabla: elimina TODO lo de esta sucursal en el
+'     → Por cada tabla: elimina TODO lo de esta sucursal en el
 '       host y re-sube toda la tabla local en bloques de 200.
 '
 ' FUNCIONES INDIVIDUALES (insertar en puntos específicos):
@@ -20,9 +20,12 @@
 '   SyncKardexMermaCotizacion30Dias()      / Masivo()
 '   SyncKardexPreIngresos30Dias()          / Masivo()
 '   SyncKardexSubPreIngresos30Dias()       / Masivo()
+'   SyncKardexPorcionamiento30Dias()       / Masivo()
+'   SyncKardexSubPorcionamiento30Dias()    / Masivo()
+'   SyncKardexProcesamiento30Dias()        / Masivo()
 '
 ' INSTALACIÓN:
-'   Alt+F11 ? Archivo ? Importar ? modulo_sync_kardex.bas
+'   Alt+F11 → Archivo → Importar → modulo_sync_kardex.bas
 ' =============================================================
 
 Option Explicit
@@ -92,6 +95,42 @@ Public Function SyncKardexSubPreIngresos30Dias() As Boolean
     SyncKardexSubPreIngresos30Dias = KdxSyncTabla( _
         KDX_BASE_URL & "sync_kardex_sub_preingresos.php", _
         sSQL, "limpiar_30dias", "SPI", c)
+End Function
+
+Public Function SyncKardexPorcionamiento30Dias() As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(DateAdd("d", -30, Date()), "yyyy-mm-dd")
+    SyncKardexPorcionamiento30Dias = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_porcionamiento.php", _
+        "SELECT * FROM Porcionamiento WHERE Fecha >= #" & f & "#", _
+        "limpiar_30dias", "PO", c)
+End Function
+
+Public Function SyncKardexSubPorcionamiento30Dias() As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(DateAdd("d", -30, Date()), "yyyy-mm-dd")
+    SyncKardexSubPorcionamiento30Dias = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_sub_porcionamiento.php", _
+        "SELECT * FROM SubPorcionamiento WHERE Fecha >= #" & f & "#", _
+        "limpiar_30dias", "SPO", c)
+End Function
+
+Public Function SyncKardexProcesamiento30Dias() As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(DateAdd("d", -30, Date()), "yyyy-mm-dd")
+    SyncKardexProcesamiento30Dias = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_procesamiento.php", _
+        "SELECT * FROM Procesamiento WHERE Fecha >= #" & f & "#", _
+        "limpiar_30dias", "PROC", c)
+End Function
+
+Public Function SyncKardexProcesamientoDia(ByVal dFecha As Date) As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    Dim f As String: f = Format(dFecha, "yyyy-mm-dd")
+    SyncKardexProcesamientoDia = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_procesamiento.php", _
+        "SELECT * FROM Procesamiento WHERE Fecha = #" & f & "#", _
+        "limpiar_dia", "PROC", c, f)
 End Function
 
 ' ── Master cierre TIENDA (sucursales) ───────────────────
@@ -172,6 +211,19 @@ Public Function SyncKardexCentralDespachoCierre30Dias() As Boolean
     SyncKardexCentralDespachoCierre30Dias = bOk
 End Function
 
+' ── Master cierre PORCIONAMIENTO ────────────────────────
+' Tablas: Procesamiento, Porcionamiento, SubPorcionamiento
+' Llamar en el procedimiento de porcionamiento/produccion.
+Public Function SyncKardexPorcionamientoCierre30Dias() As Boolean
+    Dim bOk As Boolean: bOk = True
+    KdxLog "CierrePorcionamiento", "Iniciando sync 30 dias porcionamiento - " & Now()
+    If Not SyncKardexProcesamiento30Dias()     Then bOk = False
+    If Not SyncKardexPorcionamiento30Dias()    Then bOk = False
+    If Not SyncKardexSubPorcionamiento30Dias() Then bOk = False
+    KdxLog "CierrePorcionamiento", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    SyncKardexPorcionamientoCierre30Dias = bOk
+End Function
+
 ' ── Master cierre CENTRAL CONTABILIDAD ──────────────────
 ' Tablas: Compras
 ' Llamar en el procedimiento de compras/contabilidad del sistema central.
@@ -235,6 +287,30 @@ Public Function SyncKardexSubPreIngresosMasivo() As Boolean
         "limpiar_total", "SPI", c)
 End Function
 
+Public Function SyncKardexPorcionamientoMasivo() As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    SyncKardexPorcionamientoMasivo = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_porcionamiento.php", _
+        "SELECT * FROM Porcionamiento ORDER BY CodPorcionamiento", _
+        "limpiar_total", "PO", c)
+End Function
+
+Public Function SyncKardexSubPorcionamientoMasivo() As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    SyncKardexSubPorcionamientoMasivo = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_sub_porcionamiento.php", _
+        "SELECT * FROM SubPorcionamiento ORDER BY CodSubPorcionamiento", _
+        "limpiar_total", "SPO", c)
+End Function
+
+Public Function SyncKardexProcesamientoMasivo() As Boolean
+    Dim c As String: c = CStr(codigoLocal())
+    SyncKardexProcesamientoMasivo = KdxSyncTabla( _
+        KDX_BASE_URL & "sync_kardex_procesamiento.php", _
+        "SELECT * FROM Procesamiento ORDER BY CodProcesamiento", _
+        "limpiar_total", "PROC", c)
+End Function
+
 ' ── Master masivo TIENDA (sucursales) ───────────────────
 ' Tablas: InventarioCotizacion, AjustesInventario, Compras, MermaCotizacion
 ' Activar desde botón panel admin en cada sistema de tienda.
@@ -263,6 +339,21 @@ Public Function SyncKardexCentralDespachoMasivo() As Boolean
     MsgBox "Masivo Despacho " & IIf(bOk, "OK.", "con errores (ver log)."), _
            IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo Despacho"
     SyncKardexCentralDespachoMasivo = bOk
+End Function
+
+' ── Master masivo PORCIONAMIENTO ────────────────────────
+' Tablas: Procesamiento, Porcionamiento, SubPorcionamiento
+' Activar desde botón panel admin en el módulo de porcionamiento.
+Public Function SyncKardexPorcionamientoMasivoCompleto() As Boolean
+    Dim bOk As Boolean: bOk = True
+    KdxLog "MasivoPorcionamiento", "Iniciando masivo porcionamiento - " & Now()
+    If Not SyncKardexProcesamientoMasivo()     Then bOk = False
+    If Not SyncKardexPorcionamientoMasivo()    Then bOk = False
+    If Not SyncKardexSubPorcionamientoMasivo() Then bOk = False
+    KdxLog "MasivoPorcionamiento", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    MsgBox "Masivo Porcionamiento " & IIf(bOk, "OK.", "con errores (ver log)."), _
+           IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo Porcionamiento"
+    SyncKardexPorcionamientoMasivoCompleto = bOk
 End Function
 
 ' ── Master masivo CENTRAL CONTABILIDAD ─────────────────
@@ -348,13 +439,16 @@ End Function
 ' ── Despachar al builder correcto ────────────────────────
 Private Function KdxBuildRow(rs As DAO.Recordset, codSuc As String, tid As String) As String
     Select Case tid
-        Case "IC": KdxBuildRow = KdxRowIC(rs, codSuc)
-        Case "AI": KdxBuildRow = KdxRowAI(rs, codSuc)
-        Case "C": KdxBuildRow = KdxRowC(rs, codSuc)
-        Case "MC": KdxBuildRow = KdxRowMC(rs, codSuc)
-        Case "PI": KdxBuildRow = KdxRowPI(rs, codSuc)
+        Case "IC":  KdxBuildRow = KdxRowIC(rs, codSuc)
+        Case "AI":  KdxBuildRow = KdxRowAI(rs, codSuc)
+        Case "C":   KdxBuildRow = KdxRowC(rs, codSuc)
+        Case "MC":  KdxBuildRow = KdxRowMC(rs, codSuc)
+        Case "PI":  KdxBuildRow = KdxRowPI(rs, codSuc)
         Case "SPI": KdxBuildRow = KdxRowSPI(rs, codSuc)
-        Case Else: KdxBuildRow = "{}"
+        Case "PO":   KdxBuildRow = KdxRowPO(rs, codSuc)
+        Case "SPO":  KdxBuildRow = KdxRowSPO(rs, codSuc)
+        Case "PROC": KdxBuildRow = KdxRowPROC(rs, codSuc)
+        Case Else:   KdxBuildRow = "{}"
     End Select
 End Function
 
@@ -459,6 +553,57 @@ Private Function KdxRowSPI(rs As DAO.Recordset, c As String) As String
     On Error GoTo 0: KdxRowSPI = s
 End Function
 
+Private Function KdxRowPO(rs As DAO.Recordset, c As String) As String
+    On Error Resume Next
+    Dim s As String: s = "{"
+    s = s & """CodPorcionamiento"":" & KdxVal(rs!CodPorcionamiento) & ","
+    s = s & """CodCotizacion"":" & KdxVal(rs!CodCotizacion) & ","
+    s = s & """CodProcesamiento"":" & KdxVal(rs!CodProcesamiento) & ","
+    s = s & """Cantidad"":" & KdxVal(rs!Cantidad) & ","
+    s = s & """Observaciones"":" & KdxStr(rs!Observaciones) & ","
+    s = s & """Fecha"":" & KdxFecha(rs!Fecha) & ","
+    s = s & """CodOperario"":" & KdxVal(rs!CodOperario) & ","
+    s = s & """Procedencia"":" & KdxVal(rs!Procedencia) & ","
+    s = s & """CodSubPorcionamiento"":" & KdxVal(rs!CodSubPorcionamiento) & ","
+    s = s & """HInicial"":" & KdxFechaHora(rs!HInicial) & ","
+    s = s & """HFinal"":" & KdxFechaHora(rs!HFinal) & ","
+    s = s & """Sucursal"":" & KdxStr(c)
+    s = s & "}"
+    On Error GoTo 0: KdxRowPO = s
+End Function
+
+Private Function KdxRowSPO(rs As DAO.Recordset, c As String) As String
+    On Error Resume Next
+    Dim s As String: s = "{"
+    s = s & """CodSubPorcionamiento"":" & KdxVal(rs!CodSubPorcionamiento) & ","
+    s = s & """Procedencia"":" & KdxVal(rs!Procedencia) & ","
+    s = s & """CodProcesamiento"":" & KdxVal(rs!CodProcesamiento) & ","
+    s = s & """Cantidad"":" & KdxVal(rs!Cantidad) & ","
+    s = s & """Fecha"":" & KdxFecha(rs!Fecha) & ","
+    s = s & """HInicial"":" & KdxFechaHora(rs!HInicial) & ","
+    s = s & """HFinal"":" & KdxFechaHora(rs!HFinal) & ","
+    s = s & """CodOperario"":" & KdxVal(rs!CodOperario) & ","
+    s = s & """Sucursal"":" & KdxStr(c)
+    s = s & "}"
+    On Error GoTo 0: KdxRowSPO = s
+End Function
+
+Private Function KdxRowPROC(rs As DAO.Recordset, c As String) As String
+    On Error Resume Next
+    Dim s As String: s = "{"
+    s = s & """CodProcesamiento"":" & KdxVal(rs!CodProcesamiento) & ","
+    s = s & """CodCotizacion"":" & KdxVal(rs!CodCotizacion) & ","
+    s = s & """Cantidad"":" & KdxVal(rs!Cantidad) & ","
+    s = s & """MedidaInicial"":" & KdxVal(rs!MedidaInicial) & ","
+    s = s & """MedidaFinal"":" & KdxVal(rs!MedidaFinal) & ","
+    s = s & """Fecha"":" & KdxFecha(rs!Fecha) & ","
+    s = s & """Observaciones"":" & KdxStr(rs!Observaciones) & ","
+    s = s & """Operario"":" & KdxVal(rs!Operario) & ","
+    s = s & """Sucursal"":" & KdxStr(c)
+    s = s & "}"
+    On Error GoTo 0: KdxRowPROC = s
+End Function
+
 ' ──────────────────────────────────────────────────────────
 ' HTTP HELPERS
 ' ──────────────────────────────────────────────────────────
@@ -544,6 +689,17 @@ Private Function KdxHora(v As Variant) As String
     s = Format(CDate(v), "HH:nn:ss")
     If Err.Number <> 0 Or s = "" Then KdxHora = "null": Err.Clear: Exit Function
     KdxHora = """" & s & """"
+    On Error GoTo 0
+End Function
+
+' Helper para campos Fecha/Hora combinados (HInicial, HFinal) → "yyyy-mm-dd HH:nn:ss"
+Private Function KdxFechaHora(v As Variant) As String
+    On Error Resume Next
+    If IsNull(v) Or IsEmpty(v) Then KdxFechaHora = "null": Exit Function
+    Dim s As String
+    s = Format(CDate(v), "yyyy-mm-dd HH:nn:ss")
+    If Err.Number <> 0 Or s = "" Then KdxFechaHora = "null": Err.Clear: Exit Function
+    KdxFechaHora = """" & s & """"
     On Error GoTo 0
 End Function
 

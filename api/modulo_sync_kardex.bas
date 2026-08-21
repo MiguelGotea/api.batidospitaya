@@ -211,17 +211,18 @@ Public Function SyncKardexCentralDespachoCierre30Dias() As Boolean
     SyncKardexCentralDespachoCierre30Dias = bOk
 End Function
 
-' ── Master cierre PORCIONAMIENTO ────────────────────────
-' Tablas: Procesamiento, Porcionamiento, SubPorcionamiento
-' Llamar en el procedimiento de porcionamiento/produccion.
-Public Function SyncKardexPorcionamientoCierre30Dias() As Boolean
+' ── Master cierre PRODUCCION ────────────────────────────
+' Tablas: MermaCotizacion, Procesamiento, Porcionamiento, SubPorcionamiento
+' Llamar en el procedimiento de cierre del módulo de producción.
+Public Function SyncKardexProduccionCierre30Dias() As Boolean
     Dim bOk As Boolean: bOk = True
-    KdxLog "CierrePorcionamiento", "Iniciando sync 30 dias porcionamiento - " & Now()
+    KdxLog "CierreProduccion", "Iniciando sync 30 dias produccion - " & Now()
+    If Not SyncKardexMermaCotizacion30Dias()   Then bOk = False
     If Not SyncKardexProcesamiento30Dias()     Then bOk = False
     If Not SyncKardexPorcionamiento30Dias()    Then bOk = False
     If Not SyncKardexSubPorcionamiento30Dias() Then bOk = False
-    KdxLog "CierrePorcionamiento", IIf(bOk, "OK", "Con errores") & " - " & Now()
-    SyncKardexPorcionamientoCierre30Dias = bOk
+    KdxLog "CierreProduccion", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    SyncKardexProduccionCierre30Dias = bOk
 End Function
 
 ' ── Master cierre CENTRAL CONTABILIDAD ──────────────────
@@ -341,19 +342,20 @@ Public Function SyncKardexCentralDespachoMasivo() As Boolean
     SyncKardexCentralDespachoMasivo = bOk
 End Function
 
-' ── Master masivo PORCIONAMIENTO ────────────────────────
-' Tablas: Procesamiento, Porcionamiento, SubPorcionamiento
-' Activar desde botón panel admin en el módulo de porcionamiento.
-Public Function SyncKardexPorcionamientoMasivoCompleto() As Boolean
+' ── Master masivo PRODUCCION ────────────────────────────
+' Tablas: MermaCotizacion, Procesamiento, Porcionamiento, SubPorcionamiento
+' Activar desde botón panel admin en el módulo de producción.
+Public Function SyncKardexProduccionMasivoCompleto() As Boolean
     Dim bOk As Boolean: bOk = True
-    KdxLog "MasivoPorcionamiento", "Iniciando masivo porcionamiento - " & Now()
+    KdxLog "MasivoProduccion", "Iniciando masivo produccion - " & Now()
+    If Not SyncKardexMermaCotizacionMasivo()   Then bOk = False
     If Not SyncKardexProcesamientoMasivo()     Then bOk = False
     If Not SyncKardexPorcionamientoMasivo()    Then bOk = False
     If Not SyncKardexSubPorcionamientoMasivo() Then bOk = False
-    KdxLog "MasivoPorcionamiento", IIf(bOk, "OK", "Con errores") & " - " & Now()
-    MsgBox "Masivo Porcionamiento " & IIf(bOk, "OK.", "con errores (ver log)."), _
-           IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo Porcionamiento"
-    SyncKardexPorcionamientoMasivoCompleto = bOk
+    KdxLog "MasivoProduccion", IIf(bOk, "OK", "Con errores") & " - " & Now()
+    MsgBox "Masivo Produccion " & IIf(bOk, "OK.", "con errores (ver log)."), _
+           IIf(bOk, vbInformation, vbExclamation), "Sync Kardex Masivo Produccion"
+    SyncKardexProduccionMasivoCompleto = bOk
 End Function
 
 ' ── Master masivo CENTRAL CONTABILIDAD ─────────────────

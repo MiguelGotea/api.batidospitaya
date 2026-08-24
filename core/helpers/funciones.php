@@ -207,6 +207,21 @@ function requerirCargo($cargoRequerido)
 }
 
 /**
+ * Redirige al login pasando la URL actual como parámetro ?redirect=
+ * para que después de autenticarse el usuario regrese a la página que quería ver.
+ */
+function redirigirAlLogin()
+{
+    $redirectUrl = $_SERVER['REQUEST_URI'] ?? '';
+    $loginUrl = '/login.php';
+    if (!empty($redirectUrl) && $redirectUrl !== '/login.php') {
+        $loginUrl = '/login.php?redirect=' . urlencode($redirectUrl);
+    }
+    header('Location: ' . $loginUrl);
+    exit();
+}
+
+/**
  * Redirige al hub de módulos, que determina el destino según los cargos del usuario.
  * Toda la lógica de routing vive en /modulos/index.php (única fuente de verdad).
  */

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * POS Authentication Framework - auth_pos.php
  * Batidos Pitaya | Punto de Venta
@@ -138,8 +138,7 @@ function posColaboradorAutenticado()
 function posRequiereAutenticacionTienda()
 {
     if (!posTiendaAutenticada()) {
-        header('Location: /login.php');
-        exit();
+        redirigirAlLogin();
     }
 }
 

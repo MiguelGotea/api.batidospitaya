@@ -14,7 +14,13 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/core/database/conexion.php';
 function verificarAutenticacion()
 {
     if (!isset($_SESSION['usuario_id'])) {
-        header('Location: /login.php');
+        // Pasar la URL actual como parámetro redirect para regresar después del login
+        $redirectUrl = $_SERVER['REQUEST_URI'] ?? '';
+        $loginUrl = '/login.php';
+        if (!empty($redirectUrl) && $redirectUrl !== '/login.php') {
+            $loginUrl = '/login.php?redirect=' . urlencode($redirectUrl);
+        }
+        header('Location: ' . $loginUrl);
         exit();
     }
 }

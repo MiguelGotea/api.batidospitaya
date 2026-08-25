@@ -179,7 +179,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Auditorías de Desempeño',
                 'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
-                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49]
+                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49, 27]
             ],
             [
                 'nombre' => 'Deducciones',

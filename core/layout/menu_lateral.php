@@ -444,12 +444,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Impulso de Ventas',
                 'url' => 'sucursales/kpi_sucursales.php',
-                'cargos_permitidos' => [49]
+                'cargos_permitidos' => [49, 16]
             ],
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49]
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49, 16]
             ],
             [
                 'nombre' => 'Liderazgo',
@@ -459,7 +459,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 27]
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 27, 16]
             ],
             [
                 'nombre' => 'Edición de Indicadores',

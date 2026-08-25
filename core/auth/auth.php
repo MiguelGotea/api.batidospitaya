@@ -102,3 +102,46 @@ function verificarAccesoModulo($modulo)
         exit();
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VALIDACIÓN AUTOMÁTICA DE DISPOSITIVO PARA CARGO 27 (SUCURSALES)
+// Se ejecuta en CADA carga de página para usuarios con ese cargo.
+// Al estar aquí, protege automáticamente TODAS las herramientas actuales
+// y futuras sin necesidad de modificar ningún archivo adicional.
+// ─────────────────────────────────────────────────────────────────────────────
+if (isset($_SESSION['usuario_id']) && isset($_SESSION['cargo_cod']) && (int)$_SESSION['cargo_cod'] === 27) {
+
+    // Obtener sucursal del caché de sesión para evitar consultas innecesarias
+    $sucursalCargo27 = $_SESSION['datos_usuario_actual']['sucursal_codigo'] ?? null;
+
+    if (!$sucursalCargo27) {
+        // Consulta ligera si el caché aún no está disponible en esta petición
+        global $conn;
+        $stmtSuc = $conn->prepare(
+            "SELECT anc.Sucursal FROM AsignacionNivelesCargos anc
+             WHERE anc.CodOperario = ?
+               AND anc.CodNivelesCargos = 27
+               AND (anc.Fin IS NULL OR anc.Fin >= CURDATE())
+             ORDER BY anc.Fecha DESC LIMIT 1"
+        );
+        $stmtSuc->execute([$_SESSION['usuario_id']]);
+        $rowSuc = $stmtSuc->fetch();
+        $sucursalCargo27 = $rowSuc['Sucursal'] ?? null;
+    }
+
+    if (!$sucursalCargo27) {
+        // Sin sucursal asignada: invalidar sesión y regresar al login
+        session_destroy();
+        header('Location: /login.php?error=' . urlencode('Tu usuario no tiene sucursal asignada. Contacta a soporte técnico.'));
+        exit();
+    }
+
+    $validacionDispositivo = verificarDispositivoAutorizado($sucursalCargo27);
+
+    if (!$validacionDispositivo['status']) {
+        // Dispositivo no autorizado: no destruimos sesión para que el usuario
+        // pueda intentar desde un dispositivo autorizado sin necesidad de re-loguearse.
+        header('Location: /login.php?error=' . urlencode($validacionDispositivo['msg']));
+        exit();
+    }
+}

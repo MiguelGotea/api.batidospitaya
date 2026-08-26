@@ -360,6 +360,16 @@ $menuGlobal = [
                 'url' => 'sistemas/configuracion_sucursales.php',
                 'cargos_permitidos' => [49]
             ],
+            [
+                'nombre' => 'Autorizar Dispositivos',
+                'url' => 'sistemas/autorizar_pc.php',
+                'cargos_permitidos' => [16, 49, 15]
+            ],
+            [
+                'nombre' => 'Depuración de Asistencias',
+                'url' => 'sistemas/depurar_asistencia.php',
+                'cargos_permitidos' => [49, 15, 16]
+            ],
         ]
     ],
     [
@@ -538,8 +548,10 @@ $menuGlobal = [
             [
                 'nombre' => 'Kardex de Insumos',
                 'url' => 'inventario/kardex_insumo.php',
-                'cargos_permitidos' => [49, 12, 16, 55, 11, 21, 42, 33, 52, 27]
+                'cargos_permitidos' => [49, 12, 16, 55, 11, 21, 42, 33, 52]
             ],
+
+
             [
                 'nombre' => 'Costo para Descuentos',
                 'url' => 'contabilidad/costo_descuento_productos.php',

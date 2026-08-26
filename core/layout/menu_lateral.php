@@ -51,14 +51,19 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 27, 16]
             ],
             [
+                'nombre' => 'Gestion de Asistencia',
+                'url' => 'rh/ver_marcaciones_todas_nuevo.php',
+                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52]
+            ],
+            [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52, 65, 41]
+                'cargos_permitidos' => [49, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52, 65, 41]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 5, 43, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65, 41]
+                'cargos_permitidos' => [49, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65, 41]
             ],
             [
                 'nombre' => 'Vacaciones/Subsidios',
@@ -98,7 +103,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Marcaciones',
                 'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49, 13, 5, 43, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16, 61, 63, 65, 41]
+                'cargos_permitidos' => [49, 13, 8, 11, 21, 22, 36, 13, 28, 30, 37, 39, 8, 12, 54, 33, 52, 42, 16, 61, 63, 65, 41]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',

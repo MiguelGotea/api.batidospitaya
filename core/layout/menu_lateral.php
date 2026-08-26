@@ -58,17 +58,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
-                'cargos_permitidos' => [49, 16, 21, 13, 28, 30, 37, 39, 8, 54, 11, 42, 33, 52, 65, 41]
+                'cargos_permitidos' => [49]
             ],
             [
                 'nombre' => 'Faltas/Ausencias',
                 'url' => 'lideres/faltas_manual.php',
-                'cargos_permitidos' => [49, 13, 28, 30, 37, 39, 8, 54, 11, 21, 42, 33, 43, 33, 52, 65, 41]
+                'cargos_permitidos' => [49]
             ],
             [
                 'nombre' => 'Vacaciones/Subsidios',
                 'url' => 'lideres/vacaciones.php',
-                'cargos_permitidos' => [49, 13, 16, 39, 30, 37, 28, 54, 52, 65, 41]
+                'cargos_permitidos' => [49]
             ],
             [
                 'nombre' => 'Viaticos',

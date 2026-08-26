@@ -139,9 +139,12 @@ if (isset($_SESSION['usuario_id']) && isset($_SESSION['cargo_cod']) && (int)$_SE
     $validacionDispositivo = verificarDispositivoAutorizado($sucursalCargo27);
 
     if (!$validacionDispositivo['status']) {
-        // Dispositivo no autorizado: no destruimos sesión para que el usuario
-        // pueda intentar desde un dispositivo autorizado sin necesidad de re-loguearse.
-        header('Location: /login.php?error=' . urlencode($validacionDispositivo['msg']));
+        // Dispositivo no autorizado: destruir sesión para evitar bucle de redirecciones.
+        // login.php detecta la sesión activa y redirige de vuelta, causando ERR_TOO_MANY_REDIRECTS.
+        $mensajeError = $validacionDispositivo['msg'];
+        session_unset();
+        session_destroy();
+        header('Location: /login.php?error=' . urlencode($mensajeError));
         exit();
     }
 }

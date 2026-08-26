@@ -136,7 +136,7 @@ if (isset($_SESSION['usuario_id']) && isset($_SESSION['cargo_cod']) && (int)$_SE
         exit();
     }
 
-    $validacionDispositivo = verificarDispositivoAutorizado($sucursalCargo27);
+    $validacionDispositivo = verificarDispositivoAutorizado($sucursalCargo27, 'acceso');
 
     if (!$validacionDispositivo['status']) {
         // Dispositivo no autorizado: destruir sesión para evitar bucle de redirecciones.

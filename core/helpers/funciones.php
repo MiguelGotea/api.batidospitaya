@@ -765,8 +765,17 @@ function obtenerIpCliente()
  * Solo permite navegadores basados en Chromium (Chrome/Edge).
  * Verifica la existencia y validez de la cookie erp_device_token.
  */
-function verificarDispositivoAutorizado($codSucursal)
+function verificarDispositivoAutorizado($codSucursal, $contexto = 'marcaciones')
 {
+    // Mensajes según el contexto de uso
+    $msgNoAutorizado = ($contexto === 'acceso')
+        ? 'Este dispositivo no está autorizado para acceder al sistema en esta sucursal, o la sesión de autorización expiró.'
+        : 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.';
+
+    $msgSinSucursal = ($contexto === 'acceso')
+        ? 'Esta sucursal todavía no ha sido autorizada para acceso al sistema. Contacta con soporte técnico.'
+        : 'Esta sucursal todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.';
+
     // 1. Verificar Navegador (Chrome/Edge)
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
     $esChromium = (strpos($ua, 'Chrome') !== false || strpos($ua, 'Edg') !== false);
@@ -786,7 +795,7 @@ function verificarDispositivoAutorizado($codSucursal)
         if ($totalDispositivos === 0) {
             return [
                 'status' => false,
-                'msg'    => 'Esta sucursal todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.'
+                'msg'    => $msgSinSucursal
             ];
         }
 
@@ -796,7 +805,7 @@ function verificarDispositivoAutorizado($codSucursal)
         if (!$tokenCookie) {
             return [
                 'status' => false,
-                'msg'    => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
+                'msg'    => $msgNoAutorizado
             ];
         }
 
@@ -812,7 +821,7 @@ function verificarDispositivoAutorizado($codSucursal)
 
         return [
             'status' => false,
-            'msg'    => 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.'
+            'msg'    => $msgNoAutorizado
         ];
     } catch (Exception $e) {
         error_log("Error en validación de dispositivo: " . $e->getMessage());

@@ -548,7 +548,7 @@ $menuGlobal = [
 
 
             [
-                'nombre' => 'Costo para Descuentos',
+                'nombre' => 'Costo para Deducciones',
                 'url' => 'contabilidad/costo_descuento_productos.php',
                 'cargos_permitidos' => [49, 8, 16, 42, 33]
             ],

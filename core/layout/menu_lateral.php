@@ -53,7 +53,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Gestion de Asistencia',
                 'url' => 'rh/ver_marcaciones_todas_nuevo.php',
-                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52]
+                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52, 65, 8]
             ],
             [
                 'nombre' => 'Tardanzas',

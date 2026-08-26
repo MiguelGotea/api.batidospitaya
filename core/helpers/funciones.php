@@ -148,7 +148,7 @@ function formatFechaEspanol($fecha = 'now')
 
     try {
         $date = new DateTime($fecha, new DateTimeZone('America/Managua'));
-        $nMes = (int)$date->format('n');
+        $nMes = (int) $date->format('n');
         return $date->format('d') . '-' . ($meses[$nMes] ?? '') . '-' . $date->format('y') . ' ' . $date->format('h:i a');
     } catch (Exception $e) {
         return $fecha;
@@ -160,7 +160,8 @@ function formatFechaEspanol($fecha = 'now')
  */
 function formatFechaReporte($fecha)
 {
-    if (empty($fecha) || $fecha === '0000-00-00') return '';
+    if (empty($fecha) || $fecha === '0000-00-00')
+        return '';
     try {
         $date = new DateTime($fecha);
         return $date->format('d/m/Y');
@@ -769,12 +770,12 @@ function verificarDispositivoAutorizado($codSucursal, $contexto = 'marcaciones')
 {
     // Mensajes según el contexto de uso
     $msgNoAutorizado = ($contexto === 'acceso')
-        ? 'Este dispositivo no está autorizado para acceder al sistema en esta sucursal, o la sesión de autorización expiró.'
-        : 'Este dispositivo no está autorizado para realizar marcaciones en esta sucursal o la sesión de autorización expiró.';
+        ? 'Este dispositivo no está autorizado para acceder al sistema en esta tienda, o la sesión de autorización expiró.'
+        : 'Este dispositivo no está autorizado para realizar marcaciones en esta tienda o la sesión de autorización expiró.';
 
     $msgSinSucursal = ($contexto === 'acceso')
-        ? 'Esta sucursal todavía no ha sido autorizada para acceso al sistema. Contacta con soporte técnico.'
-        : 'Esta sucursal todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.';
+        ? 'Esta tienda todavía no ha sido autorizada para acceso al sistema. Contacta con soporte técnico.'
+        : 'Esta tienda todavía no ha sido autorizada para este proceso de marcación. Contacta con soporte técnico.';
 
     // 1. Verificar Navegador (Chrome/Edge)
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
@@ -790,12 +791,12 @@ function verificarDispositivoAutorizado($codSucursal, $contexto = 'marcaciones')
         // Comprobar si la sucursal tiene al menos un dispositivo registrado
         $stmtExiste = $conn->prepare("SELECT COUNT(*) FROM dispositivos_autorizados WHERE sucursal_codigo = ?");
         $stmtExiste->execute([$codSucursal]);
-        $totalDispositivos = (int)$stmtExiste->fetchColumn();
+        $totalDispositivos = (int) $stmtExiste->fetchColumn();
 
         if ($totalDispositivos === 0) {
             return [
                 'status' => false,
-                'msg'    => $msgSinSucursal
+                'msg' => $msgSinSucursal
             ];
         }
 
@@ -805,7 +806,7 @@ function verificarDispositivoAutorizado($codSucursal, $contexto = 'marcaciones')
         if (!$tokenCookie) {
             return [
                 'status' => false,
-                'msg'    => $msgNoAutorizado
+                'msg' => $msgNoAutorizado
             ];
         }
 
@@ -813,7 +814,7 @@ function verificarDispositivoAutorizado($codSucursal, $contexto = 'marcaciones')
             "SELECT COUNT(*) FROM dispositivos_autorizados WHERE sucursal_codigo = ? AND cookie_token = ?"
         );
         $stmtToken->execute([$codSucursal, $tokenCookie]);
-        $esAutorizado = (int)$stmtToken->fetchColumn() > 0;
+        $esAutorizado = (int) $stmtToken->fetchColumn() > 0;
 
         if ($esAutorizado) {
             return ['status' => true];
@@ -821,7 +822,7 @@ function verificarDispositivoAutorizado($codSucursal, $contexto = 'marcaciones')
 
         return [
             'status' => false,
-            'msg'    => $msgNoAutorizado
+            'msg' => $msgNoAutorizado
         ];
     } catch (Exception $e) {
         error_log("Error en validación de dispositivo: " . $e->getMessage());
@@ -912,7 +913,7 @@ function obtenerOperariosSucursalLider($codSucursal, $codLider)
 {
     global $conn;
 
-    // Verificar que el líder tenga asignada esta sucursal
+    // Verificar que el líder tenga asignada esta tienda
     $stmt = $conn->prepare("
         SELECT COUNT(*) as es_lider 
         FROM AsignacionNivelesCargos 
@@ -2229,7 +2230,7 @@ function aplicaViaticoDepartamento($codDepartamento, $fecha)
 
     $diasPermitidos = explode(',', $cacheDias[$codDepartamento]);
     $diaSemana = date('N', strtotime($fecha)); // ISO: 1=lunes, 7=domingo
-    return in_array((string)$diaSemana, $diasPermitidos);
+    return in_array((string) $diaSemana, $diasPermitidos);
 }
 
 /**

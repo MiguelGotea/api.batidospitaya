@@ -43,7 +43,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Boleta de Pago',
                 'url' => 'contabilidad/boleta_pago.php',
-                'cargos_permitidos' => []
+                'cargos_permitidos' => [8]
             ],
             [
                 'nombre' => 'Historial Marcaciones',

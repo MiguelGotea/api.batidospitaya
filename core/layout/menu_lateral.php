@@ -101,11 +101,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65, 41, 65]
             ],
             [
-                'nombre' => 'Marcaciones',
-                'url' => 'rh/ver_marcaciones_todas.php',
-                'cargos_permitidos' => [49]
-            ],
-            [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
                 'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21, 30, 41, 65]

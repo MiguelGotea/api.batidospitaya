@@ -469,7 +469,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Edición de Indicadores',
                 'url' => 'gerencia/indicadores_edicion.php',
-                'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
+                'cargos_permitidos' => [49, 11, 19, 13, 42, 16]
             ],
             [
                 'nombre' => 'Tareas',

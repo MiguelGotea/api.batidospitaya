@@ -501,7 +501,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Unidades',
                 'url' => 'productos/historial_unidades_conversion.php',
-                'cargos_permitidos' => [49]
+                'cargos_permitidos' => [49, 15]
             ],
             [
                 'nombre' => 'Presentacion',

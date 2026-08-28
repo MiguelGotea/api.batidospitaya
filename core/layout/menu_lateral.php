@@ -506,12 +506,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Presentacion',
                 'url' => 'productos/producto_presentacion_gestion.php',
-                'cargos_permitidos' => [55, 49]
+                'cargos_permitidos' => [55, 49, 15]
             ],
             [
                 'nombre' => 'Producto Maestro',
                 'url' => 'productos/productos_maestro_gestion.php',
-                'cargos_permitidos' => [55, 49]
+                'cargos_permitidos' => [55, 49, 15]
             ],
             [
                 'nombre' => 'Configuracion Recetas',

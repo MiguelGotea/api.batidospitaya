@@ -227,7 +227,7 @@ $menuGlobal = [
             [
                 'nombre' => 'KPI Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
-                'cargos_permitidos' => [49, 16, 21, 28, 50, 11, 42, 33, 52]
+                'cargos_permitidos' => [49, 16, 21, 50, 11, 42, 33, 52, 13, 53]
             ],
             [
                 'nombre' => 'Historial Reseñas Google',
@@ -288,7 +288,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52, 61]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52, 61, 19, 15]
             ],
             [
                 'nombre' => 'Informe Diario',
@@ -348,7 +348,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Catálogo de Herramientas',
                 'url' => 'sistemas/catalogo_herramientas.php',
-                'cargos_permitidos' => [49, 15]
+                'cargos_permitidos' => [49, 15, 16]
             ],
             [
                 'nombre' => 'Configuración de Tiendas',
@@ -385,7 +385,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Plan Despacho Grupos',
                 'url' => 'inventario/plan_despacho_global.php',
-                'cargos_permitidos' => [49, 16, 19]
+                'cargos_permitidos' => [49, 16, 19, 55]
             ],
             [
                 'nombre' => 'Pedido Central',
@@ -395,12 +395,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33, 52, 61]
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33, 52, 61, 19]
             ],
             [
                 'nombre' => 'Proyeccion',
                 'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 52, 19, 61]
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9]
             ],
         ]
     ],
@@ -570,27 +570,27 @@ $menuGlobal = [
             [
                 'nombre' => 'Sobre Nosotros',
                 'url' => 'talento_contenido/nosotros.php',
-                'cargos_permitidos' => [16, 49, 42, 50]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Colaboradores Portal',
                 'url' => 'talento_contenido/colaboradores.php',
-                'cargos_permitidos' => [16, 49, 42, 50]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Noticias Portal',
                 'url' => 'talento_contenido/noticias.php',
-                'cargos_permitidos' => [16, 49, 42, 50]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Habilidades Portal',
                 'url' => 'talento_contenido/habilidades.php',
-                'cargos_permitidos' => [16, 49, 42, 50]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Configuración Portal',
                 'url' => 'talento_contenido/configuracion.php',
-                'cargos_permitidos' => [16, 49, 42, 50]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
         ]
     ],
@@ -759,7 +759,7 @@ function renderMenuLateral($cargoOperario)
     $moduloActual = detectarModuloActual();
 
     ob_start();
-    ?>
+?>
 
     <!-- Font Awesome Universal -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -1244,13 +1244,13 @@ function renderMenuLateral($cargoOperario)
 
     <!-- JavaScript del menú -->
     <script>
-        (function () {
+        (function() {
             'use strict';
 
             let activeGroupIndex = null;
 
             // Función para toggle de grupo (acordeón)
-            window.toggleMenuGroup = function (index) {
+            window.toggleMenuGroup = function(index) {
                 const grupo = document.getElementById('grupo-' + index);
                 const allGroups = document.querySelectorAll('.menu-group');
                 const titulo = grupo.querySelector('.menu-group-title');
@@ -1271,7 +1271,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para abrir sidebar en móvil
-            window.toggleSidebarMobile = function () {
+            window.toggleSidebarMobile = function() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1288,7 +1288,7 @@ function renderMenuLateral($cargoOperario)
             };
 
             // Función para cerrar sidebar en móvil
-            window.closeSidebarMobile = function () {
+            window.closeSidebarMobile = function() {
                 const sidebar = document.getElementById('sidebar');
                 const overlay = document.getElementById('sidebarOverlay');
 
@@ -1310,7 +1310,7 @@ function renderMenuLateral($cargoOperario)
 
             // Cerrar menú en móvil al hacer clic en un enlace
             document.querySelectorAll('.menu-item').forEach(item => {
-                item.addEventListener('click', function () {
+                item.addEventListener('click', function() {
                     if (window.innerWidth <= 768) {
                         closeSidebarMobile();
                     }
@@ -1318,7 +1318,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Marcar grupo activo si hay una página activa
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const activeItem = document.querySelector('.menu-item.active');
                 if (activeItem) {
                     const parentGroup = activeItem.closest('.menu-group');
@@ -1349,8 +1349,8 @@ function renderMenuLateral($cargoOperario)
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
 
-            const observer = new MutationObserver(function (mutations) {
-                mutations.forEach(function (mutation) {
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
                     if (mutation.attributeName === 'class') {
                         if (sidebar.classList.contains('show')) {
                             document.body.style.overflow = 'hidden';
@@ -1366,7 +1366,7 @@ function renderMenuLateral($cargoOperario)
             });
 
             // Soporte para teclado (accesibilidad)
-            document.addEventListener('keydown', function (e) {
+            document.addEventListener('keydown', function(e) {
                 // ESC para cerrar menú en móvil
                 if (e.key === 'Escape' && window.innerWidth <= 768) {
                     closeSidebarMobile();
@@ -1376,6 +1376,6 @@ function renderMenuLateral($cargoOperario)
         })();
     </script>
 
-    <?php
+<?php
     return ob_get_clean();
 }

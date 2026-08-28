@@ -496,7 +496,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Dashboard Consumo',
                 'url' => 'productos/dashboard_consumo.php',
-                'cargos_permitidos' => [49, 55]
+                'cargos_permitidos' => [49, 55, 19, 52, 62]
             ],
             [
                 'nombre' => 'Unidades',

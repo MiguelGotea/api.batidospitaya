@@ -458,13 +458,14 @@ $menuGlobal = [
             ],
             [
                 'nombre' => 'Liderazgo',
-                'url' => 'gerencia/indicadores_resultado.php',
-                'cargos_permitidos' => [49, 12, 16, 53] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
+                'url' => 'gerencia/indicadores
+                _resultado.php',
+                'cargos_permitidos' => [49, 19, 16, 53] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
             ],
             [
                 'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 27, 16]
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 16]
             ],
             [
                 'nombre' => 'Edición de Indicadores',

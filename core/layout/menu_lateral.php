@@ -514,7 +514,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [55, 49]
             ],
             [
-                'nombre' => 'Recetas',
+                'nombre' => 'Configuracion Recetas',
                 'url' => 'productos/accessantiguo_visor_recetas.php',
                 'cargos_permitidos' => [55, 49]
             ],

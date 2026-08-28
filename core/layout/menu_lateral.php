@@ -479,7 +479,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 53, 50, 26]
+                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 33, 53, 50, 26]
             ],
         ]
     ],

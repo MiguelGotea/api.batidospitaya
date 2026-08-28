@@ -477,11 +477,6 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 11, 12, 13, 42, 16]
             ],
             [
-                'nombre' => 'Consumo de Insumos',
-                'url' => 'productos/dashboard_consumo.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33]
-            ],
-            [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
                 'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 21, 33, 53, 50, 26]

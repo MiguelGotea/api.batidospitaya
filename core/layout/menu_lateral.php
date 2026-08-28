@@ -459,7 +459,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Liderazgo',
                 'url' => 'gerencia/indicadores_resultado.php',
-                'cargos_permitidos' => [49, 19, 16, 53] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
+                'cargos_permitidos' => [49] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
             ],
             [
                 'nombre' => 'Ventas',
@@ -469,7 +469,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Edición de Indicadores',
                 'url' => 'gerencia/indicadores_edicion.php',
-                'cargos_permitidos' => [49, 11, 19, 13, 42, 16]
+                'cargos_permitidos' => [49]
             ],
             [
                 'nombre' => 'Tareas',

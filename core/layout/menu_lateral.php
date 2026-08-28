@@ -562,7 +562,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 13, 16, 42, 49, 55, 21, 33, 52]
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52]
             ],
 
         ]

@@ -19,7 +19,7 @@ $menuGlobal = [
     [
         'nombre' => 'Marcacion',
         'icon' => 'fas fa-fingerprint',
-        'cargos_permitidos' => [49, 27, 16],
+        'cargos_permitidos' => [27],
         'url' => 'sucursales/marcacion.php',
         'items' => []
     ],

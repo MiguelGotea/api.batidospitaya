@@ -491,7 +491,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Dashboard Consumo',
                 'url' => 'productos/dashboard_consumo.php',
-                'cargos_permitidos' => [49, 55, 19, 52, 62]
+                'cargos_permitidos' => [49, 55, 19, 52, 62, 12, 16, 42, 11, 21, 33]
             ],
             [
                 'nombre' => 'Unidades',
@@ -516,7 +516,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Diccionario Access ERP',
                 'url' => 'productos/accessantiguo_diccionario_productos.php',
-                'cargos_permitidos' => [55, 49]
+                'cargos_permitidos' => [55, 49, 15]
             ],
         ]
     ],

@@ -458,8 +458,7 @@ $menuGlobal = [
             ],
             [
                 'nombre' => 'Liderazgo',
-                'url' => 'gerencia/indicadores
-                _resultado.php',
+                'url' => 'gerencia/indicadores_resultado.php',
                 'cargos_permitidos' => [49, 19, 16, 53] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
             ],
             [

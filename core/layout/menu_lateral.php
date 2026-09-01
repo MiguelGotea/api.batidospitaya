@@ -368,12 +368,12 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Historial Despachos Access',
+                'nombre' => 'Despachos Access',
                 'url' => 'despacho/historial_despacho.php',
                 'cargos_permitidos' => [49, 12, 16, 19]
             ],
             [
-                'nombre' => 'Historial Despachos ERP',
+                'nombre' => 'Despachos ERP',
                 'url' => 'despacho/historial_despachos.php',
                 'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43, 42]
             ],

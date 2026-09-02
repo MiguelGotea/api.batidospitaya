@@ -1,0 +1,379 @@
+/**
+ * guias_interactivas.css
+ * Estilos para el Reproductor y Editor de Guías Interactivas (Digital Adoption)
+ * Pitaya ERP
+ */
+
+/* ==========================================================================
+   1. BOTÓN FLOTANTE (FAB)
+   ========================================================================== */
+.guias-fab-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1050;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-end;
+    gap: 10px;
+    font-family: inherit;
+}
+
+.guias-fab-btn {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0E544C 0%, #15803d 100%);
+    color: #ffffff !important;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 6px 20px rgba(14, 84, 76, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.4rem;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-decoration: none;
+}
+
+.guias-fab-btn:hover {
+    transform: scale(1.1) translateY(-2px);
+    box-shadow: 0 10px 25px rgba(14, 84, 76, 0.6);
+    color: #ffffff !important;
+}
+
+.guias-fab-btn-editor {
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+}
+
+.guias-fab-badge {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1f2937;
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.guias-fab-btn:hover .guias-fab-badge {
+    opacity: 1;
+    transform: translateY(-50%) translateX(-4px);
+}
+
+.guias-fab-sub-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #0E544C !important;
+    border: 1px solid #d1d5db;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.guias-fab-sub-btn:hover {
+    background: #f3f4f6;
+    color: #111827 !important;
+    transform: scale(1.1);
+}
+
+/* ==========================================================================
+   2. REPRODUCTOR / MODAL OVERLAY
+   ========================================================================== */
+.guias-player-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.guias-player-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 15, 20, 0.88);
+    backdrop-filter: blur(4px);
+}
+
+.guias-player-wrapper {
+    position: relative;
+    z-index: 2;
+    width: 95vw;
+    max-width: 1400px;
+    height: 92vh;
+    background: #111827;
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.guias-player-header {
+    background: #1f2937;
+    color: #ffffff;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guias-player-title-box {
+    font-size: 1rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+.guias-player-controls-top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.guias-badge-progreso {
+    background: rgba(255, 255, 255, 0.12);
+    color: #93c5fd;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+.guias-player-close {
+    background: transparent;
+    border: none;
+    color: #9ca3af;
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s;
+    padding: 0;
+}
+
+.guias-player-close:hover {
+    color: #ffffff;
+}
+
+.guias-player-body {
+    flex: 1;
+    overflow: auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #0b0f19;
+    padding: 16px;
+}
+
+.guias-canvas-container {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: inline-block;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.guias-imagen-pantalla {
+    display: block;
+    max-width: 100%;
+    max-height: calc(92vh - 130px);
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+}
+
+.guias-hotspots-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: auto;
+}
+
+.guias-player-footer {
+    background: #1f2937;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    gap: 20px;
+}
+
+.guias-progress-bar-container {
+    flex: 1;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.guias-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #10b981 0%, #3b82f6 100%);
+    transition: width 0.3s ease;
+}
+
+/* ==========================================================================
+   3. HOTSPOTS & ANIMACIÓN PULSE (Storylane / Arcade style)
+   ========================================================================== */
+.guia-hotspot-item {
+    position: absolute;
+    cursor: pointer;
+    z-index: 10;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease;
+}
+
+.guia-hotspot-beacon {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.guia-hotspot-core {
+    width: 16px;
+    height: 16px;
+    background: #10b981;
+    border: 2.5px solid #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 12px #10b981;
+    position: relative;
+    z-index: 2;
+}
+
+.guia-hotspot-ripple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.6);
+    animation: guiaPulse 1.8s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1;
+}
+
+@keyframes guiaPulse {
+    0% {
+        transform: scale(0.6);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(2.2);
+        opacity: 0;
+    }
+}
+
+/* Hotspot tipo Rectángulo */
+.guia-hotspot-rect {
+    position: absolute;
+    border: 2.5px solid #10b981;
+    background: rgba(16, 185, 129, 0.15);
+    border-radius: 6px;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    animation: guiaBorderPulse 2s infinite ease-in-out;
+}
+
+@keyframes guiaBorderPulse {
+    0%, 100% {
+        border-color: #10b981;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+    }
+    50% {
+        border-color: #3b82f6;
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.7);
+    }
+}
+
+/* ==========================================================================
+   4. TOOLTIP / CALLOUT FLOTANTE
+   ========================================================================== */
+.guia-callout-card {
+    position: absolute;
+    width: 320px;
+    background: #ffffff;
+    color: #1f2937;
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.08);
+    z-index: 25;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    animation: guiaFadeIn 0.25s ease;
+}
+
+@keyframes guiaFadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.guia-callout-card h6 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0E544C;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.guia-callout-text {
+    margin-bottom: 12px;
+    color: #4b5563;
+}
+
+.guia-callout-action {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.guia-callout-btn-next {
+    background: #0E544C;
+    color: #fff;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.guia-callout-btn-next:hover {
+    background: #115e59;
+}

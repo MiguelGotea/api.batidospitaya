@@ -76,6 +76,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 8, 52]
             ],
             [
+                'nombre' => 'Configuración Viáticos',
+                'url' => 'operaciones/configuracion_viaticos.php',
+                'cargos_permitidos' => [16, 49]
+            ],
+            [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
                 'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]

@@ -33,7 +33,7 @@ Public Function SyncEnviarAnulacionesPendientes() As Boolean
     On Error GoTo ErrorHandler
 
     Dim sAnulUrlEnviar As String
-    sAnulUrlEnviar = "https://proxy.batidospitaya.com/api/sync_anulacion_pedidos.php"
+    sAnulUrlEnviar = "https://api.batidospitaya.com/api/sync_anulacion_pedidos.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -137,7 +137,7 @@ Public Function SyncLeerRespuestasAnulacion() As Boolean
     On Error GoTo ErrorHandler
 
     Dim sAnulUrlLeer As String
-    sAnulUrlLeer = "https://proxy.batidospitaya.com/api/read_anulacion_pedidos.php"
+    sAnulUrlLeer = "https://api.batidospitaya.com/api/read_anulacion_pedidos.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -322,7 +322,7 @@ Private Sub ConfirmarEjecucionEnHost(lngCodPedido As Long, codSuc As String)
     On Error GoTo ErrorHandler
 
     Dim sAnulUrlConfirm As String
-    sAnulUrlConfirm = "https://proxy.batidospitaya.com/api/confirm_anulacion_pedidos.php"
+    sAnulUrlConfirm = "https://api.batidospitaya.com/api/confirm_anulacion_pedidos.php"
 
     Dim sPayload As String
     Dim sResp    As String
@@ -356,7 +356,7 @@ Public Function SyncMasivoHistorialAnulaciones() As Boolean
     On Error GoTo ErrorHandler
 
     Dim sAnulUrlEnviar As String
-    sAnulUrlEnviar = "https://proxy.batidospitaya.com/api/sync_anulacion_pedidos.php"
+    sAnulUrlEnviar = "https://api.batidospitaya.com/api/sync_anulacion_pedidos.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -648,7 +648,7 @@ Public Function SyncAnularCierresPendientes() As Boolean
     On Error GoTo ErrorHandler
 
     Dim sUrlLeer As String
-    sUrlLeer = "https://proxy.batidospitaya.com/api/read_anulacion_cierres_diarios.php"
+    sUrlLeer = "https://api.batidospitaya.com/api/read_anulacion_cierres_diarios.php"
 
     Dim codSuc As String
     codSuc = CStr(codigoLocal())
@@ -724,7 +724,7 @@ Public Function SyncAnularCierresPendientes() As Boolean
     
     If cantProcesados > 0 Then
         Dim sUrlConfirm As String
-        sUrlConfirm = "https://proxy.batidospitaya.com/api/confirm_anulacion_cierres_diarios.php"
+        sUrlConfirm = "https://api.batidospitaya.com/api/confirm_anulacion_cierres_diarios.php"
         
         Dim sPayloadConfirm As String
         Dim sRespConfirm As String

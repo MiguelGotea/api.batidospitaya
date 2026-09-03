@@ -32,7 +32,7 @@
 Option Explicit
 
 Private Const SCD_TOKEN      As String  = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
-Private Const SCD_BASE_URL   As String  = "https://proxy.batidospitaya.com/api/"
+Private Const SCD_BASE_URL   As String  = "https://api.batidospitaya.com/api/"
 Private Const SCD_BATCH_SIZE As Integer = 200
 
 ' ══════════════════════════════════════════════════════════

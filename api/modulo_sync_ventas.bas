@@ -268,7 +268,7 @@ Private Function EnviarSyncAPI(lngCodPedido As Long, codSuc As String, _
                                 sRowsJson As String, ByRef sRespOut As String) As Boolean
     On Error GoTo ErrorHandler
 
-    Dim SYNC_URL  As String : SYNC_URL  = "https://proxy.batidospitaya.com/api/sync_ventas_pedido.php"
+    Dim SYNC_URL  As String : SYNC_URL  = "https://api.batidospitaya.com/api/sync_ventas_pedido.php"
     Dim API_TOKEN As String : API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
     Dim TIMEOUT   As Long   : TIMEOUT   = 15000
 
@@ -692,7 +692,7 @@ Private Function EnviarSyncAPIDia(sFecha As String, codSuc As String, _
                                    ByRef sRespOut As String) As Boolean
     On Error GoTo ErrorHandler
 
-    Dim SYNC_URL  As String : SYNC_URL  = "https://proxy.batidospitaya.com/api/sync_ventas_dia.php"
+    Dim SYNC_URL  As String : SYNC_URL  = "https://api.batidospitaya.com/api/sync_ventas_dia.php"
     Dim API_TOKEN As String : API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
     Dim TIMEOUT   As Long   : TIMEOUT   = 20000  ' 20s — más holgura que el sync por pedido
 

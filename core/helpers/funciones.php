@@ -21,6 +21,43 @@ function formatoFecha($fecha)
     }
 }
 
+if (!function_exists('formatoCedula')) {
+    /**
+     * Formatea una cédula nicaragüense al formato visual 000-000000-0000X (ej: 001-011101-1025A)
+     * sin alterar la información de la base de datos.
+     */
+    function formatoCedula($cedula)
+    {
+        if (empty($cedula)) {
+            return '';
+        }
+
+        $cedulaLimpia = trim(str_replace('-', '', (string) $cedula));
+        if ($cedulaLimpia === '') {
+            return '';
+        }
+
+        // Extraer números y letra final si existe
+        $numeros = preg_replace('/[^0-9]/', '', $cedulaLimpia);
+        $letra = '';
+        if (preg_match('/[A-Za-z]$/', $cedulaLimpia)) {
+            $letra = strtoupper(substr($cedulaLimpia, -1));
+        }
+
+        if (strlen($numeros) === 0) {
+            return $cedula;
+        }
+
+        if (strlen($numeros) >= 9) {
+            return substr($numeros, 0, 3) . '-' . substr($numeros, 3, 6) . '-' . substr($numeros, 9) . $letra;
+        } elseif (strlen($numeros) >= 3) {
+            return substr($numeros, 0, 3) . '-' . substr($numeros, 3) . $letra;
+        }
+
+        return $numeros . $letra;
+    }
+}
+
 /**
  * Obtiene el nombre del mes en español
  */

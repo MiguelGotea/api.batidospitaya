@@ -13,7 +13,7 @@
 Option Explicit
 
 ' ── CONFIGURACIÓN ───────────────────────────────────────────
-Private Const PING_URL        As String = "https://api.batidospitaya.com/api/ping.php"
+Private Const PING_URL        As String = "https://proxy.batidospitaya.com/api/ping.php"
 Private Const VERSION_SISTEMA As String = "2.0"
 Private Const INTERVALO_SEG   As Long   = 60   ' Ping cada 60 segundos
 ' Nota: el código de sucursal se obtiene vía codigoLocal() en tiempo de ejecución

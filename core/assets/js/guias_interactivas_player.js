@@ -31,7 +31,7 @@ function lanzarGuiaInteractiva(idGuia) {
         .then(response => response.json())
         .then(res => {
             if (!res.success || !res.data) {
-                alert(res.error || 'No se pudo cargar la guía interactiva.');
+                gpMostrarToast(res.error || 'No se pudo cargar la guía interactiva.', 'danger');
                 cerrarReproductorGuia();
                 return;
             }
@@ -40,7 +40,7 @@ function lanzarGuiaInteractiva(idGuia) {
             gpPasoIndex = 0;
 
             if (!gpGuiaActual.pasos || gpGuiaActual.pasos.length === 0) {
-                alert('Esta guía no contiene pasos registrados.');
+                gpMostrarToast('Esta guía no contiene pasos registrados.', 'info');
                 cerrarReproductorGuia();
                 return;
             }
@@ -52,7 +52,7 @@ function lanzarGuiaInteractiva(idGuia) {
         })
         .catch(err => {
             console.error('Error cargando guía:', err);
-            alert('Error de conexión al cargar la guía.');
+            gpMostrarToast('Error de conexión al cargar la guía.', 'danger');
             cerrarReproductorGuia();
         });
 }
@@ -62,11 +62,47 @@ function lanzarGuiaInteractiva(idGuia) {
  */
 function cerrarReproductorGuia() {
     detenerAutoPlay();
+    if (document.fullscreenElement) {
+        try { document.exitFullscreen(); } catch (e) {}
+    }
     const modal = document.getElementById('modalReproductorGuia');
     if (modal) modal.style.display = 'none';
     gpGuiaActual = null;
     gpPasoIndex = 0;
 }
+
+/**
+ * Alterna entre modo Pantalla Completa y Ventana Normal
+ */
+function toggleFullScreenGuia() {
+    const modal = document.getElementById('modalReproductorGuia');
+    if (!modal) return;
+
+    const icon = document.getElementById('gp_fullscreen_icon');
+
+    if (!document.fullscreenElement) {
+        if (modal.requestFullscreen) {
+            modal.requestFullscreen();
+        } else if (modal.webkitRequestFullscreen) {
+            modal.webkitRequestFullscreen();
+        }
+        if (icon) icon.className = 'bi bi-fullscreen-exit';
+    } else {
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        }
+        if (icon) icon.className = 'bi bi-arrows-fullscreen';
+    }
+}
+
+document.addEventListener('fullscreenchange', function () {
+    const icon = document.getElementById('gp_fullscreen_icon');
+    if (icon) {
+        icon.className = document.fullscreenElement ? 'bi bi-fullscreen-exit' : 'bi bi-arrows-fullscreen';
+    }
+});
 
 /**
  * Alterna entre Reproducción Automática y Pausa
@@ -102,11 +138,12 @@ function iniciarAutoPlay() {
         }
 
         if (gpPasoIndex < gpGuiaActual.pasos.length - 1) {
-            gpPasoSiguiente(true);
+            const hsEl = document.querySelector('.guia-hotspot-item');
+            gpPasoSiguiente(true, hsEl);
         } else {
             detenerAutoPlay();
         }
-    }, 3500);
+    }, 3800);
 }
 
 /**
@@ -128,11 +165,14 @@ function detenerAutoPlay() {
     if (label) label.textContent = 'Auto-Play';
 }
 
+let gpIsTransitioning = false;
+
 /**
  * Renderiza el paso actual en pantalla
  * @param {number} index 
+ * @param {string} direccion ('next' o 'prev')
  */
-function renderizarPasoGuia(index) {
+function renderizarPasoGuia(index, direccion = 'next') {
     if (!gpGuiaActual || !gpGuiaActual.pasos[index]) return;
 
     const paso = gpGuiaActual.pasos[index];
@@ -168,9 +208,16 @@ function renderizarPasoGuia(index) {
     }
 
     // Imagen y capa de hotspots
+    const canvasContainer = document.getElementById('gp_canvas_container');
     const imgEl = document.getElementById('gp_imagen_paso');
     const layerEl = document.getElementById('gp_hotspots_layer');
     if (layerEl) layerEl.innerHTML = '';
+
+    if (canvasContainer) {
+        canvasContainer.className = `guias-canvas-container gp-slide-in-${direccion}`;
+        canvasContainer.style.transform = 'scale(1)';
+        canvasContainer.style.transformOrigin = '50% 50%';
+    }
 
     if (imgEl) {
         imgEl.onload = function () {
@@ -181,18 +228,22 @@ function renderizarPasoGuia(index) {
 }
 
 /**
- * Dibuja los hotspots y el callout sobre la imagen
+ * Dibuja los hotspots y el callout sobre la imagen con zoom suave
  * @param {object} paso 
  */
 function dibujarHotspotsYCallout(paso) {
     const layerEl = document.getElementById('gp_hotspots_layer');
-    if (!layerEl) return;
+    const canvasContainer = document.getElementById('gp_canvas_container');
+    if (!layerEl || !canvasContainer) return;
     layerEl.innerHTML = '';
 
     const hotspots = paso.hotspots || [];
 
-    // Si no hay hotspots definidos, dibujamos un callout informativo central
+    // Si no hay hotspots definidos, dibujamos un callout informativo central y vista completa
     if (hotspots.length === 0) {
+        canvasContainer.style.transformOrigin = '50% 50%';
+        canvasContainer.style.transform = 'scale(1)';
+
         const callout = document.createElement('div');
         callout.className = 'guia-callout-card';
         callout.style.left = '50%';
@@ -202,12 +253,33 @@ function dibujarHotspotsYCallout(paso) {
             <h6><i class="bi bi-info-circle-fill"></i> ${escHtml(paso.titulo_paso || 'Información')}</h6>
             <div class="guia-callout-text">${paso.texto_ayuda || 'Observa la pantalla y presiona Siguiente para continuar.'}</div>
             <div class="guia-callout-action">
-                <button type="button" class="guia-callout-btn-next" onclick="gpPasoSiguiente()">Entendido / Siguiente</button>
+                <button type="button" class="guia-callout-btn-next" onclick="gpPasoSiguiente(false, null)">Entendido / Siguiente</button>
             </div>
         `;
         layerEl.appendChild(callout);
         return;
     }
+
+    // Aplicar Secuencia Cinemática: Zoom In para ubicar -> Retorno suave a tamaño normal
+    const primerHs = hotspots[0];
+    const primerPosX = parseFloat(primerHs.pos_x) || 50;
+    const primerPosY = parseFloat(primerHs.pos_y) || 50;
+
+    // 1. Zoom In hacia el punto donde debe dar clic
+    setTimeout(() => {
+        if (canvasContainer && !gpIsTransitioning) {
+            canvasContainer.style.transformOrigin = `${primerPosX}% ${primerPosY}%`;
+            canvasContainer.style.transform = 'scale(1.26)';
+        }
+    }, 120);
+
+    // 2. Regresar suavemente al tamaño normal (1x) para que el usuario tenga el contexto completo de la pantalla
+    setTimeout(() => {
+        if (canvasContainer && !gpIsTransitioning) {
+            canvasContainer.style.transformOrigin = `${primerPosX}% ${primerPosY}%`;
+            canvasContainer.style.transform = 'scale(1)';
+        }
+    }, 1500);
 
     hotspots.forEach(hs => {
         const posX = parseFloat(hs.pos_x) || 50;
@@ -236,7 +308,7 @@ function dibujarHotspotsYCallout(paso) {
 
         hsEl.addEventListener('click', function (e) {
             e.stopPropagation();
-            gpPasoSiguiente();
+            gpPasoSiguiente(false, hsEl);
         });
 
         layerEl.appendChild(hsEl);
@@ -245,20 +317,37 @@ function dibujarHotspotsYCallout(paso) {
         const callout = document.createElement('div');
         callout.className = 'guia-callout-card';
 
-        // Posicionamiento inteligente del callout según el cuadrante
-        let calloutLeft = posX;
-        let calloutTop = posY + 5;
+        // Posicionamiento según la ubicación definida en el editor
+        const posPref = hs.tooltip_posicion || 'abajo';
 
-        if (posX > 65) {
-            callout.style.right = `${100 - posX + 4}%`;
+        if (posPref.startsWith('libre:')) {
+            const parts = posPref.split(':');
+            const customX = parseFloat(parts[1]) || 50;
+            const customY = parseFloat(parts[2]) || 50;
+            callout.style.left = `${Math.max(12, Math.min(88, customX))}%`;
+            callout.style.top = `${Math.max(10, Math.min(90, customY))}%`;
+            callout.style.transform = 'translate(-50%, -50%)';
+        } else if (posPref === 'centro') {
+            callout.style.left = '50%';
+            callout.style.top = '50%';
+            callout.style.transform = 'translate(-50%, -50%)';
+        } else if (posPref === 'arriba') {
+            callout.style.left = `${Math.max(16, Math.min(84, posX))}%`;
+            callout.style.bottom = `${Math.max(6, 100 - posY + 4)}%`;
+            callout.style.transform = 'translateX(-50%)';
+        } else if (posPref === 'derecha') {
+            callout.style.left = `${Math.min(74, posX + 4)}%`;
+            callout.style.top = `${Math.max(16, Math.min(84, posY))}%`;
+            callout.style.transform = 'translateY(-50%)';
+        } else if (posPref === 'izquierda') {
+            callout.style.right = `${Math.max(6, 100 - posX + 4)}%`;
+            callout.style.top = `${Math.max(16, Math.min(84, posY))}%`;
+            callout.style.transform = 'translateY(-50%)';
         } else {
-            callout.style.left = `${posX + 4}%`;
-        }
-
-        if (posY > 65) {
-            callout.style.bottom = `${100 - posY + 4}%`;
-        } else {
-            callout.style.top = `${posY + 4}%`;
+            // 'abajo' (por defecto)
+            callout.style.left = `${Math.max(16, Math.min(84, posX))}%`;
+            callout.style.top = `${Math.min(74, posY + 4)}%`;
+            callout.style.transform = 'translateX(-50%)';
         }
 
         const textoTooltip = hs.tooltip_texto || paso.texto_ayuda || 'Haz clic en este elemento para continuar.';
@@ -268,7 +357,7 @@ function dibujarHotspotsYCallout(paso) {
             <h6><i class="bi bi-cursor-fill"></i> ${escHtml(tituloTooltip)}</h6>
             <div class="guia-callout-text">${textoTooltip}</div>
             <div class="guia-callout-action">
-                <button type="button" class="guia-callout-btn-next" onclick="gpPasoSiguiente()">Continuar</button>
+                <button type="button" class="guia-callout-btn-next" onclick="gpPasoSiguiente(false, null)">Continuar</button>
             </div>
         `;
 
@@ -277,36 +366,73 @@ function dibujarHotspotsYCallout(paso) {
 }
 
 /**
- * Avanza al siguiente paso
+ * Avanza al siguiente paso con animación suave de clic y deslizamiento
  * @param {boolean} isAuto
+ * @param {HTMLElement|null} clickedEl
  */
-function gpPasoSiguiente(isAuto = false) {
-    if (!gpGuiaActual) return;
+function gpPasoSiguiente(isAuto = false, clickedEl = null) {
+    if (!gpGuiaActual || gpIsTransitioning) return;
     if (!isAuto && gpIsAutoPlaying) {
         detenerAutoPlay();
     }
 
-    if (gpPasoIndex < gpGuiaActual.pasos.length - 1) {
-        gpPasoIndex++;
-        renderizarPasoGuia(gpPasoIndex);
-        registrarProgresoGuia(gpGuiaActual.id, gpPasoIndex + 1, 0);
-    } else {
-        // Fin de la guía
-        detenerAutoPlay();
-        registrarProgresoGuia(gpGuiaActual.id, gpGuiaActual.pasos.length, 1);
-        alert('🎉 ¡Felicitaciones! Has completado esta guía interactiva.');
-        cerrarReproductorGuia();
+    const canvasContainer = document.getElementById('gp_canvas_container');
+
+    // 1. Si se hizo clic en un hotspot o botón, emitir animación de confirmación
+    if (clickedEl) {
+        clickedEl.classList.add('clicked');
     }
+    if (canvasContainer) {
+        canvasContainer.classList.add('gp-click-pulse');
+    }
+
+    gpIsTransitioning = true;
+
+    const delayAnimacion = clickedEl ? 220 : 60;
+
+    setTimeout(() => {
+        if (gpPasoIndex < gpGuiaActual.pasos.length - 1) {
+            // Animación de salida deslizante hacia la izquierda
+            if (canvasContainer) {
+                canvasContainer.className = 'guias-canvas-container gp-slide-out-next';
+            }
+
+            setTimeout(() => {
+                gpPasoIndex++;
+                renderizarPasoGuia(gpPasoIndex, 'next');
+                registrarProgresoGuia(gpGuiaActual.id, gpPasoIndex + 1, 0);
+                gpIsTransitioning = false;
+            }, 200);
+        } else {
+            // Fin de la guía
+            detenerAutoPlay();
+            registrarProgresoGuia(gpGuiaActual.id, gpGuiaActual.pasos.length, 1);
+            gpMostrarToast('🎉 ¡Felicitaciones! Has completado esta guía interactiva.', 'success');
+            cerrarReproductorGuia();
+            gpIsTransitioning = false;
+        }
+    }, delayAnimacion);
 }
 
 /**
- * Retrocede al paso anterior
+ * Retrocede al paso anterior con animación suave de deslizamiento inverso
  */
 function gpPasoAnterior() {
+    if (!gpGuiaActual || gpPasoIndex <= 0 || gpIsTransitioning) return;
     if (gpIsAutoPlaying) detenerAutoPlay();
-    if (!gpGuiaActual || gpPasoIndex <= 0) return;
-    gpPasoIndex--;
-    renderizarPasoGuia(gpPasoIndex);
+
+    const canvasContainer = document.getElementById('gp_canvas_container');
+    gpIsTransitioning = true;
+
+    if (canvasContainer) {
+        canvasContainer.className = 'guias-canvas-container gp-slide-out-prev';
+    }
+
+    setTimeout(() => {
+        gpPasoIndex--;
+        renderizarPasoGuia(gpPasoIndex, 'prev');
+        gpIsTransitioning = false;
+    }, 200);
 }
 
 /**
@@ -333,6 +459,36 @@ function escHtml(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+/**
+ * Toast notification para el player
+ */
+function gpMostrarToast(mensaje, tipo) {
+    let container = document.getElementById('toast-container-guias');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'toast-container-guias';
+        container.style.cssText = 'position:fixed;top:20px;right:20px;z-index:999999;min-width:300px;';
+        document.body.appendChild(container);
+    }
+
+    const iconos = { success: 'bi-check-circle-fill', danger: 'bi-exclamation-triangle-fill', info: 'bi-info-circle-fill' };
+    const icono = iconos[tipo] || 'bi-bell-fill';
+    const toast = document.createElement('div');
+    toast.className = `toast-notif toast-${tipo || 'success'}`;
+    toast.innerHTML = `
+        <i class="bi ${icono}"></i>
+        <span>${mensaje}</span>
+        <button class="toast-close" onclick="this.parentElement.remove()">&times;</button>
+    `;
+
+    container.appendChild(toast);
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 400);
+    }, 4000);
 }
 
 // Atajos de teclado

@@ -44,18 +44,6 @@ if (!function_exists('obtenerGuiaActivaPorUrl')) {
                 return null;
             }
 
-            // Validar restricción por cargo si aplica
-            if ($codCargo !== null) {
-                $stmtCargos = $conn->prepare("SELECT CodNivelesCargos FROM guia_cargos_permitidos WHERE id_guia = ?");
-                $stmtCargos->execute([$guia['id']]);
-                $cargosPermitidos = $stmtCargos->fetchAll(PDO::FETCH_COLUMN);
-
-                // Si hay cargos configurados y el del usuario no está en la lista, no mostrar
-                if (!empty($cargosPermitidos) && !in_array((int)$codCargo, array_map('intval', $cargosPermitidos))) {
-                    return null;
-                }
-            }
-
             return $guia;
         } catch (Exception $e) {
             error_log("Error en obtenerGuiaActivaPorUrl: " . $e->getMessage());
@@ -187,6 +175,9 @@ if (!function_exists('renderBotonGuiaInteractiva')) {
                     <div class="guias-player-controls-top">
                         <button type="button" id="gp_btn_autoplay" class="btn btn-sm btn-outline-warning text-white py-1 px-2 d-flex align-items-center gap-1" onclick="toggleAutoPlay()" title="Iniciar / Pausar Reproducción Automática">
                             <i class="bi bi-play-fill" id="gp_autoplay_icon"></i> <span id="gp_autoplay_label" style="font-size:0.8rem;">Auto-Play</span>
+                        </button>
+                        <button type="button" class="guias-player-icon-btn" id="gp_btn_fullscreen" onclick="toggleFullScreenGuia()" title="Pantalla Completa">
+                            <i class="bi bi-arrows-fullscreen" id="gp_fullscreen_icon"></i>
                         </button>
                         <span id="gp_progreso_indicador" class="guias-badge-progreso">Paso 1 de 1</span>
                         <button type="button" class="guias-player-close" onclick="cerrarReproductorGuia()" title="Cerrar Guía">&times;</button>

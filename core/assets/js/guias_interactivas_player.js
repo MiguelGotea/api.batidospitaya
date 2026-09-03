@@ -260,27 +260,6 @@ function dibujarHotspotsYCallout(paso) {
         return;
     }
 
-    // Aplicar Secuencia Cinemática: Zoom In para ubicar -> Retorno suave a tamaño normal
-    const primerHs = hotspots[0];
-    const primerPosX = parseFloat(primerHs.pos_x) || 50;
-    const primerPosY = parseFloat(primerHs.pos_y) || 50;
-
-    // 1. Zoom In hacia el punto donde debe dar clic
-    setTimeout(() => {
-        if (canvasContainer && !gpIsTransitioning) {
-            canvasContainer.style.transformOrigin = `${primerPosX}% ${primerPosY}%`;
-            canvasContainer.style.transform = 'scale(1.26)';
-        }
-    }, 120);
-
-    // 2. Regresar suavemente al tamaño normal (1x) para que el usuario tenga el contexto completo de la pantalla
-    setTimeout(() => {
-        if (canvasContainer && !gpIsTransitioning) {
-            canvasContainer.style.transformOrigin = `${primerPosX}% ${primerPosY}%`;
-            canvasContainer.style.transform = 'scale(1)';
-        }
-    }, 1500);
-
     hotspots.forEach(hs => {
         const posX = parseFloat(hs.pos_x) || 50;
         const posY = parseFloat(hs.pos_y) || 50;
@@ -366,7 +345,7 @@ function dibujarHotspotsYCallout(paso) {
 }
 
 /**
- * Avanza al siguiente paso con animación suave de clic y deslizamiento
+ * Avanza al siguiente paso con transición cinematográfica de diapositiva
  * @param {boolean} isAuto
  * @param {HTMLElement|null} clickedEl
  */
@@ -378,21 +357,17 @@ function gpPasoSiguiente(isAuto = false, clickedEl = null) {
 
     const canvasContainer = document.getElementById('gp_canvas_container');
 
-    // 1. Si se hizo clic en un hotspot o botón, emitir animación de confirmación
+    // Efecto de pulso en el hotspot clickeado
     if (clickedEl) {
         clickedEl.classList.add('clicked');
     }
-    if (canvasContainer) {
-        canvasContainer.classList.add('gp-click-pulse');
-    }
 
     gpIsTransitioning = true;
-
-    const delayAnimacion = clickedEl ? 220 : 60;
+    const delayAnimacion = clickedEl ? 180 : 40;
 
     setTimeout(() => {
         if (gpPasoIndex < gpGuiaActual.pasos.length - 1) {
-            // Animación de salida deslizante hacia la izquierda
+            // Deslizamiento suave hacia la izquierda
             if (canvasContainer) {
                 canvasContainer.className = 'guias-canvas-container gp-slide-out-next';
             }
@@ -402,7 +377,7 @@ function gpPasoSiguiente(isAuto = false, clickedEl = null) {
                 renderizarPasoGuia(gpPasoIndex, 'next');
                 registrarProgresoGuia(gpGuiaActual.id, gpPasoIndex + 1, 0);
                 gpIsTransitioning = false;
-            }, 200);
+            }, 180);
         } else {
             // Fin de la guía
             detenerAutoPlay();
@@ -415,7 +390,7 @@ function gpPasoSiguiente(isAuto = false, clickedEl = null) {
 }
 
 /**
- * Retrocede al paso anterior con animación suave de deslizamiento inverso
+ * Retrocede al paso anterior con transición suave de diapositiva inversa
  */
 function gpPasoAnterior() {
     if (!gpGuiaActual || gpPasoIndex <= 0 || gpIsTransitioning) return;
@@ -432,7 +407,7 @@ function gpPasoAnterior() {
         gpPasoIndex--;
         renderizarPasoGuia(gpPasoIndex, 'prev');
         gpIsTransitioning = false;
-    }, 200);
+    }, 180);
 }
 
 /**
@@ -491,16 +466,31 @@ function gpMostrarToast(mensaje, tipo) {
     }, 4000);
 }
 
-// Atajos de teclado
+// Atajos de teclado para el Reproductor
 document.addEventListener('keydown', function (e) {
     const modal = document.getElementById('modalReproductorGuia');
     if (!modal || modal.style.display === 'none') return;
 
+    // Evitar interceptar teclas si el foco está en un campo de texto
+    if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
     if (e.key === 'Escape') {
-        cerrarReproductorGuia();
-    } else if (e.key === 'ArrowRight') {
+        if (document.fullscreenElement) {
+            try { document.exitFullscreen(); } catch (err) {}
+        } else {
+            cerrarReproductorGuia();
+        }
+    } else if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        e.preventDefault();
         gpPasoSiguiente();
-    } else if (e.key === 'ArrowLeft') {
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
         gpPasoAnterior();
+    } else if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        toggleAutoPlay();
+    } else if (e.key === 'f' || e.key === 'F') {
+        e.preventDefault();
+        toggleFullScreenGuia();
     }
 });

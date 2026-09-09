@@ -376,7 +376,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Despachos Access',
                 'url' => 'despacho/historial_despacho.php',
-                'cargos_permitidos' => [49, 12, 16, 19]
+                'cargos_permitidos' => [49, 12, 16, 19, 61]
             ],
             [
                 'nombre' => 'Despachos ERP',

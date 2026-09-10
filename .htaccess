@@ -1,0 +1,21 @@
+# ─── Seguridad básica ────────────────────────────────────────────────────────
+# Desactivar listado de directorios
+Options -Indexes
+
+# Desactivar reglas de ModSecurity que puedan interferir con la API
+<IfModule mod_security.c>
+SecRuleRemoveById 400011
+SecRuleRemoveById 400012
+</IfModule>
+
+# ─── Permitir acceso público a todos los endpoints ────────────────────────────
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
+
+# ─── CORS — Permitir peticiones desde Access y ERP ───────────────────────────
+<IfModule mod_headers.c>
+    Header always set Access-Control-Allow-Origin "*"
+    Header always set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, X-Requested-With"
+</IfModule>

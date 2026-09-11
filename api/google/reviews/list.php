@@ -26,6 +26,7 @@ try {
             reviewId,
             comment,
             starRating,
+            createTime,
             updateTime,
             reviewReplyComment,
             reviewReplyUpdateTime,

@@ -556,7 +556,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Tolerancia Conteo Cíclico',
                 'url' => 'inventario/porcentaje_tolerancia_conteo_ciclico.php',
-                'cargos_permitidos' => [49, 8, 16, 42, 33, 55, 52]
+                'cargos_permitidos' => [49]
             ],
         ]
     ],

@@ -553,6 +553,11 @@ $menuGlobal = [
                 'url' => 'contabilidad/costo_existencias_productos.php',
                 'cargos_permitidos' => [49, 8, 16, 42, 33]
             ],
+            [
+                'nombre' => 'Tolerancia Conteo Cíclico',
+                'url' => 'inventario/porcentaje_tolerancia_conteo_ciclico.php',
+                'cargos_permitidos' => [49, 8, 16, 42, 33, 55, 52]
+            ],
         ]
     ],
     [

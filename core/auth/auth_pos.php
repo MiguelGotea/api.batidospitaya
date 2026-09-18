@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * POS Authentication Framework - auth_pos.php
  * Batidos Pitaya | Punto de Venta
@@ -10,20 +10,9 @@
  * Seguridad adicional: Solo dispositivos autorizados mediante erp_device_token
  */
 
-// Sesiones de larga duración (2 horas mínimo)
-$pos_session_lifetime = 7200;
-ini_set('session.gc_maxlifetime', $pos_session_lifetime);
-session_set_cookie_params([
-    'lifetime' => $pos_session_lifetime,
-    'path'     => '/',
-    'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
-    'httponly' => true,
-    'samesite' => 'Lax',
-]);
-
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Gestor centralizado de sesiones (8 horas y corte a Medianoche UTC-6)
+require_once __DIR__ . '/session_manager.php';
+iniciarSesionSegura();
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/core/database/conexion.php';
 require_once $_SERVER['DOCUMENT_ROOT'] . '/core/helpers/funciones.php';

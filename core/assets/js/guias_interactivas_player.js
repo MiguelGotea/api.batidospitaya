@@ -45,6 +45,21 @@ function lanzarGuiaInteractiva(idGuia) {
                 return;
             }
 
+            // Precargar todas las imágenes de los pasos en segundo plano para transiciones instantáneas
+            gpGuiaActual.pasos.forEach(p => {
+                if (p.imagen_ruta) {
+                    const preloadImg = new Image();
+                    preloadImg.src = p.imagen_ruta;
+                }
+            });
+
+            // Resetear capas previas
+            const imgBg = document.getElementById('gp_imagen_bg');
+            if (imgBg) {
+                imgBg.style.display = 'none';
+                imgBg.src = '';
+            }
+
             renderizarPasoGuia(gpPasoIndex);
 
             // Registrar inicio en log
@@ -116,7 +131,7 @@ function toggleAutoPlay() {
 }
 
 /**
- * Inicia la reproducción automática (avanza cada 3.5 segundos)
+ * Inicia la reproducción automática (avanza cada 3.8 segundos)
  */
 function iniciarAutoPlay() {
     if (!gpGuiaActual) return;
@@ -168,7 +183,7 @@ function detenerAutoPlay() {
 let gpIsTransitioning = false;
 
 /**
- * Renderiza el paso actual en pantalla
+ * Renderiza el paso actual en pantalla con transición suave crossfade
  * @param {number} index 
  * @param {string} direccion ('next' o 'prev')
  */
@@ -207,23 +222,52 @@ function renderizarPasoGuia(index, direccion = 'next') {
         }
     }
 
-    // Imagen y capa de hotspots
-    const canvasContainer = document.getElementById('gp_canvas_container');
+    // Capas de imagen y hotspots
     const imgEl = document.getElementById('gp_imagen_paso');
+    const imgBg = document.getElementById('gp_imagen_bg');
     const layerEl = document.getElementById('gp_hotspots_layer');
     if (layerEl) layerEl.innerHTML = '';
 
-    if (canvasContainer) {
-        canvasContainer.className = `guias-canvas-container gp-slide-in-${direccion}`;
-        canvasContainer.style.transform = 'scale(1)';
-        canvasContainer.style.transformOrigin = '50% 50%';
-    }
+    const currentSrc = imgEl ? (imgEl.getAttribute('src') || '') : '';
+    const newSrc = paso.imagen_ruta || '';
 
-    if (imgEl) {
+    // Si ya había una imagen mostrándose y es diferente, hacemos crossfade suave sin pantalla negra
+    if (imgEl && imgBg && currentSrc && currentSrc !== newSrc) {
+        imgBg.src = currentSrc;
+        imgBg.style.display = 'block';
+
+        imgEl.style.transition = 'none';
+        imgEl.style.opacity = '0';
+        imgEl.src = newSrc;
+
+        const onImageLoaded = () => {
+            void imgEl.offsetHeight; // Forzar reflow
+            imgEl.style.transition = 'opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1)';
+            imgEl.style.opacity = '1';
+            dibujarHotspotsYCallout(paso);
+
+            setTimeout(() => {
+                if (imgBg) imgBg.style.display = 'none';
+            }, 240);
+        };
+
+        if (imgEl.complete && imgEl.naturalWidth > 0) {
+            onImageLoaded();
+        } else {
+            imgEl.onload = onImageLoaded;
+        }
+    } else if (imgEl) {
+        // Primera carga o misma imagen
+        if (imgBg) imgBg.style.display = 'none';
+        imgEl.style.transition = 'none';
+        imgEl.style.opacity = '1';
         imgEl.onload = function () {
             dibujarHotspotsYCallout(paso);
         };
-        imgEl.src = paso.imagen_ruta;
+        imgEl.src = newSrc;
+        if (imgEl.complete && imgEl.naturalWidth > 0) {
+            dibujarHotspotsYCallout(paso);
+        }
     }
 }
 
@@ -345,7 +389,7 @@ function dibujarHotspotsYCallout(paso) {
 }
 
 /**
- * Avanza al siguiente paso con transición cinematográfica de diapositiva
+ * Avanza al siguiente paso con transición suave
  * @param {boolean} isAuto
  * @param {HTMLElement|null} clickedEl
  */
@@ -355,29 +399,22 @@ function gpPasoSiguiente(isAuto = false, clickedEl = null) {
         detenerAutoPlay();
     }
 
-    const canvasContainer = document.getElementById('gp_canvas_container');
-
     // Efecto de pulso en el hotspot clickeado
     if (clickedEl) {
         clickedEl.classList.add('clicked');
     }
 
     gpIsTransitioning = true;
-    const delayAnimacion = clickedEl ? 180 : 40;
+    const delayAnimacion = clickedEl ? 130 : 0;
 
     setTimeout(() => {
         if (gpPasoIndex < gpGuiaActual.pasos.length - 1) {
-            // Deslizamiento suave hacia la izquierda
-            if (canvasContainer) {
-                canvasContainer.className = 'guias-canvas-container gp-slide-out-next';
-            }
-
+            gpPasoIndex++;
+            renderizarPasoGuia(gpPasoIndex, 'next');
+            registrarProgresoGuia(gpGuiaActual.id, gpPasoIndex + 1, 0);
             setTimeout(() => {
-                gpPasoIndex++;
-                renderizarPasoGuia(gpPasoIndex, 'next');
-                registrarProgresoGuia(gpGuiaActual.id, gpPasoIndex + 1, 0);
                 gpIsTransitioning = false;
-            }, 180);
+            }, 240);
         } else {
             // Fin de la guía
             detenerAutoPlay();
@@ -390,24 +427,18 @@ function gpPasoSiguiente(isAuto = false, clickedEl = null) {
 }
 
 /**
- * Retrocede al paso anterior con transición suave de diapositiva inversa
+ * Retrocede al paso anterior con transición suave
  */
 function gpPasoAnterior() {
     if (!gpGuiaActual || gpPasoIndex <= 0 || gpIsTransitioning) return;
     if (gpIsAutoPlaying) detenerAutoPlay();
 
-    const canvasContainer = document.getElementById('gp_canvas_container');
     gpIsTransitioning = true;
-
-    if (canvasContainer) {
-        canvasContainer.className = 'guias-canvas-container gp-slide-out-prev';
-    }
-
+    gpPasoIndex--;
+    renderizarPasoGuia(gpPasoIndex, 'prev');
     setTimeout(() => {
-        gpPasoIndex--;
-        renderizarPasoGuia(gpPasoIndex, 'prev');
         gpIsTransitioning = false;
-    }, 180);
+    }, 240);
 }
 
 /**

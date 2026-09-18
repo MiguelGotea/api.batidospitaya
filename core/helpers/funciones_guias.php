@@ -186,7 +186,8 @@ if (!function_exists('renderBotonGuiaInteractiva')) {
 
                 <div class="guias-player-body">
                     <div id="gp_canvas_container" class="guias-canvas-container">
-                        <img id="gp_imagen_paso" src="" alt="Captura del paso" class="guias-imagen-pantalla">
+                        <img id="gp_imagen_bg" src="" alt="" class="guias-imagen-pantalla guias-img-bg" style="display: none;">
+                        <img id="gp_imagen_paso" src="" alt="Captura del paso" class="guias-imagen-pantalla guias-img-active">
                         <div id="gp_hotspots_layer" class="guias-hotspots-layer"></div>
                     </div>
                 </div>

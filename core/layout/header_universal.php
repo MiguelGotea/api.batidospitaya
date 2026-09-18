@@ -706,6 +706,66 @@ function renderHeader($usuario, $titulo = '')
                 console.log('No hay modal de ayuda definido para esta página');
             }
         }
+
+        // =========================================================================
+        // HEARTBEAT / PING DE SESIÓN (Renovación periódica y detección de 8h/12am)
+        // =========================================================================
+        (function() {
+            const PING_INTERVAL_MS = 5 * 60 * 1000; // Cada 5 minutos
+            let pingTimer = null;
+            let isCheckingSession = false;
+
+            function verificarSesionPing() {
+                if (isCheckingSession) return;
+                isCheckingSession = true;
+
+                const pingUrl = getBaseUrl() + '/core/auth/ping.php';
+                fetch(pingUrl, {
+                    method: 'GET',
+                    cache: 'no-store',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(response => {
+                    if (response.status === 401) {
+                        return response.json().then(data => {
+                            manejarSesionExpirada(data.message || 'Tu sesión ha expirado.');
+                        }).catch(() => {
+                            manejarSesionExpirada('Tu sesión ha expirado.');
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.status === 'expired') {
+                        manejarSesionExpirada(data.message || 'Tu sesión ha expirado.');
+                    }
+                })
+                .catch(err => {
+                    // Error de red momentáneo: no forzar redirección para no interrumpir offline breve
+                    console.warn('[Heartbeat] Error de conexión momentáneo:', err);
+                })
+                .finally(() => {
+                    isCheckingSession = false;
+                });
+            }
+
+            function manejarSesionExpirada(mensaje) {
+                if (pingTimer) clearInterval(pingTimer);
+                const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
+                const msg = encodeURIComponent(mensaje || 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
+                window.location.href = getBaseUrl() + '/login.php?redirect=' + currentPath + '&error=' + msg;
+            }
+
+            // Iniciar intervalo periódico de 5 minutos
+            pingTimer = setInterval(verificarSesionPing, PING_INTERVAL_MS);
+
+            // Verificar al reactivar la pestaña (si la computadora estuvo suspendida o inactiva)
+            document.addEventListener('visibilitychange', function() {
+                if (document.visibilityState === 'visible') {
+                    verificarSesionPing();
+                }
+            });
+        })();
     </script>
 
     <?php

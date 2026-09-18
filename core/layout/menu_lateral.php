@@ -490,11 +490,6 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Dashboard Consumo',
-                'url' => 'productos/dashboard_consumo.php',
-                'cargos_permitidos' => [49, 55, 19, 52, 62, 12, 16, 42, 11, 21, 33]
-            ],
-            [
                 'nombre' => 'Unidades',
                 'url' => 'productos/historial_unidades_conversion.php',
                 'cargos_permitidos' => [49, 15]

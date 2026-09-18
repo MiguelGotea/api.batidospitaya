@@ -453,11 +453,6 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Impulso de Ventas',
-                'url' => 'sucursales/kpi_sucursales.php',
-                'cargos_permitidos' => [49, 16]
-            ],
-            [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
                 'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49, 16]

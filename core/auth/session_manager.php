@@ -23,8 +23,9 @@ function iniciarSesionSegura()
     $sessionSavePath = $basePath . '/core/sessions';
 
     if (!is_dir($sessionSavePath)) {
-        @mkdir($sessionSavePath, 0700, true);
+        @mkdir($sessionSavePath, 0777, true);
     }
+    @chmod($sessionSavePath, 0777);
 
     if (is_dir($sessionSavePath) && is_writable($sessionSavePath)) {
         session_save_path($sessionSavePath);
@@ -32,6 +33,7 @@ function iniciarSesionSegura()
 
     // Configurar tiempo de vida de la sesión en el servidor y cookie
     ini_set('session.gc_maxlifetime', SESSION_DURATION_SECONDS);
+    ini_set('session.cookie_lifetime', SESSION_DURATION_SECONDS);
 
     $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
 

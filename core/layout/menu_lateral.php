@@ -238,7 +238,7 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Cumpleaños',
+                'nombre' => 'Cumpleaños Clientes',
                 'url' => 'atencioncliente/cumpleanos_clientes.php',
                 'cargos_permitidos' => [49, 22, 28, 50]
             ],
@@ -248,7 +248,7 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50, 33, 21]
             ],
             [
-                'nombre' => 'Campañas WSP',
+                'nombre' => 'Campañas Whatsapp',
                 'url' => 'marketing/campanas_wsp.php',
                 'cargos_permitidos' => [49, 42, 53]
             ]

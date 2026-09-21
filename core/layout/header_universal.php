@@ -726,6 +726,7 @@ function renderHeader($usuario, $titulo = '')
                 return fetch(pingUrl, {
                     method: 'GET',
                     cache: 'no-store',
+                    credentials: 'same-origin',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                 .then(response => {

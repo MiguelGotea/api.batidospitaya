@@ -61,17 +61,12 @@ function obtenerUsuarioActual()
 // Verificar acceso a módulo
 function verificarAccesoModulo($modulo)
 {
-    verificarAutenticacion();
-
-    // Admin tiene acceso a todo
-    if (isset($_SESSION['usuario_rol']) && $_SESSION['usuario_rol'] === 'admin') {
-        return;
-    }
-
     // Normalizar nombres de módulos comunes (singular/plural)
     $moduloBuscado = trim(strtolower($modulo));
-    if ($moduloBuscado === 'operario') $moduloBuscado = 'operarios';
-    if ($moduloBuscado === 'sistema') $moduloBuscado = 'sistemas';
+    if ($moduloBuscado === 'operario')
+        $moduloBuscado = 'operarios';
+    if ($moduloBuscado === 'sistema')
+        $moduloBuscado = 'sistemas';
 
     if (!isset($_SESSION['modulos_permitidos'])) {
         $cargosUsuario = obtenerCargosUsuario($_SESSION['usuario_id']);
@@ -110,7 +105,7 @@ function verificarAccesoModulo($modulo)
 // Al estar aquí, protege automáticamente TODAS las herramientas actuales
 // y futuras sin necesidad de modificar ningún archivo adicional.
 // ─────────────────────────────────────────────────────────────────────────────
-if (isset($_SESSION['usuario_id']) && isset($_SESSION['cargo_cod']) && (int)$_SESSION['cargo_cod'] === 27) {
+if (isset($_SESSION['usuario_id']) && isset($_SESSION['cargo_cod']) && (int) $_SESSION['cargo_cod'] === 27) {
 
     // Obtener sucursal del caché de sesión para evitar consultas innecesarias
     $sucursalCargo27 = $_SESSION['datos_usuario_actual']['sucursal_codigo'] ?? null;

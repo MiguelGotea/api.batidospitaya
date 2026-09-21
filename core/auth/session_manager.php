@@ -19,8 +19,7 @@ function iniciarSesionSegura()
     date_default_timezone_set('America/Managua');
 
     // Directorio privado de sesiones para evitar que el Garbage Collector de Hostinger las borre a los 24 minutos
-    $basePath = !empty($_SERVER['DOCUMENT_ROOT']) ? $_SERVER['DOCUMENT_ROOT'] : dirname(__DIR__, 2);
-    $sessionSavePath = $basePath . '/core/sessions';
+    $sessionSavePath = dirname(__DIR__, 2) . '/core/sessions';
 
     if (!is_dir($sessionSavePath)) {
         @mkdir($sessionSavePath, 0777, true);
@@ -29,11 +28,21 @@ function iniciarSesionSegura()
 
     if (is_dir($sessionSavePath) && is_writable($sessionSavePath)) {
         session_save_path($sessionSavePath);
+    } else {
+        // El directorio privado no está disponible; se usará el path por defecto del servidor.
+        // GC ya está deshabilitado (gc_probability=0) así que las sesiones no serán borradas prematuramente.
+        error_log('[SessionManager] ADVERTENCIA: Directorio de sesiones privado no disponible o no escribible: ' . $sessionSavePath);
     }
 
     // Configurar tiempo de vida de la sesión en el servidor y cookie
-    ini_set('session.gc_maxlifetime', SESSION_DURATION_SECONDS);
+    ini_set('session.gc_maxlifetime',  SESSION_DURATION_SECONDS);
     ini_set('session.cookie_lifetime', SESSION_DURATION_SECONDS);
+
+    // Deshabilitar el Garbage Collector automático de PHP para esta petición.
+    // Esto impide que Hostinger (u otro entorno) destruya sesiones activas
+    // mientras el usuario está trabajando, sin importar qué path se use.
+    ini_set('session.gc_probability', 0);
+    ini_set('session.gc_divisor',     1);
 
     $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
 

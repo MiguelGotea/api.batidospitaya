@@ -712,37 +712,60 @@ function renderHeader($usuario, $titulo = '')
         // =========================================================================
         (function() {
             const PING_INTERVAL_MS = 5 * 60 * 1000; // Cada 5 minutos
+            const MIN_PING_GAP_MS  = 60 * 1000;     // Mínimo 1 minuto entre pings por visibilitychange
             let pingTimer = null;
+            let visibilityDebounceTimer = null;
             let isCheckingSession = false;
+            let lastPingTime = Date.now();
 
-            function verificarSesionPing() {
-                if (isCheckingSession) return;
+            function ejecutarPing(esReintento = false) {
+                if (isCheckingSession) return Promise.resolve(true);
                 isCheckingSession = true;
 
                 const pingUrl = getBaseUrl() + '/core/auth/ping.php';
-                fetch(pingUrl, {
+                return fetch(pingUrl, {
                     method: 'GET',
                     cache: 'no-store',
                     headers: { 'X-Requested-With': 'XMLHttpRequest' }
                 })
                 .then(response => {
+                    lastPingTime = Date.now();
                     if (response.status === 401) {
-                        return response.json().then(data => {
+                        return response.json().catch(() => ({ status: 'expired' })).then(data => {
+                            if (!esReintento) {
+                                // Reintentar una vez tras 2 segundos para descartar colisiones o bloqueos momentáneos
+                                isCheckingSession = false;
+                                return new Promise(resolve => {
+                                    setTimeout(() => {
+                                        ejecutarPing(true).then(resolve);
+                                    }, 2000);
+                                });
+                            }
+                            // Si se confirma en el segundo intento, la sesión expiró de forma legítima
                             manejarSesionExpirada(data.message || 'Tu sesión ha expirado.');
-                        }).catch(() => {
-                            manejarSesionExpirada('Tu sesión ha expirado.');
+                            return false;
                         });
                     }
                     return response.json();
                 })
                 .then(data => {
                     if (data && data.status === 'expired') {
+                        if (!esReintento) {
+                            isCheckingSession = false;
+                            return new Promise(resolve => {
+                                setTimeout(() => {
+                                    ejecutarPing(true).then(resolve);
+                                }, 2000);
+                            });
+                        }
                         manejarSesionExpirada(data.message || 'Tu sesión ha expirado.');
                     }
+                    return true;
                 })
                 .catch(err => {
                     // Error de red momentáneo: no forzar redirección para no interrumpir offline breve
                     console.warn('[Heartbeat] Error de conexión momentáneo:', err);
+                    return true;
                 })
                 .finally(() => {
                     isCheckingSession = false;
@@ -751,18 +774,25 @@ function renderHeader($usuario, $titulo = '')
 
             function manejarSesionExpirada(mensaje) {
                 if (pingTimer) clearInterval(pingTimer);
+                if (visibilityDebounceTimer) clearTimeout(visibilityDebounceTimer);
                 const currentPath = encodeURIComponent(window.location.pathname + window.location.search);
                 const msg = encodeURIComponent(mensaje || 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.');
                 window.location.href = getBaseUrl() + '/login.php?redirect=' + currentPath + '&error=' + msg;
             }
 
             // Iniciar intervalo periódico de 5 minutos
-            pingTimer = setInterval(verificarSesionPing, PING_INTERVAL_MS);
+            pingTimer = setInterval(() => ejecutarPing(false), PING_INTERVAL_MS);
 
-            // Verificar al reactivar la pestaña (si la computadora estuvo suspendida o inactiva)
+            // Verificar al reactivar la pestaña con debounce y respetando el gap mínimo
             document.addEventListener('visibilitychange', function() {
                 if (document.visibilityState === 'visible') {
-                    verificarSesionPing();
+                    if (visibilityDebounceTimer) clearTimeout(visibilityDebounceTimer);
+                    visibilityDebounceTimer = setTimeout(() => {
+                        const tiempoTranscurrido = Date.now() - lastPingTime;
+                        if (tiempoTranscurrido >= MIN_PING_GAP_MS) {
+                            ejecutarPing(false);
+                        }
+                    }, 1000);
                 }
             });
         })();

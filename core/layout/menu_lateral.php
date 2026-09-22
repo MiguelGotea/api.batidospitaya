@@ -534,7 +534,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Costo de Existencias',
                 'url' => 'contabilidad/costo_existencias_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 42, 33]
+                'cargos_permitidos' => [49, 8, 16, 42]
             ],
             [
                 'nombre' => 'Tolerancia Conteo Cíclico',

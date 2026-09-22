@@ -31,7 +31,9 @@ $menuGlobal = [
             [
                 'nombre' => 'Avisos',
                 'url' => 'supervision/auditorias_original/index_avisos.php',
-                'cargos_permitidos' => []
+                // Excel Operaciones: Gerente(11), LiderCIF(33), Entrenadora(62), Auditor(52),
+                // Supervision(21), Lideres(5,43,67), Tiendas(27), JefeExpansion(35), SupMtto(63), TecMtto(56)
+                'cargos_permitidos' => [5, 11, 21, 27, 33, 35, 43, 52, 56, 62, 63, 67]
             ]
         ]
     ],
@@ -43,7 +45,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Gestion de Asistencia',
                 'url' => 'rh/ver_marcaciones_todas_nuevo.php',
-                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52, 65, 8, 19, 41, 64, 30, 13, 39, 28, 11, 15, 63, 61]
+                // Excel: agregar 35(JefeExp), 62(Entrenadora), 67(LiderRot); quitar 63(SupMtto)
+                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52, 65, 8, 19, 41, 64, 30, 13, 39, 28, 11, 15, 61, 35, 62, 67]
             ],
             [
                 'nombre' => 'Tardanzas',
@@ -63,7 +66,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Viaticos',
                 'url' => 'operaciones/viaticos.php',
-                'cargos_permitidos' => [49, 16, 8, 52]
+                // Excel: agregar 11(Gerente Ops), 21(SupTiendas); quitar 52(Auditor)
+                'cargos_permitidos' => [49, 16, 8, 11, 21]
             ],
             [
                 'nombre' => 'Configuración Viáticos',
@@ -73,17 +77,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]
+                // Excel: agregar 67(LiderRotativo); quitar 52(Auditor)
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 67]
             ],
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33, 52]
+                // Excel: quitar 52(Auditor de Tiendas)
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33]
             ],
             [
                 'nombre' => 'Generar Horarios',
                 'url' => 'lideres/programar_horarios_lider2.php',
-                'cargos_permitidos' => [49, 5, 43]
+                // Excel: agregar 67(Lider Rotativo)
+                'cargos_permitidos' => [49, 5, 43, 67]
             ],
             [
                 'nombre' => 'Confirmar Horarios',
@@ -93,12 +100,14 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65, 41, 65]
+                // Excel: agregar 35(JefeExpansion), 63(SupMtto), 67(LiderRotativo)
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65, 41, 35, 63, 67]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21, 30, 41, 65]
+                // Excel: agregar 52(Auditor), 62(Entrenadora)
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21, 30, 41, 65, 52, 62]
             ],
             [
                 'nombre' => 'Gestion de Feriados',
@@ -120,7 +129,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Maestro Colaboradores',
                 'url' => 'rh/colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
+                // Excel: agregar 11(Gerente de Operaciones)
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 11]
             ],
             [
                 'nombre' => 'Agenda Colaboradores',
@@ -130,7 +140,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Cumpleaños Colaboradores',
                 'url' => 'rh/cumpleanos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 42, 41]
+                // Excel: agregar 11(Gerente Ops), 21(SupTiendas), 33(LiderCIF)
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 42, 41, 11, 21, 33]
             ],
 
         ]
@@ -170,12 +181,14 @@ $menuGlobal = [
             [
                 'nombre' => 'Auditorias de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
-                'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52]
+                // Excel: agregar 5(Lider), 27(Tiendas), 43(LiderInterino), 62(Entrenadora), 67(LiderRot)
+                'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52, 5, 27, 43, 62, 67]
             ],
             [
                 'nombre' => 'Auditorias de Desempeño',
                 'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
-                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49, 27]
+                // Excel: agregar 5(Lider), 33(LiderCIF), 43(LiderInterino), 62(Entrenadora), 67(LiderRot)
+                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49, 27, 5, 33, 43, 62, 67]
             ],
             [
                 'nombre' => 'Deducciones',
@@ -190,17 +203,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Cierres Diarios',
                 'url' => 'contabilidad/historial_cierres_diarios.php',
-                'cargos_permitidos' => [52, 49, 42, 8, 33, 21]
+                // Excel: agregar 11(Gerente Ops), 62(Entrenadora)
+                'cargos_permitidos' => [52, 49, 42, 8, 33, 21, 11, 62]
             ],
             [
                 'nombre' => 'Depositos de Tiendas',
                 'url' => 'contabilidad/masivo_depositos.php',
-                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 43]
+                // Excel: agregar 11(Gerente Ops), 62(Entrenadora), 67(LiderRotativo)
+                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 43, 11, 62, 67]
             ],
             [
                 'nombre' => 'Mermas',
                 'url' => 'inventario/mermas_productos.php',
-                'cargos_permitidos' => [33, 8, 42, 52, 21, 49]
+                // Excel: agregar 5(Lider), 11(Gerente Ops), 27(Tiendas), 43(LiderInterino), 62(Entrenadora), 67(LiderRot)
+                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 11, 27, 43, 62, 67]
             ],
             [
                 'nombre' => 'Balance Inventario',
@@ -218,17 +234,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Reclamo de Clientes',
                 'url' => 'supervision/auditorias_original/index_reclamos.php',
-                'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21]
+                // Excel: agregar 5(Lider), 43(LiderInterino), 62(Entrenadora), 67(LiderRotativo)
+                'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21, 5, 43, 62, 67]
             ],
             [
                 'nombre' => 'KPI Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
-                'cargos_permitidos' => [49, 16, 21, 50, 11, 42, 33, 52, 53]
+                // Excel: solo 11(Gerente Ops); quitar 21, 33, 52 del area ops
+                'cargos_permitidos' => [49, 16, 50, 11, 42, 53]
             ],
             [
                 'nombre' => 'Historial Reseñas Google',
                 'url' => 'marketing/resenas_google_descargado.php',
-                'cargos_permitidos' => [49, 16, 50, 42, 53, 52, 33, 21]
+                // Excel: 11(Gerente Ops), 21(SupTiendas); quitar 33, 52
+                'cargos_permitidos' => [49, 16, 50, 42, 53, 21, 11]
             ],
         ]
     ],
@@ -245,7 +264,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Clientes Club',
                 'url' => 'atencioncliente/historial_clientes.php',
-                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50, 33, 21]
+                // Excel: agregar 11(Gerente Ops)
+                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50, 33, 21, 11]
             ],
             [
                 'nombre' => 'Campañas Whatsapp',
@@ -284,7 +304,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Solicitudes de Mantenimiento',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52, 61, 19, 15]
+                // Excel: agregar 27(Tiendas), 62(Entrenadora), 67(LiderRotativo)
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52, 61, 19, 15, 27, 62, 67]
             ],
             [
                 'nombre' => 'Informe Diario',
@@ -344,7 +365,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Catálogo de Herramientas',
                 'url' => 'sistemas/catalogo_herramientas.php',
-                'cargos_permitidos' => [49, 15, 16]
+                // Excel: agregar 11(Gerente de Operaciones)
+                'cargos_permitidos' => [49, 15, 16, 11]
             ],
             [
                 'nombre' => 'Configuración de Tiendas',
@@ -371,7 +393,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Despachos ERP',
                 'url' => 'despacho/historial_despachos.php',
-                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43, 42, 62, 33]
+                // Excel: agregar 11(Gerente Ops), 67(LiderRotativo)
+                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43, 42, 62, 11, 67]
             ],
             [
                 'nombre' => 'Plan Despacho Perecibles',
@@ -386,17 +409,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Pedido Perecibles Central',
                 'url' => 'sucursales/compra_local_registro_pedidos.php',
-                'cargos_permitidos' => [49, 27]
+                // Excel: agregar 5(Lider), 43(LiderInterino), 67(LiderRotativo)
+                'cargos_permitidos' => [49, 27, 5, 43, 67]
             ],
             [
                 'nombre' => 'Consolidado Pedido Perecibles',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33, 52, 61, 19]
+                // Excel: quitar 52(Auditor de Tiendas)
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 33, 61, 19]
             ],
             [
                 'nombre' => 'Proyeccion de Abastecimiento',
                 'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9]
+                // Excel: agregar 62(Entrenadora de Desarrollo e Innovacion)
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9, 62]
             ],
         ]
     ],
@@ -408,17 +434,20 @@ $menuGlobal = [
             [
                 'nombre' => 'Facturacion de Ferias',
                 'url' => 'sucursales/ferias/index_ferias.php',
-                'cargos_permitidos' => [49, 27, 26]
+                // Excel: agregar 11(Gerente de Operaciones)
+                'cargos_permitidos' => [49, 27, 26, 11]
             ],
             [
                 'nombre' => 'Cupones',
                 'url' => 'marketing/cupones.php',
-                'cargos_permitidos' => [49, 16, 42, 26]
+                // Excel: agregar 11(Gerente de Operaciones)
+                'cargos_permitidos' => [49, 16, 42, 26, 11]
             ],
             [
                 'nombre' => 'Historial de Ventas',
                 'url' => 'ventas/historial_ventas.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 42, 53, 8, 21]
+                // Excel: agregar 11(Gerente Ops), 33(LiderCIF), 52(Auditor), 62(Entrenadora)
+                'cargos_permitidos' => [49, 16, 42, 26, 53, 8, 21, 11, 33, 52, 62]
             ],
             [
                 'nombre' => 'Graficos con IA',
@@ -445,7 +474,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49, 16]
+                // Excel: agregar 67(Lider Rotativo)
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49, 16, 67]
             ],
             [
                 'nombre' => 'Liderazgo',
@@ -455,7 +485,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Reporte de Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 16]
+                // Excel: 11(Gerente), 21(SupTiendas), 33(LiderCIF) ya presentes - sin cambios en ops
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33]
             ],
             [
                 'nombre' => 'Edición de Indicadores',
@@ -470,7 +501,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 33, 53, 50, 26]
+                // Excel: solo 11 y 21 de ops; quitar 33; agregar 21
+                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 53, 50, 26, 21]
             ],
         ]
     ],
@@ -514,19 +546,22 @@ $menuGlobal = [
             [
                 'nombre' => 'Conteo Ciclico',
                 'url' => 'inventario/historial_conteo_existencias.php',
-                'cargos_permitidos' => [16, 49, 55, 52, 5, 43, 21, 16, 42, 33, 47, 46, 45, 66, 67]
+                // Excel: agregar 11(Gerente Ops), 62(Entrenadora); quitar vendedores(47,46,45,66)
+                'cargos_permitidos' => [16, 49, 55, 52, 5, 43, 21, 42, 33, 67, 11, 62]
             ],
             [
                 'nombre' => 'Kardex de Insumos',
                 'url' => 'inventario/kardex_insumo.php',
-                'cargos_permitidos' => [49, 16, 55, 11, 21, 42, 33, 52]
+                // Excel: quitar 33(LiderCIF)
+                'cargos_permitidos' => [49, 16, 55, 11, 21, 42, 52]
             ],
 
 
             [
                 'nombre' => 'Costo para Deducciones',
                 'url' => 'contabilidad/costo_descuento_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 42, 33]
+                // Excel: solo 11 de ops; quitar 33, agregar 11
+                'cargos_permitidos' => [49, 8, 16, 42, 11]
             ],
             [
                 'nombre' => 'Costo de Existencias',
@@ -536,7 +571,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Tolerancia Conteo Cíclico',
                 'url' => 'inventario/porcentaje_tolerancia_conteo_ciclico.php',
-                'cargos_permitidos' => [49]
+                // Excel: agregar 11(Gerente de Operaciones)
+                'cargos_permitidos' => [49, 11]
             ],
         ]
     ],
@@ -548,7 +584,8 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52, 19]
+                // Excel: agregar 62(Entrenadora de Desarrollo e Innovacion)
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52, 19, 62]
             ],
 
         ]

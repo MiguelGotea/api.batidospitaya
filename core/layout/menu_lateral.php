@@ -207,7 +207,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Balance Inventario',
                 'url' => 'productos/balance_inventario_access_host.php',
-                'cargos_permitidos' => [49, 12, 55, 16, 42, 52, 11, 21]
+                'cargos_permitidos' => [49, 12, 55, 16, 42]
             ],
         ]
     ],

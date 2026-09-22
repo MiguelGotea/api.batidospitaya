@@ -33,7 +33,7 @@ $menuGlobal = [
                 'url' => 'supervision/auditorias_original/index_avisos.php',
                 // Excel Operaciones: Gerente(11), LiderCIF(33), Entrenadora(62), Auditor(52),
                 // Supervision(21), Lideres(5,43,67), Tiendas(27), JefeExpansion(35), SupMtto(63), TecMtto(56)
-                'cargos_permitidos' => [5, 11, 21, 27, 33, 35, 43, 52, 56, 62, 63, 67]
+                'cargos_permitidos' => []
             ]
         ]
     ],

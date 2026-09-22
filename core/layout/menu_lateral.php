@@ -296,12 +296,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Informe Diario',
                 'url' => 'mantenimiento/historial_informes.php',
-                'cargos_permitidos' => [49, 14, 56, 16, 35, 63]
+                'cargos_permitidos' => [49, 16]
             ],
             [
                 'nombre' => 'Calendario',
                 'url' => 'mantenimiento/programacion_solicitudes.php',
-                'cargos_permitidos' => [49, 21, 16, 35, 33, 52, 63]
+                'cargos_permitidos' => [49, 16]
             ]
         ]
 

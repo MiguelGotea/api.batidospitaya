@@ -1,9 +1,9 @@
 <?php
 // /core/auth/session_manager.php
-// Gestor centralizado de sesiones del ERP con regla de 8 horas y corte a Medianoche (12:00 AM UTC-6)
+// Gestor centralizado de sesiones del ERP con inactividad de 8 horas y corte a Medianoche (12:00 AM UTC-6)
 
 if (!defined('SESSION_DURATION_SECONDS')) {
-    define('SESSION_DURATION_SECONDS', 28800); // 8 horas en segundos
+    define('SESSION_DURATION_SECONDS', 28800); // 8 horas de inactividad máxima
 }
 
 /**
@@ -35,7 +35,9 @@ function iniciarSesionSegura()
     }
 
     // Configurar tiempo de vida de la sesión en el servidor y cookie
-    ini_set('session.gc_maxlifetime',  SESSION_DURATION_SECONDS);
+    // Se usa SESSION_DURATION_SECONDS * 2 como margen para que el GC del servidor
+    // no destruya el archivo de sesión antes de que nuestra lógica de inactividad lo haga.
+    ini_set('session.gc_maxlifetime',  SESSION_DURATION_SECONDS * 2);
     ini_set('session.cookie_lifetime', SESSION_DURATION_SECONDS);
 
     // Deshabilitar el Garbage Collector automático de PHP para esta petición.
@@ -102,11 +104,15 @@ function verificarExpiracionSesion()
         $motivoExpiracion = 'midnight';
     }
 
-    // Regla 2: Validar tiempo máximo de 8 horas
-    if (!$haExpirado && isset($_SESSION['login_time'])) {
-        if (($ahora - $_SESSION['login_time']) > SESSION_DURATION_SECONDS) {
+    // Regla 2: Validar inactividad máxima de 8 horas (ventana deslizante)
+    // Se usa last_activity (que se actualiza en cada petición) en lugar de login_time
+    // (que es fijo desde el login). Así la sesión solo expira si el usuario estuvo
+    // inactivo más de SESSION_DURATION_SECONDS segundos seguidos.
+    if (!$haExpirado) {
+        $ultimaActividad = $_SESSION['last_activity'] ?? $_SESSION['login_time'] ?? null;
+        if ($ultimaActividad !== null && ($ahora - $ultimaActividad) > SESSION_DURATION_SECONDS) {
             $haExpirado = true;
-            $motivoExpiracion = 'timeout_8h';
+            $motivoExpiracion = 'inactividad_8h';
         }
     }
 

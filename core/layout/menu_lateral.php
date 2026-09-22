@@ -165,17 +165,17 @@ $menuGlobal = [
             [
                 'nombre' => 'Anulacion de Pedidos',
                 'url' => 'sistemas/gestion_anulaciones.php',
-                'cargos_permitidos' => [49, 11, 21, 33, 42, 16]
+                'cargos_permitidos' => [49, 11, 21, 33, 16]
             ],
             [
                 'nombre' => 'Auditorias de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
-                'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52, 5, 27, 43, 62, 67]
+                'cargos_permitidos' => [49, 11, 21, 16, 33, 52, 5, 27, 43, 62, 67]
             ],
             [
                 'nombre' => 'Auditorias de Desempeño',
                 'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
-                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49, 27, 5, 33, 43, 62, 67]
+                'cargos_permitidos' => [13, 16, 52, 11, 21, 49, 27, 5, 33, 43, 62, 67]
             ],
             [
                 'nombre' => 'Deducciones',
@@ -190,27 +190,27 @@ $menuGlobal = [
             [
                 'nombre' => 'Cierres Diarios',
                 'url' => 'contabilidad/historial_cierres_diarios.php',
-                'cargos_permitidos' => [52, 49, 42, 8, 33, 21, 11, 62]
+                'cargos_permitidos' => [52, 49, 8, 33, 21, 11, 62]
             ],
             [
                 'nombre' => 'Depositos de Tiendas',
                 'url' => 'contabilidad/masivo_depositos.php',
-                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 43, 11, 62, 67]
+                'cargos_permitidos' => [33, 8, 52, 21, 49, 5, 43, 11, 62, 67]
             ],
             [
                 'nombre' => 'Mermas',
                 'url' => 'inventario/mermas_productos.php',
-                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 11, 27, 43, 62, 67]
+                'cargos_permitidos' => [33, 8, 52, 21, 49, 5, 11, 27, 43, 62, 67]
             ],
             [
                 'nombre' => 'Balance Inventario',
                 'url' => 'productos/balance_inventario_access_host.php',
-                'cargos_permitidos' => [49, 12, 55, 16, 42]
+                'cargos_permitidos' => [49, 12, 55, 16]
             ],
             [
                 'nombre' => 'Proyeccion de Abastecimiento',
                 'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9, 62]
+                'cargos_permitidos' => [11, 12, 16, 49, 21, 33, 52, 19, 61, 9, 62]
             ],
         ]
     ],

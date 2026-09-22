@@ -95,7 +95,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65, 41, 35, 63, 67]
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 33, 52, 62, 65, 41, 35, 63, 67] // MV: quitado 53 (Coordinador no tiene vista en Excel)
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
@@ -127,7 +127,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Agenda Colaboradores',
                 'url' => 'rh/contactos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 42] // MV: agregado 42 (Gerente tiene vista en Excel)
             ],
             [
                 'nombre' => 'Cumpleaños Colaboradores',
@@ -225,7 +225,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Reclamo de Clientes',
                 'url' => 'supervision/auditorias_original/index_reclamos.php',
-                'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21, 5, 43, 62, 67]
+                'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21, 5, 43, 62, 67, 53] // MV: agregado 53 (Coordinador tiene vista en Excel)
             ],
             [
                 'nombre' => 'KPI Reseñas Google',
@@ -247,7 +247,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Cumpleaños Clientes',
                 'url' => 'atencioncliente/cumpleanos_clientes.php',
-                'cargos_permitidos' => [49, 22, 28, 50]
+                'cargos_permitidos' => [49, 22, 28, 50, 42, 53] // MV: agregados 42 (Gerente) y 53 (Coordinador) tienen vista en Excel
             ],
             [
                 'nombre' => 'Clientes Club',
@@ -257,7 +257,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Campañas Whatsapp',
                 'url' => 'marketing/campanas_wsp.php',
-                'cargos_permitidos' => [49, 42, 53]
+                'cargos_permitidos' => [49, 42, 53, 50] // MV: agregado 50 (Especialista tiene vista en Excel)
             ]
         ]
     ],
@@ -351,7 +351,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Catálogo de Herramientas',
                 'url' => 'sistemas/catalogo_herramientas.php',
-                'cargos_permitidos' => [49, 15, 16, 11]
+                'cargos_permitidos' => [49, 15, 16, 11, 42] // MV: agregado 42 (Gerente tiene vista en Excel)
             ],
             [
                 'nombre' => 'Configuración de Tiendas',
@@ -416,12 +416,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Cupones',
                 'url' => 'marketing/cupones.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 11]
+                'cargos_permitidos' => [49, 16, 42, 26, 11, 50, 53] // MV: agregados 50 (Especialista) y 53 (Coordinador) tienen vista en Excel
             ],
             [
                 'nombre' => 'Historial de Ventas',
                 'url' => 'ventas/historial_ventas.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 53, 8, 21, 11, 33, 52, 62]
+                'cargos_permitidos' => [49, 16, 42, 26, 53, 8, 21, 11, 33, 52, 62, 50] // MV: agregado 50 (Especialista tiene vista en Excel)
             ],
             [
                 'nombre' => 'Graficos con IA',
@@ -448,7 +448,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49, 16, 67]
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 49, 16, 67] // MV: quitado 53 (Coordinador no tiene vista en Excel)
             ],
             [
                 'nombre' => 'Liderazgo',
@@ -458,7 +458,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Reporte de Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33]
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 55, 21, 33] // MV: quitados 50 y 53 (Especialista y Coordinador no tienen vista en Excel)
             ],
             [
                 'nombre' => 'Edición de Indicadores',
@@ -473,7 +473,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 53, 50, 26, 21]
+                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 26, 21] // MV: quitados 53 y 50 (Coordinador y Especialista no tienen vista en Excel)
             ],
         ]
     ],
@@ -551,7 +551,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52, 19, 62]
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52, 19, 62, 50, 53] // MV: agregados 50 (Especialista) y 53 (Coordinador) tienen vista en Excel
             ],
 
         ]

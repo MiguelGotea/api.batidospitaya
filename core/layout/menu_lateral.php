@@ -564,27 +564,27 @@ $menuGlobal = [
             [
                 'nombre' => 'Sobre Nosotros',
                 'url' => 'talento_contenido/nosotros.php',
-                'cargos_permitidos' => [16, 49, 42, 50, 15]
+                'cargos_permitidos' => [16, 49, 15]
             ],
             [
                 'nombre' => 'Colaboradores Portal',
                 'url' => 'talento_contenido/colaboradores.php',
-                'cargos_permitidos' => [16, 49, 42, 50, 15]
+                'cargos_permitidos' => [16, 49, 15]
             ],
             [
                 'nombre' => 'Noticias Portal',
                 'url' => 'talento_contenido/noticias.php',
-                'cargos_permitidos' => [16, 49, 42, 50, 15]
+                'cargos_permitidos' => [16, 49, 15]
             ],
             [
                 'nombre' => 'Habilidades Portal',
                 'url' => 'talento_contenido/habilidades.php',
-                'cargos_permitidos' => [16, 49, 42, 50, 15]
+                'cargos_permitidos' => [16, 49, 15]
             ],
             [
                 'nombre' => 'Configuración Portal',
                 'url' => 'talento_contenido/configuracion.php',
-                'cargos_permitidos' => [16, 49, 42, 50, 15]
+                'cargos_permitidos' => [16, 49, 15]
             ],
         ]
     ],

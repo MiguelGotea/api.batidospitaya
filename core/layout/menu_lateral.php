@@ -46,6 +46,11 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52, 65, 8, 19, 41, 64, 30, 13, 39, 28, 11, 15, 61, 35, 62, 67]
             ],
             [
+                'nombre' => 'Boletas de Pago',
+                'url' => 'contabilidad/boleta_pago.php',
+                'cargos_permitidos' => [49, 8]
+            ],
+            [
                 'nombre' => 'Tardanzas',
                 'url' => 'operaciones/tardanzas_manual.php',
                 'cargos_permitidos' => [49]

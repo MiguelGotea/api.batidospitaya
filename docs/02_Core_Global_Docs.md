@@ -629,7 +629,7 @@ $menuGlobal = [
         'items' => [
             [
                 'nombre' => 'Gestión de Ferias', 
-                'url' => 'sucursales/ferias/index.php',
+                'url' => 'sucursales/ferias/index_ferias.php',
                 'cargos_permitidos' => [49, 27, 26]
             ],
             [

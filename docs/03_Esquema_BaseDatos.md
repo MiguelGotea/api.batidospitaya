@@ -130,99 +130,85 @@ CREATE TABLE `sucursales` (
 ```sql
 CREATE TABLE `tools_erp` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(255) NOT NULL COMMENT 'Identificador único (snake_case)',
-  `titulo` varchar(100) NOT NULL COMMENT 'Título mostrado en UI',
-  `tipo_componente` enum('herramienta','indicador','balance') DEFAULT 'herramienta',
-  `class_name` varchar(100) DEFAULT NULL COMMENT 'Clase PHP para componentes dinámicos',
-  `config_json` text DEFAULT NULL COMMENT 'Configuración JSON adicional',
-  `grupo` varchar(255) NOT NULL COMMENT 'Módulo al que pertenece (ej: marketing, rh, operaciones)',
-  `descripcion` varchar(255) DEFAULT NULL COMMENT 'Descripción breve de la funcionalidad',
-  `url_real` varchar(255) DEFAULT NULL COMMENT 'Ruta real del archivo PHP',
-  `url_alias` varchar(255) DEFAULT NULL COMMENT 'Alias amigable para URL',
-  `icono` varchar(255) DEFAULT NULL COMMENT 'Clase CSS del icono (Font Awesome)',
-  `orden` int(11) DEFAULT 0 COMMENT 'Orden de visualización en menús',
+  `nombre` varchar(255) NOT NULL,
+  `titulo` varchar(100) NOT NULL,
+  `tipo_componente` enum('herramienta','indicador','balance','alerta','notificacion_email') NOT NULL DEFAULT 'herramienta' COMMENT 'Tipo de componente del sistema',
+  `class_name` varchar(100) DEFAULT NULL,
+  `config_json` text DEFAULT NULL,
+  `grupo` varchar(255) NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `descripcion_breve` varchar(255) DEFAULT NULL COMMENT 'Resumen conciso (<=200 chars) del propósito de la herramienta para onboarding RRHH',
+  `url_real` varchar(255) DEFAULT NULL,
+  `url_alias` varchar(255) DEFAULT NULL,
+  `icono` varchar(255) DEFAULT NULL,
+  `orden` int(11) DEFAULT 0,
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `activo` tinyint(4) NOT NULL DEFAULT 1 COMMENT '1=activo, 0=inactivo',
+  `activo` tinyint(4) NOT NULL DEFAULT 1,
+  `en_pruebas` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'Si es 1, la herramienta está en pruebas/testing y se excluye del catálogo oficial',
   PRIMARY KEY (`id`),
   KEY `idx_tipo_componente` (`tipo_componente`,`activo`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=202 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 ```
 
 ### Campos Principales
 
 | Campo | Tipo | Requerido | Descripción | Ejemplo |
 |-------|------|-----------|-------------|---------|
-| `nombre` | varchar(255) | ✅ | Identificador único en snake_case | `'gestion_sorteos'` |
-| `titulo` | varchar(100) | ✅ | Título mostrado en la interfaz | `'Gestión Sorteos'` |
-| `tipo_componente` | enum | ⚪ | Tipo: herramienta, indicador, balance | `'herramienta'` |
-| `grupo` | varchar(255) | ✅ | Módulo del sistema | `'marketing'` |
-| `descripcion` | varchar(255) | ⚪ | Descripción funcional | `'Gestión de registros del sorteo Pitaya Love'` |
-| `url_real` | varchar(255) | ⚪ | Ruta del archivo | `'/modulos/marketing/gestion_sorteos.php'` |
-| `url_alias` | varchar(255) | ⚪ | URL amigable | `'gestion-sorteos'` |
-| `icono` | varchar(255) | ⚪ | Icono Font Awesome | `'fas fa-gift'` |
-| `orden` | int(11) | ⚪ | Orden de visualización | `10` |
+| `nombre` | varchar(255) | ✅ | Identificador único en snake_case | `'pos_ferias'` |
+| `titulo` | varchar(100) | ✅ | Título mostrado en la interfaz | `'POS Ferias'` |
+| `tipo_componente` | enum | ✅ NOT NULL | `herramienta`, `indicador`, `balance`, `alerta`, `notificacion_email` | `'herramienta'` |
+| `grupo` | varchar(255) | ✅ | Módulo del sistema | `'Sucursales'` |
+| `descripcion` | varchar(255) | ⚪ | Descripción funcional larga | `'POS de facturación para ferias'` |
+| `descripcion_breve` | varchar(255) | ⚪ | Resumen ≤200 chars para onboarding RRHH | `'POS ferias'` |
+| `url_real` | varchar(255) | ⚪ | Ruta del archivo PHP | `'/modulos/sucursales/ferias/index_ferias.php'` |
+| `url_alias` | varchar(255) | ⚪ | URL amigable | `'pos-ferias'` |
+| `icono` | varchar(255) | ⚪ | Icono Font Awesome | `'fas fa-people-carry'` |
+| `orden` | int(11) | ⚪ | Orden de visualización (default 0) | `10` |
 | `activo` | tinyint(4) | ⚪ | Estado (default: 1) | `1` |
+| `en_pruebas` | tinyint(1) | ⚪ | En testing, excluye del catálogo (default: 0) | `0` |
 
 ### Template SQL para Registro
 
 ```sql
 -- Template completo para registrar nueva herramienta
-INSERT INTO tools_erp (
-    nombre,           -- REQUERIDO: Identificador único
-    titulo,           -- REQUERIDO: Título para UI
-    tipo_componente,  -- OPCIONAL: 'herramienta', 'indicador', 'balance'
-    grupo,            -- REQUERIDO: Módulo
-    descripcion,      -- OPCIONAL: Descripción breve
-    url_real,         -- OPCIONAL: Ruta del archivo PHP
-    url_alias,        -- OPCIONAL: Alias para URL amigable
-    icono,            -- OPCIONAL: Clase CSS del icono
-    orden,            -- OPCIONAL: Orden de visualización
-    activo            -- OPCIONAL: 1 = activo, 0 = inactivo
-)
-VALUES (
+INSERT INTO tools_erp (nombre, titulo, tipo_componente, grupo, descripcion, url_real, activo)
+SELECT
     'nombre_herramienta',
     'Título Herramienta',
     'herramienta',
     'nombre_modulo',
     'Descripción de la herramienta',
     '/modulos/nombre_modulo/archivo.php',
-    'alias-url',
-    'fas fa-icon',
-    10,
     1
-)
-ON DUPLICATE KEY UPDATE 
-    titulo = 'Título Herramienta',
-    descripcion = 'Descripción de la herramienta',
-    url_real = '/modulos/nombre_modulo/archivo.php',
-    url_alias = 'alias-url',
-    icono = 'fas fa-icon',
-    orden = 10,
-    activo = 1;
+WHERE NOT EXISTS (SELECT 1 FROM tools_erp WHERE nombre = 'nombre_herramienta');
 ```
 
 ### Ejemplo Real
 
 ```sql
--- Ejemplo: Gestión de Sorteos Pitaya Love
-INSERT INTO tools_erp (
-    nombre, titulo, tipo_componente, grupo, descripcion,
-    url_real, url_alias, icono, orden, activo
-)
-VALUES (
-    'gestion_sorteos',
-    'Gestión Sorteos',
+-- Ejemplo: POS de Ferias
+INSERT INTO tools_erp (nombre, titulo, tipo_componente, grupo, descripcion, url_real, activo)
+SELECT
+    'pos_ferias',
+    'POS Ferias',
     'herramienta',
-    'marketing',
-    'Gestión de registros del sorteo Pitaya Love',
-    '/modulos/marketing/gestion_sorteos.php',
-    'gestion-sorteos',
-    'fas fa-gift',
-    10,
+    'Sucursales',
+    'POS de facturación para ferias y eventos externos',
+    '/modulos/sucursales/ferias/index_ferias.php',
     1
-);
+WHERE NOT EXISTS (SELECT 1 FROM tools_erp WHERE nombre = 'pos_ferias');
 ```
+
+### Valores de tipo_componente
+
+| Valor | Uso |
+|---|---|
+| `herramienta` | Página/módulo navegable (default) |
+| `indicador` | KPI o métrica del dashboard |
+| `balance` | Balance financiero/contable |
+| `alerta` | Alerta o notificación en UI |
+| `notificacion_email` | Notificación enviada por correo |
 
 ### Iconos Comunes (Font Awesome)
 
@@ -234,6 +220,7 @@ VALUES (
 
 ## acciones_tools_erp: Todas las acciones que se le pueden asignar a cada herramienta, siempre tiene que existir vista que da permiso de poder ver una herramienta
 
+```sql
 CREATE TABLE `acciones_tools_erp` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `tool_erp_id` int(11) NOT NULL,
@@ -242,12 +229,22 @@ CREATE TABLE `acciones_tools_erp` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `fk_acciones_tools_erp` (`tool_erp_id`),
+  UNIQUE KEY `uq_tool_accion` (`tool_erp_id`,`nombre_accion`),
   CONSTRAINT `fk_acciones_tools_erp` FOREIGN KEY (`tool_erp_id`) REFERENCES `tools_erp` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=521 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+**Nota:** La combinación (`tool_erp_id`, `nombre_accion`) es única — no puede existir la misma acción dos veces para la misma herramienta.
+
+**Acciones estándar:**
+- `vista` — siempre requerida; permite ver/acceder a la herramienta
+- `nuevo` — crear registros
+- `edicion` — editar registros existentes
+- `eliminar` — eliminar registros
 
 ## permisos_tools_erp: Seleccion de cargos de niveles cargos que tienen permiso para cada accion creada de cada herramienta o pagina
 
+```sql
 CREATE TABLE `permisos_tools_erp` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `accion_tool_erp_id` int(11) NOT NULL,
@@ -256,9 +253,31 @@ CREATE TABLE `permisos_tools_erp` (
   `created_at` timestamp NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `fk_accion_tool_erp` (`accion_tool_erp_id`),
   CONSTRAINT `fk_accion_tool_erp` FOREIGN KEY (`accion_tool_erp_id`) REFERENCES `acciones_tools_erp` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1392 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=26103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+**Flujo completo de registro (idempotente):**
+
+```sql
+-- 1. Herramienta
+INSERT INTO tools_erp (nombre, titulo, tipo_componente, grupo, descripcion, url_real, activo)
+SELECT 'mi_tool','Mi Tool','herramienta','Modulo','Descripcion','/modulos/ruta.php',1
+WHERE NOT EXISTS (SELECT 1 FROM tools_erp WHERE nombre = 'mi_tool');
+
+-- 2. Acción vista
+INSERT INTO acciones_tools_erp (tool_erp_id, nombre_accion, descripcion)
+SELECT t.id, 'vista', 'Acceso a Mi Tool'
+FROM tools_erp t WHERE t.nombre = 'mi_tool'
+AND NOT EXISTS (SELECT 1 FROM acciones_tools_erp a WHERE a.tool_erp_id = t.id AND a.nombre_accion = 'vista');
+
+-- 3. Permiso por cargo (repetir por cada cargo)
+INSERT INTO permisos_tools_erp (accion_tool_erp_id, CodNivelesCargos, permiso)
+SELECT a.id, 27, 'allow'
+FROM tools_erp t INNER JOIN acciones_tools_erp a ON t.id = a.tool_erp_id
+WHERE t.nombre = 'mi_tool' AND a.nombre_accion = 'vista'
+AND NOT EXISTS (SELECT 1 FROM permisos_tools_erp p WHERE p.accion_tool_erp_id = a.id AND p.CodNivelesCargos = 27);
+```
 
 ## clientesclub: Lista de clientes registrado en las sucursales con provilegios de club
 

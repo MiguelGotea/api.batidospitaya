@@ -182,7 +182,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Deducciones',
                 'url' => 'supervision/auditorias_original/auditinternas/deducciones_total.php',
-                'cargos_permitidos' => [49, 8, 11, 16, 13, 65]
+                'cargos_permitidos' => [49, 8, 16, 13, 65]
             ],
             [
                 'nombre' => 'Faltantes de Caja',

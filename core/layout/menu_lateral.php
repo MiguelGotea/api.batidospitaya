@@ -434,7 +434,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Sorteos',
                 'url' => 'marketing/gestion_sorteos.php',
-                'cargos_permitidos' => [49, 42]
+                'cargos_permitidos' => [49]
             ],
         ]
     ],

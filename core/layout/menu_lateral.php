@@ -31,8 +31,6 @@ $menuGlobal = [
             [
                 'nombre' => 'Avisos',
                 'url' => 'supervision/auditorias_original/index_avisos.php',
-                // Excel Operaciones: Gerente(11), LiderCIF(33), Entrenadora(62), Auditor(52),
-                // Supervision(21), Lideres(5,43,67), Tiendas(27), JefeExpansion(35), SupMtto(63), TecMtto(56)
                 'cargos_permitidos' => []
             ]
         ]
@@ -75,7 +73,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 67]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 33, 67]
             ],
             [
                 'nombre' => 'Feriados',

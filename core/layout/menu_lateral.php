@@ -130,7 +130,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Cumpleaños Colaboradores',
                 'url' => 'rh/cumpleanos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 42, 41, 11, 21, 33]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 41, 11, 21, 33]
             ],
 
         ]

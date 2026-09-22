@@ -7,7 +7,8 @@ if (!defined('SESSION_DURATION_SECONDS')) {
 }
 
 /**
- * Inicia la sesión de forma segura y consistente con almacenamiento privado
+ * Inicia la sesión de forma segura usando MySQL como almacén de sesiones.
+ * Esto evita que el GC externo de Hostinger destruya los archivos de sesión.
  */
 function iniciarSesionSegura()
 {
@@ -18,35 +19,62 @@ function iniciarSesionSegura()
     // Configurar zona horaria de Nicaragua
     date_default_timezone_set('America/Managua');
 
-    // Directorio privado de sesiones para evitar que el Garbage Collector de Hostinger las borre a los 24 minutos
-    $sessionSavePath = dirname(__DIR__, 2) . '/core/sessions';
+    // -------------------------------------------------------------------------
+    // Handler de sesiones en MySQL
+    // Almacena sesiones en la tabla `php_sessions`, inmune al GC de Hostinger.
+    // -------------------------------------------------------------------------
+    require_once __DIR__ . '/DbSessionHandler.php';
 
-    if (!is_dir($sessionSavePath)) {
-        @mkdir($sessionSavePath, 0777, true);
+    // Conexión PDO independiente para el handler (no depende de $conn global)
+    $dbHost = 'localhost';
+    $dbName = 'u839374897_erp';
+    $dbUser = 'u839374897_erp';
+    $dbPass = 'ERpPitHay2025$';
+
+    try {
+        $pdoSession = new PDO(
+            "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4",
+            $dbUser,
+            $dbPass,
+            [
+                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false,
+                PDO::ATTR_PERSISTENT         => false,
+            ]
+        );
+
+        $handler = new DbSessionHandler($pdoSession, SESSION_DURATION_SECONDS * 2);
+
+        // Crear tabla si aún no existe (operación idempotente)
+        $handler->instalarTabla();
+
+        // Registrar el handler ANTES de session_start()
+        session_set_save_handler($handler, true);
+
+    } catch (PDOException $e) {
+        // Fallback a archivos si la BD no está disponible
+        error_log('[SessionManager] ADVERTENCIA: No se pudo iniciar handler de BD. Usando archivos. ' . $e->getMessage());
+
+        $sessionSavePath = dirname(__DIR__, 2) . '/core/sessions';
+        if (!is_dir($sessionSavePath)) {
+            @mkdir($sessionSavePath, 0777, true);
+        }
+        @chmod($sessionSavePath, 0777);
+        if (is_dir($sessionSavePath) && is_writable($sessionSavePath)) {
+            session_save_path($sessionSavePath);
+        }
     }
-    @chmod($sessionSavePath, 0777);
 
-    if (is_dir($sessionSavePath) && is_writable($sessionSavePath)) {
-        session_save_path($sessionSavePath);
-    } else {
-        // El directorio privado no está disponible; se usará el path por defecto del servidor.
-        // GC ya está deshabilitado (gc_probability=0) así que las sesiones no serán borradas prematuramente.
-        error_log('[SessionManager] ADVERTENCIA: Directorio de sesiones privado no disponible o no escribible: ' . $sessionSavePath);
-    }
-
-    // Configurar tiempo de vida de la sesión en el servidor y cookie
-    // Se usa SESSION_DURATION_SECONDS * 2 como margen para que el GC del servidor
-    // no destruya el archivo de sesión antes de que nuestra lógica de inactividad lo haga.
+    // Configurar tiempo de vida de sesión y cookie
     ini_set('session.gc_maxlifetime',  SESSION_DURATION_SECONDS * 2);
     ini_set('session.cookie_lifetime', SESSION_DURATION_SECONDS);
 
-    // Deshabilitar el Garbage Collector automático de PHP para esta petición.
-    // Esto impide que Hostinger (u otro entorno) destruya sesiones activas
-    // mientras el usuario está trabajando, sin importar qué path se use.
+    // Deshabilitar GC automático de PHP (el DbSessionHandler tiene su propio GC)
     ini_set('session.gc_probability', 0);
     ini_set('session.gc_divisor',     1);
 
-    $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+    $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
         || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)
         || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
         || (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && strtolower($_SERVER['HTTP_X_FORWARDED_SSL']) === 'on');
@@ -75,7 +103,7 @@ function iniciarSesionSegura()
 
 /**
  * Verifica si la sesión actual ha expirado según las reglas de negocio:
- * 1. Más de 8 horas de duración continua.
+ * 1. Inactividad de más de 8 horas (ventana deslizante por last_activity).
  * 2. Cambio de día (medianoche 12:00 AM en hora de Nicaragua).
  * 
  * @return bool true si la sesión es válida o no hay usuario autenticado; false si expiró

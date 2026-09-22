@@ -515,24 +515,24 @@ $menuGlobal = [
             [
                 'nombre' => 'Conteo Ciclico',
                 'url' => 'inventario/historial_conteo_existencias.php',
-                'cargos_permitidos' => [16, 49, 55, 52, 5, 43, 21, 42, 33, 67, 11, 62]
+                'cargos_permitidos' => [16, 49, 55, 52, 5, 43, 21, 33, 67, 11, 62]
             ],
             [
                 'nombre' => 'Kardex de Insumos',
                 'url' => 'inventario/kardex_insumo.php',
-                'cargos_permitidos' => [49, 16, 55, 11, 21, 42, 52]
+                'cargos_permitidos' => [49, 16, 55, 11, 21, 52]
             ],
 
 
             [
                 'nombre' => 'Costo para Deducciones',
                 'url' => 'contabilidad/costo_descuento_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 42, 11]
+                'cargos_permitidos' => [49, 8, 16, 11]
             ],
             [
                 'nombre' => 'Costo de Existencias',
                 'url' => 'contabilidad/costo_existencias_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 42]
+                'cargos_permitidos' => [49, 8, 16]
             ],
             [
                 'nombre' => 'Tolerancia Conteo Cíclico',

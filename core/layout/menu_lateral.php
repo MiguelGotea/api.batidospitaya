@@ -396,7 +396,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Consolidado Pedido Perecibles',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 33, 61, 19]
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 16, 33, 61, 19]
             ],
 
         ]

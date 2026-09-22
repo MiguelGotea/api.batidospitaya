@@ -209,6 +209,11 @@ $menuGlobal = [
                 'url' => 'productos/balance_inventario_access_host.php',
                 'cargos_permitidos' => [49, 12, 55, 16, 42]
             ],
+            [
+                'nombre' => 'Proyeccion de Abastecimiento',
+                'url' => 'productos/pronostico_abastecimiento.php',
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9, 62]
+            ],
         ]
     ],
 
@@ -395,11 +400,7 @@ $menuGlobal = [
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
                 'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 33, 61, 19]
             ],
-            [
-                'nombre' => 'Proyeccion de Abastecimiento',
-                'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9, 62]
-            ],
+
         ]
     ],
     [

@@ -17,7 +17,7 @@ $menuGlobal = [
         'items' => [] // Vacía el array de items
     ],
     [
-        'nombre' => 'Marcacion de Colaboradores',
+        'nombre' => 'Marcacion',
         'icon' => 'fas fa-fingerprint',
         'cargos_permitidos' => [27],
         'url' => 'sucursales/marcacion.php',
@@ -41,14 +41,19 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Gestion de Asistencia',
-                'url' => 'rh/ver_marcaciones_todas_nuevo.php',
-                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52, 65, 8, 19, 41, 64, 30, 13, 39, 28, 11, 15, 61, 35, 62, 67, 12]
+                'nombre' => 'Boleta de Pago',
+                'url' => 'contabilidad/boleta_pago.php',
+                'cargos_permitidos' => [8]
             ],
             [
-                'nombre' => 'Boletas de Pago',
-                'url' => 'contabilidad/boleta_pago.php',
-                'cargos_permitidos' => [49, 8]
+                'nombre' => 'Historial Marcaciones',
+                'url' => 'sucursales/historial_marcaciones_sucursales.php',
+                'cargos_permitidos' => [49, 27, 16]
+            ],
+            [
+                'nombre' => 'Gestion de Asistencia',
+                'url' => 'rh/ver_marcaciones_todas_nuevo.php',
+                'cargos_permitidos' => [49, 16, 5, 43, 42, 33, 21, 52, 65, 8, 19, 41, 64, 30, 13, 39, 28, 11, 15, 63, 61]
             ],
             [
                 'nombre' => 'Tardanzas',
@@ -68,7 +73,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Viaticos',
                 'url' => 'operaciones/viaticos.php',
-                'cargos_permitidos' => [49, 16, 8, 11, 21]
+                'cargos_permitidos' => [49, 16, 8, 52]
             ],
             [
                 'nombre' => 'Configuración Viáticos',
@@ -78,17 +83,12 @@ $menuGlobal = [
             [
                 'nombre' => 'Horas Extras',
                 'url' => 'operaciones/horas_extras_manual.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 33, 67]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 5, 43, 21, 42, 33, 52]
             ],
             [
                 'nombre' => 'Feriados',
                 'url' => 'operaciones/feriados.php',
-                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 33]
-            ],
-            [
-                'nombre' => 'Generar Horarios',
-                'url' => 'lideres/programar_horarios_lider2.php',
-                'cargos_permitidos' => [49, 5, 43, 67]
+                'cargos_permitidos' => [49, 11, 16, 8, 13, 21, 42, 33, 52]
             ],
             [
                 'nombre' => 'Confirmar Horarios',
@@ -96,14 +96,19 @@ $menuGlobal = [
                 'cargos_permitidos' => [16, 21, 36, 11, 33]
             ],
             [
+                'nombre' => 'Generar Horarios',
+                'url' => 'lideres/programar_horarios_lider2.php',
+                'cargos_permitidos' => [49, 5, 43]
+            ],
+            [
                 'nombre' => 'Horarios Programados',
                 'url' => 'supervision/ver_horarios_compactos.php',
-                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 33, 52, 62, 65, 41, 35, 63, 67] // MV: quitado 53 (Coordinador no tiene vista en Excel)
+                'cargos_permitidos' => [49, 16, 11, 5, 43, 21, 42, 36, 13, 28, 30, 37, 39, 27, 8, 54, 53, 33, 52, 62, 65, 41, 65]
             ],
             [
                 'nombre' => 'Panel Equipos de Tiendas',
                 'url' => 'operaciones/gestion_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 36, 11, 39, 33, 28, 21, 30, 41, 65, 52, 62]
+                'cargos_permitidos' => [49, 16, 36, 11, 39, 42, 33, 28, 21, 30, 41, 65]
             ],
             [
                 'nombre' => 'Gestion de Feriados',
@@ -123,19 +128,19 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Maestro Colaboradores',
+                'nombre' => 'Colaboradores',
                 'url' => 'rh/colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 11]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
             ],
             [
                 'nombre' => 'Agenda Colaboradores',
                 'url' => 'rh/contactos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 42] // MV: agregado 42 (Gerente tiene vista en Excel)
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65]
             ],
             [
                 'nombre' => 'Cumpleaños Colaboradores',
                 'url' => 'rh/cumpleanos_colaboradores.php',
-                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 41, 11, 21, 33]
+                'cargos_permitidos' => [49, 16, 13, 28, 30, 37, 39, 54, 65, 42, 41]
             ],
 
         ]
@@ -170,22 +175,22 @@ $menuGlobal = [
             [
                 'nombre' => 'Anulacion de Pedidos',
                 'url' => 'sistemas/gestion_anulaciones.php',
-                'cargos_permitidos' => [49, 11, 21, 33, 16]
+                'cargos_permitidos' => [49, 11, 21, 33, 42, 16]
             ],
             [
-                'nombre' => 'Auditorias de Efectivo',
+                'nombre' => 'Auditorías de Efectivo',
                 'url' => 'supervision/auditorias_original/auditinternas/auditorias_consolidadas.php',
-                'cargos_permitidos' => [49, 11, 21, 16, 33, 52, 5, 27, 43, 62, 67]
+                'cargos_permitidos' => [49, 11, 21, 16, 42, 33, 52]
             ],
             [
-                'nombre' => 'Auditorias de Desempeño',
+                'nombre' => 'Auditorías de Desempeño',
                 'url' => 'supervision/auditorias_original/index_auditoria_desempeno.php',
-                'cargos_permitidos' => [13, 16, 52, 11, 21, 49, 27, 5, 33, 43, 62, 67]
+                'cargos_permitidos' => [13, 16, 42, 52, 11, 21, 49, 27]
             ],
             [
                 'nombre' => 'Deducciones',
                 'url' => 'supervision/auditorias_original/auditinternas/deducciones_total.php',
-                'cargos_permitidos' => [49, 8, 16, 13, 65]
+                'cargos_permitidos' => [49, 8, 11, 16, 13, 65]
             ],
             [
                 'nombre' => 'Faltantes de Caja',
@@ -195,27 +200,22 @@ $menuGlobal = [
             [
                 'nombre' => 'Cierres Diarios',
                 'url' => 'contabilidad/historial_cierres_diarios.php',
-                'cargos_permitidos' => [52, 49, 8, 33, 21, 11, 62]
+                'cargos_permitidos' => [52, 49, 42, 8, 33, 21]
             ],
             [
-                'nombre' => 'Depositos de Tiendas',
+                'nombre' => 'Depósitos',
                 'url' => 'contabilidad/masivo_depositos.php',
-                'cargos_permitidos' => [33, 8, 52, 21, 49, 5, 43, 11, 62, 67]
+                'cargos_permitidos' => [33, 8, 42, 52, 21, 49, 5, 43]
             ],
             [
                 'nombre' => 'Mermas',
                 'url' => 'inventario/mermas_productos.php',
-                'cargos_permitidos' => [33, 8, 52, 21, 49, 5, 11, 27, 43, 62, 67]
+                'cargos_permitidos' => [33, 8, 42, 52, 21, 49]
             ],
             [
                 'nombre' => 'Balance Inventario',
                 'url' => 'productos/balance_inventario_access_host.php',
-                'cargos_permitidos' => [49, 12, 55, 16]
-            ],
-            [
-                'nombre' => 'Proyeccion de Abastecimiento',
-                'url' => 'productos/pronostico_abastecimiento.php',
-                'cargos_permitidos' => [11, 12, 16, 49, 21, 33, 52, 19, 61, 9, 62]
+                'cargos_permitidos' => [49, 12, 55, 16, 42, 52, 11, 21]
             ],
         ]
     ],
@@ -226,19 +226,19 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Reclamo de Clientes',
+                'nombre' => 'Reclamos de Clientes',
                 'url' => 'supervision/auditorias_original/index_reclamos.php',
-                'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21, 5, 43, 62, 67, 53] // MV: agregado 53 (Coordinador tiene vista en Excel)
+                'cargos_permitidos' => [49, 16, 11, 42, 50, 52, 33, 21]
             ],
             [
                 'nombre' => 'KPI Reseñas Google',
                 'url' => 'atencioncliente/resenas_google.php',
-                'cargos_permitidos' => [49, 16, 50, 11, 42, 53]
+                'cargos_permitidos' => [49, 16, 21, 50, 11, 42, 33, 52, 13, 53]
             ],
             [
                 'nombre' => 'Historial Reseñas Google',
                 'url' => 'marketing/resenas_google_descargado.php',
-                'cargos_permitidos' => [49, 16, 50, 42, 53, 21, 11]
+                'cargos_permitidos' => [49, 16, 28, 50, 42, 53, 52, 33, 21]
             ],
         ]
     ],
@@ -248,19 +248,19 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Cumpleaños Clientes',
+                'nombre' => 'Cumpleaños',
                 'url' => 'atencioncliente/cumpleanos_clientes.php',
-                'cargos_permitidos' => [49, 22, 28, 50, 42, 53] // MV: agregados 42 (Gerente) y 53 (Coordinador) tienen vista en Excel
+                'cargos_permitidos' => [49, 22, 28, 50]
             ],
             [
                 'nombre' => 'Clientes Club',
                 'url' => 'atencioncliente/historial_clientes.php',
-                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50, 33, 21, 11]
+                'cargos_permitidos' => [49, 16, 22, 28, 27, 42, 26, 53, 50, 33, 21]
             ],
             [
-                'nombre' => 'Campañas Whatsapp',
+                'nombre' => 'Campañas WSP',
                 'url' => 'marketing/campanas_wsp.php',
-                'cargos_permitidos' => [49, 42, 53, 50] // MV: agregado 50 (Especialista tiene vista en Excel)
+                'cargos_permitidos' => [49, 42, 53]
             ]
         ]
     ],
@@ -292,19 +292,19 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Solicitudes de Mantenimiento',
+                'nombre' => 'Solicitudes',
                 'url' => 'mantenimiento/historial_solicitudes.php',
-                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 21, 33, 52, 61, 19, 15, 27, 62, 67]
+                'cargos_permitidos' => [49, 11, 16, 5, 43, 35, 14, 56, 63, 12, 26, 42, 53, 21, 33, 52, 61, 19, 15]
             ],
             [
                 'nombre' => 'Informe Diario',
                 'url' => 'mantenimiento/historial_informes.php',
-                'cargos_permitidos' => [49, 16]
+                'cargos_permitidos' => [49, 14, 56, 16, 35, 63]
             ],
             [
                 'nombre' => 'Calendario',
                 'url' => 'mantenimiento/programacion_solicitudes.php',
-                'cargos_permitidos' => [49, 16]
+                'cargos_permitidos' => [49, 21, 16, 35, 33, 52, 63]
             ]
         ]
 
@@ -354,7 +354,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Catálogo de Herramientas',
                 'url' => 'sistemas/catalogo_herramientas.php',
-                'cargos_permitidos' => [49, 15, 16, 11, 42] // MV: agregado 42 (Gerente tiene vista en Excel)
+                'cargos_permitidos' => [49, 15, 16]
             ],
             [
                 'nombre' => 'Configuración de Tiendas',
@@ -381,7 +381,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Despachos ERP',
                 'url' => 'despacho/historial_despachos.php',
-                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43, 62, 11, 67]
+                'cargos_permitidos' => [49, 12, 16, 19, 61, 21, 52, 33, 27, 5, 43, 42, 62, 33]
             ],
             [
                 'nombre' => 'Plan Despacho Perecibles',
@@ -394,16 +394,20 @@ $menuGlobal = [
                 'cargos_permitidos' => [49, 16, 19, 55]
             ],
             [
-                'nombre' => 'Pedido Perecibles Central',
+                'nombre' => 'Pedido Central',
                 'url' => 'sucursales/compra_local_registro_pedidos.php',
-                'cargos_permitidos' => [49, 27, 5, 43, 67]
+                'cargos_permitidos' => [49, 27]
             ],
             [
-                'nombre' => 'Consolidado Pedido Perecibles',
+                'nombre' => 'Compras Locales Consolidado',
                 'url' => 'cds/compra_local_consolidado_pedidos.php',
-                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 16, 33, 61, 19]
+                'cargos_permitidos' => [49, 12, 9, 17, 55, 11, 21, 42, 16, 21, 33, 52, 61, 19]
             ],
-
+            [
+                'nombre' => 'Proyeccion',
+                'url' => 'productos/pronostico_abastecimiento.php',
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 21, 33, 52, 19, 61, 9]
+            ],
         ]
     ],
     [
@@ -412,19 +416,19 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Facturacion de Ferias',
-                'url' => 'sucursales/ferias/index_ferias.php',
-                'cargos_permitidos' => [49, 27, 26, 11]
+                'nombre' => 'Gestión de Ferias',
+                'url' => 'sucursales/ferias/index.php',
+                'cargos_permitidos' => [49, 27, 26]
             ],
             [
                 'nombre' => 'Cupones',
                 'url' => 'marketing/cupones.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 11, 50, 53] // MV: agregados 50 (Especialista) y 53 (Coordinador) tienen vista en Excel
+                'cargos_permitidos' => [49, 16, 42, 26]
             ],
             [
-                'nombre' => 'Historial de Ventas',
+                'nombre' => 'Historial Ventas',
                 'url' => 'ventas/historial_ventas.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 53, 8, 21, 11, 33, 52, 62, 50] // MV: agregado 50 (Especialista tiene vista en Excel)
+                'cargos_permitidos' => [49, 16, 42, 26, 42, 53, 8, 21]
             ],
             [
                 'nombre' => 'Graficos con IA',
@@ -439,7 +443,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Sorteos',
                 'url' => 'marketing/gestion_sorteos.php',
-                'cargos_permitidos' => [49]
+                'cargos_permitidos' => [49, 42]
             ],
         ]
     ],
@@ -449,9 +453,14 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
+                'nombre' => 'Impulso de Ventas',
+                'url' => 'sucursales/kpi_sucursales.php',
+                'cargos_permitidos' => [49, 16]
+            ],
+            [
                 'nombre' => 'Desempeño de Tienda',
                 'url' => 'supervision/auditorias_original/desempeno_sucursales_v2.php',
-                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 49, 16, 67] // MV: quitado 53 (Coordinador no tiene vista en Excel)
+                'cargos_permitidos' => [11, 21, 42, 33, 27, 5, 43, 52, 62, 53, 49, 16]
             ],
             [
                 'nombre' => 'Liderazgo',
@@ -459,9 +468,9 @@ $menuGlobal = [
                 'cargos_permitidos' => [49] // Removidos: 11, 13, 42, 33, 50 (según solicitud de "quitar del menú")
             ],
             [
-                'nombre' => 'Reporte de Ventas',
+                'nombre' => 'Ventas',
                 'url' => 'gerencia/kpi_reportes_ventas.php',
-                'cargos_permitidos' => [49, 11, 26, 42, 16, 55, 21, 33] // MV: quitados 50 y 53 (Especialista y Coordinador no tienen vista en Excel)
+                'cargos_permitidos' => [49, 11, 26, 42, 16, 50, 53, 55, 21, 33, 16]
             ],
             [
                 'nombre' => 'Edición de Indicadores',
@@ -476,7 +485,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Analisis RFM',
                 'url' => 'marketing/dashboard_rfm.php',
-                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 26, 21] // MV: quitados 53 y 50 (Coordinador y Especialista no tienen vista en Excel)
+                'cargos_permitidos' => [11, 19, 13, 16, 42, 49, 33, 53, 50, 26]
             ],
         ]
     ],
@@ -485,6 +494,11 @@ $menuGlobal = [
         'icon' => 'fas fa-boxes',
         'cargos_permitidos' => [],
         'items' => [
+            [
+                'nombre' => 'Dashboard Consumo',
+                'url' => 'productos/dashboard_consumo.php',
+                'cargos_permitidos' => [49, 55, 19, 52, 62, 12, 16, 42, 11, 21, 33]
+            ],
             [
                 'nombre' => 'Unidades',
                 'url' => 'productos/historial_unidades_conversion.php',
@@ -518,31 +532,31 @@ $menuGlobal = [
         'cargos_permitidos' => [],
         'items' => [
             [
-                'nombre' => 'Conteo Ciclico',
+                'nombre' => 'Conteo Cíclico',
                 'url' => 'inventario/historial_conteo_existencias.php',
-                'cargos_permitidos' => [16, 49, 55, 52, 5, 43, 21, 33, 67, 11, 62]
+                'cargos_permitidos' => [16, 49, 55, 52, 5, 43, 21, 16, 42, 33, 47, 46, 45, 66, 67]
             ],
             [
                 'nombre' => 'Kardex de Insumos',
                 'url' => 'inventario/kardex_insumo.php',
-                'cargos_permitidos' => [49, 16, 55, 11, 21, 52]
+                'cargos_permitidos' => [49, 16, 55, 11, 21, 42, 33, 52]
             ],
 
 
             [
                 'nombre' => 'Costo para Deducciones',
                 'url' => 'contabilidad/costo_descuento_productos.php',
-                'cargos_permitidos' => [49, 8, 16, 11]
+                'cargos_permitidos' => [49, 8, 16, 42, 33]
             ],
             [
                 'nombre' => 'Costo de Existencias',
                 'url' => 'contabilidad/costo_existencias_productos.php',
-                'cargos_permitidos' => [49, 8, 16]
+                'cargos_permitidos' => [49, 8, 16, 42, 33]
             ],
             [
                 'nombre' => 'Tolerancia Conteo Cíclico',
                 'url' => 'inventario/porcentaje_tolerancia_conteo_ciclico.php',
-                'cargos_permitidos' => [49, 11]
+                'cargos_permitidos' => [49]
             ],
         ]
     ],
@@ -554,7 +568,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Recetas Vigentes',
                 'url' => 'productos/visor_recetas_light.php',
-                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52, 19, 62, 50, 53] // MV: agregados 50 (Especialista) y 53 (Coordinador) tienen vista en Excel
+                'cargos_permitidos' => [11, 12, 16, 42, 49, 55, 21, 33, 52, 19]
             ],
 
         ]
@@ -567,27 +581,27 @@ $menuGlobal = [
             [
                 'nombre' => 'Sobre Nosotros',
                 'url' => 'talento_contenido/nosotros.php',
-                'cargos_permitidos' => [16, 49, 15]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Colaboradores Portal',
                 'url' => 'talento_contenido/colaboradores.php',
-                'cargos_permitidos' => [16, 49, 15]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Noticias Portal',
                 'url' => 'talento_contenido/noticias.php',
-                'cargos_permitidos' => [16, 49, 15]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Habilidades Portal',
                 'url' => 'talento_contenido/habilidades.php',
-                'cargos_permitidos' => [16, 49, 15]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
             [
                 'nombre' => 'Configuración Portal',
                 'url' => 'talento_contenido/configuracion.php',
-                'cargos_permitidos' => [16, 49, 15]
+                'cargos_permitidos' => [16, 49, 42, 50, 15]
             ],
         ]
     ],

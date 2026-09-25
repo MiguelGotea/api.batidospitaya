@@ -1,9 +1,6 @@
 Attribute VB_Name = "ModuloClientesClub"
 Option Explicit
 
-' ========== CONFIGURACIÓN ==========
-Const API_BASE_URL = "https://api.batidospitaya.com/api/"
-Const API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
 
 ' ========== FUNCIÓN: VERIFICAR CÉDULA CLUB ==========
 ' Retorna: "sin_registro" si no tiene cédula o el número de cédula si existe
@@ -14,6 +11,8 @@ Public Function verificarcedulaclub(codigoclub As Variant) As String
     Dim url As String
     Dim response As String
     Dim json As Object
+    Const API_BASE_URL = "https://api.batidospitaya.com/api/"
+    Const API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
     
     ' Validar entrada
     If IsNull(codigoclub) Or codigoclub = "" Then
@@ -70,7 +69,9 @@ Public Function guardarnumerocedulahost(membresia As Variant, cedula As Variant)
     Dim url As String
     Dim postData As String
     Dim response As String
-    
+    Const API_BASE_URL = "https://api.batidospitaya.com/api/"
+    Const API_TOKEN = "a8f5e2d9c4b7a1e6f3d8c5b2a9e6d3f0c7a4b1e8d5c2a9f6e3d0c7b4a1e8f5d2"
+       
     ' Validar entrada
     If IsNull(membresia) Or IsNull(cedula) Then
         guardarnumerocedulahost = "Error: Datos nulos"

@@ -37,7 +37,7 @@ HOST HOSTINGER (producción)
 
 > El admin es la única persona con acceso al host, a las credenciales de producción y con permisos para aprobar cambios al sistema.
 
-### Configurar el servidor local (una sola vez)
+### Configurar el servidor local (una sola vez) PC de camaras
 
 **Requisito:** Una PC fija en la red con XAMPP instalado.
 
@@ -54,7 +54,7 @@ CREATE DATABASE erp_local CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 **3. Importar los datos de producción**
 - Exportar desde Hostinger phpMyAdmin → base `u839374897_erp` → formato SQL
-- En el phpMyAdmin del servidor local: seleccionar `erp_local` → Importar → subir el `.sql`
+- En el phpMyAdmin del servidor local: seleccionar `erp_local` → Importar → subir el `.sql` (posterior a modificar el archivo .sql)
 
 > El archivo `.sql` se comparte fuera del repositorio (Drive, correo). Nunca se sube a Git.
 

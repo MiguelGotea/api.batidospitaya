@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // /core/auth/session_manager.php
 // Gestor centralizado de sesiones del ERP con inactividad de 8 horas y corte a Medianoche (12:00 AM UTC-6)
 
@@ -26,10 +26,12 @@ function iniciarSesionSegura()
     require_once __DIR__ . '/DbSessionHandler.php';
 
     // Conexión PDO independiente para el handler (no depende de $conn global)
-    $dbHost = 'localhost';
-    $dbName = 'u839374897_erp';
-    $dbUser = 'u839374897_erp';
-    $dbPass = 'ERpPitHay2025$';
+    // Las constantes DB_* son cargadas por core/database/env.php
+    // a través de core/database/conexion.php (incluido antes que este archivo)
+    $dbHost = defined('DB_HOST') ? DB_HOST : 'localhost';
+    $dbName = defined('DB_NAME') ? DB_NAME : '';
+    $dbUser = defined('DB_USER') ? DB_USER : '';
+    $dbPass = defined('DB_PASS') ? DB_PASS : '';
 
     try {
         $pdoSession = new PDO(

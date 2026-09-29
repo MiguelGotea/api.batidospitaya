@@ -45,7 +45,11 @@ jobs:
         run: |
           REPRO_ID="api.batidospitaya"
           # Sincronización por Checksum para ignorar fechas
-          rsync -rvhc --delete ./core/   _pitayacore/core/
+          # Los env.php NUNCA se propagan al core maestro (credenciales por entorno)
+          rsync -rvhc --delete \
+            --exclude='core/database/env.php' \
+            --exclude='core/database/env.production.php' \
+            ./core/   _pitayacore/core/
           rsync -rvhc --delete ./docs/   _pitayacore/docs/
           rsync -rvhc --delete .agent/   _pitayacore/.agent/
           

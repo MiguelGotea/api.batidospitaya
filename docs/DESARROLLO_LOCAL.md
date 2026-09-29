@@ -58,6 +58,8 @@ CREATE DATABASE erp_local CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 > El archivo `.sql` se comparte fuera del repositorio (Drive, correo). Nunca se sube a Git.
 
+> ⚠️ **Los dumps de Hostinger pueden pesar 300–400 MB** y además usan un collation (`utf8mb4_uca1400_ai_ci`) que no existe en MariaDB 10.4 (el que trae XAMPP). Antes de importar, sigue el proceso de preparación del SQL que se detalla en la sección [Preparación del dump de Hostinger para importar en XAMPP](#-preparación-del-dump-de-hostinger-para-importar-en-xampp) más abajo.
+
 **4. Crear el usuario restringido para developers**
 ```sql
 CREATE USER 'erp_dev'@'%' IDENTIFIED BY 'DevLocal2025!';
@@ -237,6 +239,8 @@ El developer remoto necesita su **propio MySQL local** (XAMPP en su PC) en lugar
    - Click **Nueva** → nombre: `erp_local` → cotejamiento: `utf8mb4_unicode_ci` → **Crear**
 4. Importar el dump:
    - Click en `erp_local` → tab **Importar** → seleccionar el `.sql` que te envió el admin
+
+   > ⚠️ Si el `.sql` pesa más de 50 MB o falla al importar, sigue el proceso completo en la sección [Preparación del dump de Hostinger para importar en XAMPP](#-preparación-del-dump-de-hostinger-para-importar-en-xampp).
 5. Crear el usuario restringido (ejecutar en phpMyAdmin → SQL):
 ```sql
 CREATE USER 'erp_dev'@'localhost' IDENTIFIED BY 'DevLocal2025!';
@@ -328,6 +332,175 @@ Developer                     Admin                      Host (Hostinger)
 ### ❌ La sesión se cierra sola constantemente
 **Causa:** La carpeta de sesiones no tiene permisos de escritura.  
 **Solución:** Verificar que exista `.scripts\php-portable\sessions\` con permisos de escritura.
+
+---
+
+## 📦 Preparación del dump de Hostinger para importar en XAMPP
+
+> **Contexto:** Los exports de Hostinger phpMyAdmin pueden pesar 300–400 MB y usan características de MariaDB 11.3+ que no existen en MariaDB 10.4 (XAMPP). Este proceso se aplica tanto al servidor local de la red como al XAMPP de un developer remoto.
+
+### Paso A — Ampliar límites para archivos grandes
+
+**1. Editar `C:\xampp\php\php.ini`** (en XAMPP: *Config → Apache → PHP (php.ini)*):
+```ini
+upload_max_filesize = 512M
+post_max_size       = 512M
+max_execution_time  = 1800
+max_input_time      = 1800
+memory_limit        = 1024M
+```
+
+**2. Editar `C:\xampp\mysql\bin\my.ini`**, bajo la sección `[mysqld]`:
+```ini
+[mysqld]
+max_allowed_packet      = 256M
+innodb_buffer_pool_size = 512M
+innodb_flush_log_at_trx_commit = 2
+```
+
+**3. Editar `C:\xampp\phpMyAdmin\config.inc.php`**, al final del archivo:
+```php
+$cfg['ExecTimeLimit'] = 0;
+```
+
+**4. Reiniciar Apache y MySQL** desde el XAMPP Control Panel.
+
+---
+
+### Paso B — Corregir el collation incompatible (`uca1400`)
+
+**Problema:** El dump usa `utf8mb4_uca1400_ai_ci`, que solo existe en MariaDB 11.3+. XAMPP trae MariaDB 10.4 y lo rechaza.
+
+**Solución:** Reemplazar el collation en el archivo antes de importar. El siguiente script lee y escribe línea por línea para no cargar los 300+ MB en memoria:
+
+```powershell
+# PowerShell — reemplaza collation uca1400 → unicode_ci
+$src = "C:\Users\migue\Downloads\u839374897_erp.sql"
+$dst = "C:\Users\migue\Downloads\u839374897_erp_local.sql"
+$enc = New-Object System.Text.UTF8Encoding($false)
+$reader = New-Object System.IO.StreamReader($src, $enc)
+$writer = New-Object System.IO.StreamWriter($dst, $false, $enc)
+$writer.NewLine = "`n"
+while (($line = $reader.ReadLine()) -ne $null) {
+    if ($line.Contains('uca1400')) {
+        $line = $line -replace 'utf8mb4_uca1400_\w+', 'utf8mb4_unicode_ci' `
+                      -replace 'utf8mb3_uca1400_\w+', 'utf8mb3_unicode_ci'
+    }
+    $writer.WriteLine($line)
+}
+$reader.Close(); $writer.Close()
+```
+
+> Ajusta las rutas `$src` y `$dst` según donde hayas guardado el dump.
+
+---
+
+### Paso C — Eliminar DEFINER y referencias GTID
+
+**Problema:** El dump incluye `DEFINER=usuario@host` y variables `SQL_LOG_BIN`/`GTID_PURGED` propias del servidor de Hostinger. En MariaDB 10.4 local producen errores de permisos.
+
+```powershell
+# PowerShell — elimina DEFINER y referencias GTID
+$src = "C:\Users\migue\Downloads\u839374897_erp_local.sql"
+$dst = "C:\Users\migue\Downloads\u839374897_erp_clean.sql"
+$enc = New-Object System.Text.UTF8Encoding($false)
+$reader = New-Object System.IO.StreamReader($src, $enc)
+$writer = New-Object System.IO.StreamWriter($dst, $false, $enc)
+$writer.NewLine = "`n"
+while (($line = $reader.ReadLine()) -ne $null) {
+    if ($line -match 'SQL_LOG_BIN|GTID_PURGED') { continue }
+    if ($line.Contains('DEFINER')) {
+        $line = $line -replace '/\*!\d+\s+DEFINER=`[^`]+`@`[^`]+`\s*\*/', '' `
+                      -replace 'DEFINER=`[^`]+`@`[^`]+`\s*', ''
+    }
+    $writer.WriteLine($line)
+}
+$reader.Close(); $writer.Close()
+```
+
+---
+
+### Paso D — Corregir sintaxis de VISTAs
+
+**Problema:** Algunas VISTAs en el dump tienen `UNION ALL SELECT` sin espacio entre palabras, lo que falla en el parser local.
+
+```powershell
+# PowerShell — corrige espaciado en UNION ALL en todo el archivo
+$src = "C:\Users\migue\Downloads\u839374897_erp_clean.sql"
+$dst = "C:\Users\migue\Downloads\vistas_fix.sql"
+$enc = New-Object System.Text.UTF8Encoding($false)
+$writer = New-Object System.IO.StreamWriter($dst, $false, $enc)
+$writer.NewLine = "`n"
+foreach ($l in [System.IO.File]::ReadLines($src)) {
+    $l = $l -replace '(?i)(\S)(union\s+all)(select)', '$1 $2 $3'
+    $l = $l -replace '(?i)(\S)(union\s+all)\s',       '$1 $2 '
+    $l = $l -replace '(?i)\s(union\s+all)(select)',   ' $1 $2'
+    $writer.WriteLine($l)
+}
+$writer.Close()
+```
+
+> **Nota:** El archivo de salida `vistas_fix.sql` es una copia completa del archivo de entrada con las correcciones aplicadas. No omite ninguna línea.
+
+---
+
+### Paso E — Verificar que el archivo final está limpio
+
+Antes de importar, confirma que no quedaron referencias problemáticas:
+
+```powershell
+# Ninguno de estos debe devolver resultados
+Select-String -Path "C:\Users\migue\Downloads\vistas_fix.sql" -Pattern "uca1400"    -List
+Select-String -Path "C:\Users\migue\Downloads\vistas_fix.sql" -Pattern "DEFINER="   -List
+Select-String -Path "C:\Users\migue\Downloads\vistas_fix.sql" -Pattern "CREATE DATABASE|^USE " -List
+```
+
+Si no imprime nada, el archivo está listo para importar.
+
+
+### Resumen del flujo de preparación
+
+```
+Hostinger export
+  └─ u839374897_erp.sql  (puede pesar 400–900+ MB, collation uca1400)
+        │
+        ▼  Paso B: reemplazar collation
+  u839374897_erp_local.sql
+        │
+        ▼  Paso C: eliminar DEFINER/GTID
+  u839374897_erp_clean.sql
+        │
+        ▼  Paso D: corregir VISTAs
+  vistas_fix.sql  ← IMPORTAR ESTE (ver método recomendado abajo)
+```
+
+> ⚠️ Los scripts PowerShell de conversión (Pasos B–D) **no tienen problemas con archivos grandes**: usan lectura línea por línea (`StreamReader` / `ReadLines`), por lo que el consumo de memoria es constante (~pocos MB) sin importar si el dump pesa 400 MB o 1 GB.
+
+---
+
+### 📥 Cómo importar el archivo final
+
+**phpMyAdmin tiene un límite real:** aunque se configuren `upload_max_filesize = 512M` en `php.ini`, PHP necesita recibir el upload completo en memoria antes de procesarlo. Con archivos de 900 MB o más, esto falla de forma poco predecible (timeout del navegador, falta de RAM, corte mid-import).
+
+#### ✅ Método recomendado: `mysql.exe` desde línea de comandos
+
+```powershell
+# Importar directamente — sin límites de tamaño ni de tiempo
+& "C:\xampp\mysql\bin\mysql.exe" -u root -p erp_local < "C:\Users\migue\Downloads\vistas_fix.sql"
+```
+
+- **Sin límites de memoria ni de tiempo:** stream directo al motor MySQL
+- **Funciona para cualquier tamaño:** 400 MB, 900 MB, 2 GB — igual
+- **Más rápido** que phpMyAdmin para archivos grandes
+- Si MySQL pide contraseña y el root local no tiene, omite `-p`
+
+#### 🔶 Método alternativo: phpMyAdmin (solo para archivos < 200 MB)
+
+Solo útil si el dump es pequeño. Con los cambios del Paso A aplicados:
+- `erp_local` → tab **Importar** → seleccionar `vistas_fix.sql`
+
+> Una vez que el dump supere 200–300 MB, usa siempre `mysql.exe`.
+
 
 ---
 

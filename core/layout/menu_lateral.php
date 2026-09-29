@@ -624,9 +624,9 @@ $menuGlobal = [
  */
 function detectarRutaBase()
 {
-    // Obtener la ruta del script actual
-    $scriptActual = $_SERVER['SCRIPT_FILENAME'];
-    $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+    // Obtener la ruta del script actual normalizando separadores para compatibilidad Windows/Linux
+    $scriptActual = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME'] ?? '');
+    $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
 
     // Convertir a ruta relativa desde el document root
     $rutaRelativa = str_replace($documentRoot, '', $scriptActual);
@@ -674,6 +674,11 @@ function generarUrlModulo($rutaDestino)
         return '/logout.php';
     }
 
+    // Si la ruta ya es absoluta o es un protocolo
+    if (strpos($rutaDestino, '/') === 0 || strpos($rutaDestino, 'http://') === 0 || strpos($rutaDestino, 'https://') === 0 || strpos($rutaDestino, '#') === 0) {
+        return $rutaDestino;
+    }
+
     // Para otras rutas, construir la ruta completa
     return $rutaBase . $rutaDestino;
 }
@@ -683,8 +688,8 @@ function generarUrlModulo($rutaDestino)
  */
 function detectarModuloActual()
 {
-    $scriptActual = $_SERVER['SCRIPT_FILENAME'];
-    $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+    $scriptActual = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME'] ?? '');
+    $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
 
     $rutaRelativa = str_replace($documentRoot, '', $scriptActual);
     $posModulos = strpos($rutaRelativa, '/modulos/');

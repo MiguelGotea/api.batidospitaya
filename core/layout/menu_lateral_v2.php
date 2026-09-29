@@ -8,8 +8,8 @@
 
 function detectarRutaBase()
 {
-    $scriptActual = $_SERVER['SCRIPT_FILENAME'];
-    $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+    $scriptActual = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME'] ?? '');
+    $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
 
     $rutaRelativa = str_replace($documentRoot, '', $scriptActual);
     $posModulos = strpos($rutaRelativa, '/modulos/');
@@ -40,13 +40,17 @@ function generarUrlModulo($rutaDestino)
         return '/logout.php';
     }
 
+    if (strpos($rutaDestino, '/') === 0 || strpos($rutaDestino, 'http://') === 0 || strpos($rutaDestino, 'https://') === 0 || strpos($rutaDestino, '#') === 0) {
+        return $rutaDestino;
+    }
+
     return $rutaBase . $rutaDestino;
 }
 
 function detectarModuloActual()
 {
-    $scriptActual = $_SERVER['SCRIPT_FILENAME'];
-    $documentRoot = $_SERVER['DOCUMENT_ROOT'];
+    $scriptActual = str_replace('\\', '/', $_SERVER['SCRIPT_FILENAME'] ?? '');
+    $documentRoot = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'] ?? '');
 
     $rutaRelativa = str_replace($documentRoot, '', $scriptActual);
     $posModulos = strpos($rutaRelativa, '/modulos/');

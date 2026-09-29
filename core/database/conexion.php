@@ -78,7 +78,6 @@ try {
     }
 }
 
-
 // Función para ejecutar consultas seguras
 function ejecutarConsulta($sql, $params = [])
 {

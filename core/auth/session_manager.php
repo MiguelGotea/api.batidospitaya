@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 // /core/auth/session_manager.php
 // Gestor centralizado de sesiones del ERP con inactividad de 8 horas y corte a Medianoche (12:00 AM UTC-6)
 

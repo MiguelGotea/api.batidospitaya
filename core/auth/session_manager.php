@@ -25,28 +25,21 @@ function iniciarSesionSegura()
     // -------------------------------------------------------------------------
     require_once __DIR__ . '/DbSessionHandler.php';
 
-    // Conexión PDO independiente para el handler (no depende de $conn global)
-    // Las constantes DB_* son cargadas por core/database/env.php
-    // a través de core/database/conexion.php (incluido antes que este archivo)
-    $dbHost = defined('DB_HOST') ? DB_HOST : 'localhost';
-    $dbName = defined('DB_NAME') ? DB_NAME : '';
-    $dbUser = defined('DB_USER') ? DB_USER : '';
-    $dbPass = defined('DB_PASS') ? DB_PASS : '';
+    // Reusar $conn global (creado por core/database/conexion.php).
+    // Antes se creaba una conexión PDO independiente ($pdoSession), pero cuando
+    // Ticket.php → database.php → conexion.php se carga primero que auth.php,
+    // el segundo PDO podía fallar silenciosamente por límite de conexiones en Hostinger,
+    // dejando la sesión vacía y causando el bucle de redirección.
+    global $conn;
+
+    // Si $conn aún no está disponible (edge case), cargamos conexion.php primero
+    if (!isset($conn) || !($conn instanceof PDO)) {
+        require_once $_SERVER['DOCUMENT_ROOT'] . '/core/database/conexion.php';
+        global $conn;
+    }
 
     try {
-        $pdoSession = new PDO(
-            "mysql:host={$dbHost};dbname={$dbName};charset=utf8mb4",
-            $dbUser,
-            $dbPass,
-            [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_EMULATE_PREPARES   => false,
-                PDO::ATTR_PERSISTENT         => false,
-            ]
-        );
-
-        $handler = new DbSessionHandler($pdoSession, SESSION_DURATION_SECONDS * 2);
+        $handler = new DbSessionHandler($conn, SESSION_DURATION_SECONDS * 2);
 
         // Crear tabla si aún no existe (operación idempotente)
         $handler->instalarTabla();
@@ -67,6 +60,7 @@ function iniciarSesionSegura()
             session_save_path($sessionSavePath);
         }
     }
+
 
     // Configurar tiempo de vida de sesión y cookie
     ini_set('session.gc_maxlifetime',  SESSION_DURATION_SECONDS * 2);

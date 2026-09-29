@@ -482,24 +482,66 @@ Hostinger export
 
 **phpMyAdmin tiene un límite real:** aunque se configuren `upload_max_filesize = 512M` en `php.ini`, PHP necesita recibir el upload completo en memoria antes de procesarlo. Con archivos de 900 MB o más, esto falla de forma poco predecible (timeout del navegador, falta de RAM, corte mid-import).
 
-#### ✅ Método recomendado: `mysql.exe` desde línea de comandos
+#### ✅ Método 1 (Consola - Más rápido): `mysql.exe` desde línea de comandos
 
 ```powershell
 # Importar directamente — sin límites de tamaño ni de tiempo
 & "C:\xampp\mysql\bin\mysql.exe" -u root -p erp_local < "C:\Users\migue\Downloads\vistas_fix.sql"
 ```
 
-- **Sin límites de memoria ni de tiempo:** stream directo al motor MySQL
-- **Funciona para cualquier tamaño:** 400 MB, 900 MB, 2 GB — igual
-- **Más rápido** que phpMyAdmin para archivos grandes
-- Si MySQL pide contraseña y el root local no tiene, omite `-p`
+- **Sin límites de memoria ni de tiempo:** stream directo al motor MySQL.
+- **Funciona para cualquier tamaño:** 400 MB, 900 MB, 2 GB — igual.
+- Si MySQL pide contraseña y el root local no tiene, omite `-p`.
 
-#### 🔶 Método alternativo: phpMyAdmin (solo para archivos < 200 MB)
+---
+
+#### 🦫 Método 2 (Visual / GUI - Menos restricciones): DBeaver
+
+**¿Por qué DBeaver?** A diferencia de phpMyAdmin, DBeaver se comunica directamente por socket/TCP con el motor de MariaDB/MySQL (puerto 3306), por lo que **no tiene las restricciones de Apache ni de PHP** (`upload_max_filesize`, `memory_limit`, cortes por timeout del navegador HTTP, etc.). Esto permite subir dumps pesados de forma estable y visual.
+
+##### Pasos para importar `vistas_fix.sql` en DBeaver:
+
+1. **Abrir conexión local en DBeaver:**
+   - Crear o abrir la conexión a MySQL / MariaDB Local:
+     - **Host:** `localhost` | **Port:** `3306`
+     - **Database:** (dejar en blanco o `erp_local`)
+     - **Username:** `root` | **Password:** *(vacía por defecto en XAMPP)*
+
+2. **Crear la base de datos `erp_local` (si aún no existe):**
+   - En el explorador de conexiones de DBeaver, expande tu conexión local.
+   - Clic derecho en **Bases de datos (Databases)** → **Crear nueva base de datos (Create New Database)**.
+   - **Nombre de base de datos:** `erp_local`
+   - **Charset:** `utf8mb4`
+   - **Collation:** `utf8mb4_unicode_ci`
+   - Clic en **Aceptar (OK)**.
+
+3. **Ejecutar la importación del archivo limpio:**
+
+   * **Opción A (Recomendada para archivos de más de 200 MB — Herramienta Nativa):**
+     1. Clic derecho sobre la base de datos `erp_local` en el panel izquierdo.
+     2. Selecciona **Herramientas (Tools)** → **Restaurar base de datos (Restore Database)** o **Ejecutar script (Execute script)**.
+     3. **Cliente local (Local Client):** Si DBeaver no tiene configurado el cliente nativo, haz clic en *Browse / Administrar* y apunta a la carpeta bin de MySQL de XAMPP:  
+        `C:\xampp\mysql\bin`
+     4. **Archivo de entrada (Input file):** Selecciona el archivo limpio:  
+        `C:\Users\migue\Downloads\vistas_fix.sql`
+     5. Clic en **Iniciar (Start)**.  
+        DBeaver ejecutará el volcado con una barra de progreso en tiempo real sin consumir memoria excesiva en el visor.
+
+   * **Opción B (Desde el Editor SQL de DBeaver — archivos medianos):**
+     1. En el menú superior de DBeaver: **SQL Editor** → **Abrir archivo de script SQL...** (`Ctrl + O`).
+     2. Selecciona `vistas_fix.sql`.
+     3. Asegúrate de que el selector de esquema/base de datos activa en la barra superior del editor esté apuntando a `erp_local`.
+     4. Presiona el botón **Ejecutar script SQL** (icono de play con hoja de cálculo o atajo `Alt + X`).
+     5. Confirma la ejecución completa.
+
+---
+
+#### 🔶 Método 3 (Alternativo limitado): phpMyAdmin (solo para archivos < 200 MB)
 
 Solo útil si el dump es pequeño. Con los cambios del Paso A aplicados:
 - `erp_local` → tab **Importar** → seleccionar `vistas_fix.sql`
 
-> Una vez que el dump supere 200–300 MB, usa siempre `mysql.exe`.
+> 💡 **Recomendación:** Para dumps de producción completos (superiores a 200–300 MB), utiliza siempre **`mysql.exe` (Método 1)** o **DBeaver (Método 2)**. Evitarás errores de timeout o caídas de phpMyAdmin.
 
 
 ---

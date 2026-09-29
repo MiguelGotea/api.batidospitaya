@@ -46,9 +46,9 @@ foreach ($_required as $_const) {
 }
 
 $servername = DB_HOST;
-$username   = DB_USER;
-$password   = DB_PASS;
-$dbname     = DB_NAME;
+$username = DB_USER;
+$password = DB_PASS;
+$dbname = DB_NAME;
 
 // Verifica si se puede conectar, caso contrario manda error
 try {
@@ -57,9 +57,9 @@ try {
         $username,
         $password,
         [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES   => false,
+            PDO::ATTR_EMULATE_PREPARES => false,
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci"
         ]
     );
@@ -69,7 +69,7 @@ try {
     error_log("Error de conexión: " . $e->getMessage());
 
     $esLocal = defined('APP_ENV') && APP_ENV === 'local';
-    $host    = $_SERVER['HTTP_HOST'] ?? '';
+    $host = $_SERVER['HTTP_HOST'] ?? '';
 
     if ($esLocal || str_contains($host, 'localhost') || str_contains($host, '.local')) {
         die("❌ Error de conexión LOCAL: " . $e->getMessage());
@@ -78,8 +78,10 @@ try {
     }
 }
 
+
 // Función para ejecutar consultas seguras
-function ejecutarConsulta($sql, $params = []) {
+function ejecutarConsulta($sql, $params = [])
+{
     global $conn;
     try {
         $stmt = $conn->prepare($sql);

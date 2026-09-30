@@ -428,7 +428,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Cupones',
                 'url' => 'marketing/cupones.php',
-                'cargos_permitidos' => [49, 16, 42, 26]
+                'cargos_permitidos' => [49, 16, 42, 26, 11]
             ],
             [
                 'nombre' => 'Historial Ventas',

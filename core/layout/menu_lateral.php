@@ -433,7 +433,7 @@ $menuGlobal = [
             [
                 'nombre' => 'Historial Ventas',
                 'url' => 'ventas/historial_ventas.php',
-                'cargos_permitidos' => [49, 16, 42, 26, 42, 53, 8, 21, 55]
+                'cargos_permitidos' => [49, 16, 42, 26, 42, 53, 8, 21, 55, 11]
             ],
             [
                 'nombre' => 'Graficos con IA',

@@ -92,7 +92,7 @@ La clave privada se encuentra configurada en el servidor Hostinger. Para obtener
 **Excluye:** `uploads/` por módulo
 
 **Secrets:**
-- `HOSTINGER_SSH_KEY`: Clave privada compartida
+- `HOSTINGER_SSH_KEY`: Ubicado en la raiz del host /.ssh/batidospitaya-deploy
 - `HOSTINGER_USER`: `u839374897`
 - `HOSTINGER_HOST`: `145.223.105.42`
 - `HOSTINGER_PATH`: `/home/u839374897/domains/erp.batidospitaya.com/public_html`
